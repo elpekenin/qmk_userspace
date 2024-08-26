@@ -1,0 +1,59 @@
+{
+    "repo": "https://github.com/qmk/qmk_firmware",
+    "branch": "xap",
+    "path": "~/workspace/qmk",
+    "default_compilation": false,
+    "operations": [
+        {
+            "operation": "cp",
+            "orig": "keyboards/elpekenin/access/*",
+            "destination": "keyboards/elpekenin/access"
+        },
+        {
+            "operation": "cp",
+            "orig": "users/elpekenin/*",
+            "destination": "users/elpekenin"
+        },
+        {
+            // 3color eink
+            "operation": "pr",
+            "id": 20032
+        },
+        {
+            // #23679-ish
+            "operation": "merge",
+            "repo": "https://github.com/elpekenin/qmk_firmware",
+            "branch": "rgb_pr"
+        },
+        {
+            "operation": "checkout",
+            "files": ["drivers/painter/il91874"],
+            "repo": "https://github.com/elpekenin/qmk_firmware",
+            "branch": "il91874"
+        },
+        {
+            "operation": "diff",
+            "file": "il91874.diff"
+        },
+        {
+            "operation": "diff",
+            "file": "spi_comms.diff"
+        },
+        {
+            "operation": "diff",
+            "file": "generic_rotation.diff"
+        },
+        {
+            "operation": "diff",
+            "file": "print_no_console.diff"
+        },
+        {
+            "operation": "diff",
+            "file": "animation.diff"
+        },
+    ],
+    "compile_command": "./keyboards/elpekenin/access/compile",
+    "wsl": {
+        "destination": "/mnt/d"
+    }
+}

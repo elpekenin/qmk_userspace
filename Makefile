@@ -1,16 +1,11 @@
-.SILENT:
+.PHONY: lint
 
-MAKEFLAGS += --no-print-directory
+USER_SRC = users/elpekenin/src/* keyboards/*
 
-QMK_USERSPACE := $(patsubst %/,%,$(dir $(shell realpath "$(lastword $(MAKEFILE_LIST))")))
-ifeq ($(QMK_USERSPACE),)
-    QMK_USERSPACE := $(shell pwd)
-endif
+LINTERS := clang-tidy flawfinder
+lint:
+	$(foreach LINTER,$(LINTERS),$(shell mkdir -p lint && $(LINTER) $(USER_SRC) > lint/$(LINTER) 2>&1 || exit 0))
 
-QMK_FIRMWARE_ROOT = $(shell qmk config -ro user.qmk_home | cut -d= -f2 | sed -e 's@^None$$@@g')
-ifeq ($(QMK_FIRMWARE_ROOT),)
-    $(error Cannot determine qmk_firmware location. `qmk config -ro user.qmk_home` is not set)
-endif
-
-%:
-	+$(MAKE) -C $(QMK_FIRMWARE_ROOT) $(MAKECMDGOALS) QMK_USERSPACE=$(QMK_USERSPACE)
+# build some arbitrary C (foo.c) and link it with my custom zig library
+native-testing:
+	@cd users/elpekenin && zig build -Dmcu=native && gcc foo.c -lelpekenin -Lzig-out/lib -o foo

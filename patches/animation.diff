@@ -1,0 +1,18 @@
+diff --git a/quantum/painter/qp_draw_image.c b/quantum/painter/qp_draw_image.c
+index 18fa38cb19..aac0954057 100644
+--- a/quantum/painter/qp_draw_image.c
++++ b/quantum/painter/qp_draw_image.c
+@@ -321,12 +321,8 @@ static uint32_t animation_callback(uint32_t trigger_time, void *cb_arg) {
+     animation_state_t *state = (animation_state_t *)cb_arg;
+     uint16_t           delay_ms;
+     bool               ret = qp_render_animation_state(state, &delay_ms);
+-    if (!ret) {
+-        // Setting the device to NULL clears the animation slot
+-        state->device = NULL;
+-    }
+     // If we're successful, keep animating -- returning 0 cancels the deferred execution
+-    return ret ? delay_ms : 0;
++    return ret ? delay_ms : 1;
+ }
+ 
+ deferred_token qp_animate_recolor(painter_device_t device, uint16_t x, uint16_t y, painter_image_handle_t image, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg, uint8_t sat_bg, uint8_t val_bg) {

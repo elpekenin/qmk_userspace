@@ -1,0 +1,81 @@
+diff --git a/drivers/painter/generic/qp_surface_common.c b/drivers/painter/generic/qp_surface_common.c
+index 2da96c73ac..252c28848f 100644
+--- a/drivers/painter/generic/qp_surface_common.c
++++ b/drivers/painter/generic/qp_surface_common.c
+@@ -49,6 +49,37 @@ void qp_surface_update_dirty(surface_dirty_data_t *dirty, uint16_t x, uint16_t y
+     }
+ }
+ 
++void qp_surface_apply_rotation(surface_painter_device_t *surface, uint16_t *x, uint16_t *y) {
++    uint16_t w = surface->base.panel_width;
++    uint16_t h = surface->base.panel_height;
++
++    uint16_t new_x = *x;
++    uint16_t new_y = *y;
++
++    switch (surface->base.rotation) {
++        case QP_ROTATION_0:
++            break;
++
++        case QP_ROTATION_90:
++            new_x = w - 1 - *y;
++            new_y = *x;
++            break;
++
++        case QP_ROTATION_180:
++            new_x = w - 1 - *x;
++            new_y = h - 1 - *y;
++            break;
++
++        case QP_ROTATION_270:
++            new_x = *y;
++            new_y = h - 1 - *x;
++            break;
++    }
++
++    *x = new_x;
++    *y = new_y;
++}
++
+ ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ // Driver vtable
+
+diff --git a/drivers/painter/generic/qp_surface_internal.h b/drivers/painter/generic/qp_surface_internal.h
+index 71f82e924d..38f8f59bd3 100644
+--- a/drivers/painter/generic/qp_surface_internal.h
++++ b/drivers/painter/generic/qp_surface_internal.h
+@@ -89,6 +89,7 @@ bool qp_surface_flush(painter_device_t device);
+ bool qp_surface_viewport(painter_device_t device, uint16_t left, uint16_t top, uint16_t right, uint16_t bottom);
+ void qp_surface_increment_pixdata_location(surface_viewport_data_t *viewport);
+ void qp_surface_update_dirty(surface_dirty_data_t *dirty, uint16_t x, uint16_t y);
++void qp_surface_apply_rotation(surface_painter_device_t *surface, uint16_t *x, uint16_t *y);
+ 
+ #endif // QUANTUM_PAINTER_SURFACE_ENABLE
+
+diff --git a/drivers/painter/generic/qp_surface_mono1bpp.c b/drivers/painter/generic/qp_surface_mono1bpp.c
+index c66b56519d..14918d5bec 100644
+--- a/drivers/painter/generic/qp_surface_mono1bpp.c
++++ b/drivers/painter/generic/qp_surface_mono1bpp.c
+@@ -15,6 +15,8 @@ static inline void setpixel_mono1bpp(surface_painter_device_t *surface, uint16_t
+     uint16_t w = surface->base.panel_width;
+     uint16_t h = surface->base.panel_height;
+ 
++    qp_surface_apply_rotation(surface, &x, &y);
++
+     // Drop out if it's off-screen
+     if (x >= w || y >= h) {
+         return;
+
+diff --git a/drivers/painter/generic/qp_surface_rgb565.c b/drivers/painter/generic/qp_surface_rgb565.c
+index 8883ed541d..0bc81b3ddf 100644
+--- a/drivers/painter/generic/qp_surface_rgb565.c
++++ b/drivers/painter/generic/qp_surface_rgb565.c
+@@ -15,6 +15,8 @@ static inline void setpixel_rgb565(surface_painter_device_t *surface, uint16_t x
+     uint16_t w = surface->base.panel_width;
+     uint16_t h = surface->base.panel_height;
+ 
++    qp_surface_apply_rotation(surface, &x, &y);
++
+     // Drop out if it's off-screen
+     if (x >= w || y >= h) {
+         return;

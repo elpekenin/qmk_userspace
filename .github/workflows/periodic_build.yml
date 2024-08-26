@@ -1,0 +1,76 @@
+name: Build vs latest QMK
+
+on:
+  # every 5 days
+  schedule:
+    - cron: "0 0 */5 * *"
+  workflow_dispatch:
+
+env:
+  RUST_LOG: trace
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/qmk/qmk_cli:latest
+
+    steps:
+      - name: Disable safe.directory check
+        run: git config --global --add safe.directory '*'
+
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'firmware'
+          sparse-checkout-cone-mode: false
+
+      - name: git credentials
+        run: |
+          git config --global user.email github-ci@elpekenin.dev
+          git config --global user.name elpekenin-ci
+
+      - name: QMK deps + config
+        run: |
+          pip install Jinja2 fnvhash
+          pip install --upgrade milc
+          qmk config compile.parallel=20
+
+      - name: Install Rust
+        run: |
+          apt-get -y update
+          apt-get -y install curl
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+
+      - name: Compile qmk_build
+        run: |
+          git clone https://github.com/elpekenin/qmk_build
+          source "$HOME/.cargo/env"
+          cargo install --path qmk_build
+
+      - name: Show environment info
+        run: |
+          source "$HOME/.cargo/env"
+          echo -n "    distro: " && uname -a || true
+          echo -n "       pip: " && pip -V || true
+          echo -n "       qmk: " && qmk -V || true
+          echo -n "qmk config: " && qmk config || true
+          echo -n " qmk_build: " && qmk_build -V || true
+
+      - name: Run qmk_build
+        run: |
+          source "$HOME/.cargo/env"
+          cd firmware
+          qmk_build
+
+      # NOTE(elpekenin): for now, this is just a check of whether code builds
+      # it's never downloaded but kept here as reference for the future
+      # - name: Upload binaries
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: binaries
+      #     path: firmware/binaries/*

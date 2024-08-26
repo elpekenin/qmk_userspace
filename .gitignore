@@ -9,3 +9,14 @@
 *.hex
 *.bin
 *.uf2
+
+# nothing to be seen
+lint
+
+# notes to self
+TODO.md
+
+compile_commands.json
+
+# python leftovers
+__pycache__
