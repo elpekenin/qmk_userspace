@@ -24,15 +24,13 @@ jobs:
       - name: Disable safe.directory check
         run: git config --global --add safe.directory '*'
 
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: 'firmware'
-          sparse-checkout-cone-mode: false
+      - name: Get the code in
+        uses: actions/checkout@v4
 
       - name: git credentials
         run: |
-          git config --global user.email github-ci@elpekenin.dev
           git config --global user.name elpekenin-ci
+          git config --global user.email github-ci@elpekenin.dev
 
       - name: QMK deps + config
         run: |
@@ -64,7 +62,6 @@ jobs:
       - name: Run qmk_build
         run: |
           source "$HOME/.cargo/env"
-          cd firmware
           qmk_build
 
       # NOTE(elpekenin): for now, this is just a check of whether code builds
