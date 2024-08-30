@@ -52,7 +52,10 @@ PEKE_CORE1_LOOP(__real_deferred_exec_task);
 PEKE_CORE1_LOOP(__real_housekeeping_task);
 #endif
 
+// keep symbol defined, it is referenced by asm startup
+// however, no-op unless we wanna use the second core
 void c1_main(void) {
+#if defined(USE_SECOND_CORE)
     chSysWaitSystemState(ch_sys_running);
     chInstanceObjectInit(&ch1, &ch_core1_cfg);
 
@@ -74,4 +77,5 @@ void c1_main(void) {
             (*func)();
         }
     }
+#endif
 }

@@ -45,7 +45,6 @@
 #define F11 KC_F11
 #define F12 KC_F12
 
-// hacky
 #define RABK LSFT(LABK) /* cant use S(), it gets redefined */
 
 #define PIPE KC(PIPE)

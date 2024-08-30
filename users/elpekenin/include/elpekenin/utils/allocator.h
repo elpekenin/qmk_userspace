@@ -32,7 +32,7 @@ void *malloc_with(allocator_t *allocator, size_t total_size);
 void *realloc_with(allocator_t *allocator, void *ptr, size_t size);
 
 size_t get_used_heap(void);
-const allocator_t **get_known_allocators(uint8_t *n);
+const allocator_t **get_known_allocators(int8_t *n);
 
 #if defined(PROTOCOL_CHIBIOS)
 #include <ch.h>

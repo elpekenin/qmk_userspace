@@ -65,13 +65,15 @@ void xap_keyevent(uint16_t keycode, keyrecord_t *record) {
 }
 
 void xap_shutdown(bool jump_to_bootloader) {
-    if (is_keyboard_master()) {
-        shutdown_msg_t msg = {
-            .msg_id = _SHUTDOWN,
-            .bootloader = jump_to_bootloader,
-        };
-
-        xap_broadcast_user(&msg, sizeof(msg));
+    if (!is_keyboard_master()) {
+        return;
     }
+
+    shutdown_msg_t msg = {
+        .msg_id = _SHUTDOWN,
+        .bootloader = jump_to_bootloader,
+    };
+
+    xap_broadcast_user(&msg, sizeof(msg));
 }
 PEKE_DEINIT(xap_shutdown, DEINIT_XAP);

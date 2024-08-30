@@ -8,6 +8,7 @@
 #include <quantum/logging/debug.h> // debug_config
 #include <tmk_core/protocol/host.h> // keyboard_led_state
 
+#include "elpekenin/utils/allocator.h" // memory_heap_t
 #include "elpekenin/keylog.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/utils/compiler.h"

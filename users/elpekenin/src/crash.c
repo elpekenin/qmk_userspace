@@ -9,10 +9,14 @@
 #include "elpekenin/utils/compiler.h"
 #include "elpekenin/utils/sections.h"
 
+/* When set into a known address, flags that the program has crashed. */
 #define MAGIC_VALUE (0xDEADA55)
-#define DEPTH (100) /* max size */
 
-typedef struct {
+/* Max depth of stack unwinding. */
+#define DEPTH (100)
+
+/* Information stored after crashing, can be retrieved on next run. */
+typedef struct _crash_info_t {
     uint32_t    magic;
     uint8_t     stack_depth;
     backtrace_t call_stack[DEPTH];

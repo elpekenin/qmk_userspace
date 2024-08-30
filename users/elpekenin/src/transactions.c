@@ -12,6 +12,10 @@
 #include "elpekenin/utils/compiler.h"
 #include "elpekenin/utils/sections.h"
 
+// race condition, QMK fills the left/master fields **after** post_init funcs
+// lets manually invoke it to make sure we get the right thing
+bool is_keyboard_master_impl(void);
+
 static inline void __split_size_err(void) {
     _ = logging(SPLIT, LOG_ERROR, "%s size", __func__);
 }
@@ -77,10 +81,18 @@ static inline uint32_t slave_log_sync_callback(uint32_t trigger_time, void *cb_a
 // *** Exposed to other places ***
 
 void reset_ee_slave(void) {
+    if (!is_keyboard_master_impl()) {
+        return;
+    }
+
     transaction_rpc_send(RPC_ID_USER_EE_CLR, 0, NULL);
 }
 
 void xap_execute_slave(const void *data) {
+    if (!is_keyboard_master_impl()) {
+        return;
+    }
+
     xap_split_msg_t msg = {0};
     // user, qp, operation = 3
     memcpy(&msg, data - sizeof(xap_request_header_t) - 3, XAP_EPSIZE);
@@ -96,9 +108,6 @@ static void split_init(void) {
     transaction_register_rpc(RPC_ID_USER_EE_CLR, user_ee_clr_callback);
     transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
 
-    // race condition, QMK fills the left/master fields **after** this func is called
-    // lets manually invoke that logic to get it working
-    bool is_keyboard_master_impl(void);
     if (is_keyboard_master_impl()) {
         // 5 secs to prevent drawing on eInk right after flash
         // and issues if slave is not yet working (or w/eekenin))
@@ -109,7 +118,7 @@ static void split_init(void) {
 PEKE_PRE_INIT(split_init, INIT_SPLIT);
 
 // static void split_deinit(bool jump_to_bootloader) {
-//     if (is_keyboard_master()) {
+//     if (is_keyboard_master_impl()) {
 //         transaction_rpc_send(RPC_ID_USER_SHUTDOWN, sizeof(jump_to_bootloader), &jump_to_bootloader);
 //     }
 // }

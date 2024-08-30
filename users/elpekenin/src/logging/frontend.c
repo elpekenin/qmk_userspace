@@ -127,7 +127,6 @@ NON_NULL(1) READ_ONLY(1) static token_t get_token(const char **str) {
         case 'M': // %M
             return M_SPEC;
 
-
         case 'T': // %T
             return T_SPEC;
 
@@ -225,7 +224,7 @@ int logging(feature_t feature, log_level_t level, const char *msg, ...) {
     msg_level = level;
 
     // there seems to be some issue using logging() early on, let's alias to print while not 100% ready
-    if (!ready) {
+    if (!ready || true) {
         va_start(args, msg);
         vprintf(msg, args);
         va_end(args);

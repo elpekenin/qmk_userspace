@@ -6,21 +6,7 @@
 #include "elpekenin.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/placeholders.h"
-#include "elpekenin/utils/sections.h"
 
-
-bool shutdown_user(bool jump_to_bootloader) {
-    if (!shutdown_keymap(jump_to_bootloader)) {
-        return false;
-    }
-
-    // functions registered with PEKE_DEINIT
-    FOREACH_SECTION(deinit_fn, deinit, func) {
-        (*func)(jump_to_bootloader);
-    }
-
-    return true;
-}
 
 static bool suspend_changed     = true;
 static bool suspend_debug_state = true;
