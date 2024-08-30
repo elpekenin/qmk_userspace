@@ -38,7 +38,7 @@ void keyboard_pre_init_user(void) {
 /**
  * First, check if previous execution crashed, printing traceback.
  *
- * Then, call :c:func:`keyboard_post_init_user` for ``keymap.c``-level extensions.
+ * Then, call :c:func:`keyboard_post_init_keymap` for ``keymap.c``-level extensions.
  *
  * Finally, iterate the :c:var:`post_init` linker section, executing all functions put into it (initializers).
  */
