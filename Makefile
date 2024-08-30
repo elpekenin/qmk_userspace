@@ -28,7 +28,7 @@ docs:
 
 # copy files + generate docs + copy them on raspberry
 deploy-docs: cp docs
-	scp -r $(WORKSPACE)/$(USER)/docs/* $(WEB_HOST):~/qmk_docs
+	scp -r $(WORKSPACE)/$(USER)/docs/_build/html/* $(WEB_HOST):~/qmk_docs
 
 # build some C and link it with my custom zig library for testing
 native-testing:
