@@ -27,6 +27,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"
+html_show_sourcelink = False  # disable "view source" button, showing raw rst
 html_static_path: list[str] = []
 html_theme_options  = {
     "navigation_with_keys": True,
