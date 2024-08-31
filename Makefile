@@ -30,6 +30,9 @@ docs:
 deploy-docs: cp docs
 	scp -r $(WORKSPACE)/$(USER)/docs/_build/html/* $(WEB_HOST):~/qmk_docs
 
+preview-docs: cp docs
+	cd $(WORKSPACE)/$(USER)/docs/_build/html && python -m http.server
+
 # build some C and link it with my custom zig library for testing
 native-testing:
 	cd $(WORKSPACE)/$(USER) && \

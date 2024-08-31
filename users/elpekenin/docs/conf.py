@@ -151,13 +151,11 @@ hawkmoth_clang = [
 ] + [
     f"-include{file}" for file in CONFIG_H
 ] + [
-    # clang doesnt like some attributes, and neither
-    # does it know that target is ARM, where interrupts
-    # have a different signature than x86-64
-    "-DINTERRUPT",  # override the macro that usually aliases __attribute__((isr))
-    "-Wno-attributes",
+    # attributes are a no-op for clang not to mess up
+    "-D_ATTR(...)=",
 
     # provided by build system
+    "-DMCU_RP",
     "-DINIT_EE_HANDS_RIGHT",
     "-DPROTOCOL_CHIBIOS",
     "-DEEPROM_WEAR_LEVELING",
