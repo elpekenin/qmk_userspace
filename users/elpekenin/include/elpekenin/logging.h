@@ -81,21 +81,7 @@ typedef enum {
 } log_level_t; // ALWAYS ADD AT THE END, FOR ASSERT TO WORK
 
 /**
- * Emit a logging message.
- *
- * Args:
- *     feature: Piece of code being logged.
- *     level: Severity of the message.
- *     msg: Format string for the message.
- *     ...: Variadic arguments to fill the specifiers in ``msg``.
- *
- * Return:
- *    Whether message could be emited. See :doc:`errno` for details
- */
-NON_NULL(3) PRINTF(3) READ_ONLY(3) WARN_UNUSED int logging(feature_t feature, log_level_t level, const char *msg, ...);
-
-/**
- * .. note::
+ * .. hint::
  *   The :c:func:`logging` function will apply an extra transformation to your input, based on a custom format.
  *   Its specifiers being:
  *
@@ -110,10 +96,27 @@ NON_NULL(3) PRINTF(3) READ_ONLY(3) WARN_UNUSED int logging(feature_t feature, lo
  *     * Default implementation is seconds since boot.
  *   * ``%%``: Write a literal ``%``.
  *
+ *   For example, with format of ``[%F] (%LL) -- %M | %T``, messages would look like: ``[QP] (DEBUG) -- <msg%args> | 3s``
+ *
  *   You can query the current format using :c:func:`get_logging_fmt` or change it with :c:func:`set_logging_fmt`.
  */
 
-// -- barrier --
+/**
+ * Emit a logging message.
+ *
+ * Args:
+ *     feature: Piece of code being logged.
+ *     level: Severity of the message.
+ *     msg: Format string for the message.
+ *     ...: Variadic arguments to fill the specifiers in ``msg``.
+ *
+ * Return:
+ *    Whether message could be emited.
+ *
+ *    .. seealso::
+ *      :doc:`errno`
+ */
+NON_NULL(3) PRINTF(3) READ_ONLY(3) WARN_UNUSED int logging(feature_t feature, log_level_t level, const char *msg, ...);
 
 typedef enum {
     STR_END,
@@ -137,7 +140,7 @@ uint8_t get_logging_fmt_len(void);
 /**
  * Copy the current logging format into ``dest``.
  *
- * .. warning::
+ * .. tip::
  *   Destination must be big enough, use :c:func:`get_logging_fmt_len`.
  */
 NON_NULL(1) WRITE_ONLY(1) void get_logging_fmt(char *dest);
@@ -149,7 +152,10 @@ NON_NULL(1) WRITE_ONLY(1) void get_logging_fmt(char *dest);
  *     fmt: The new format, can't be longer than :c:macro:`MAX_LOG_FMT_LEN`.
  *
  * Return:
- *    Whether it could be set. See :doc:`errno` for details.
+ *    Whether it could be set
+ *
+ *    .. seealso::
+ *      :doc:`errno`
  */
 NON_NULL(1) READ_ONLY(1) WARN_UNUSED int set_logging_fmt(const char *fmt);
 
@@ -179,7 +185,7 @@ void step_level_for(feature_t feature, bool increase);
 extern int _;
 
 /**
- * .. warning::
+ * .. attention::
  *   From this point, the functions are mostly implementation details.
  *
  *   You, most likely, don't need to know anything about them.
@@ -230,7 +236,7 @@ void dump_stack(void);
 /**
  * Print a string using the given function.
  *
- * .. note::
+ * .. caution::
  *    Logging's own formatting is **not** applied.
  *
  * Args:
@@ -242,7 +248,7 @@ NON_NULL(1) NON_NULL(2) READ_ONLY(1) void print_str(const char *str, const sendc
 /**
  * Print a number using the given function.
  *
- * .. note::
+ * .. caution::
  *    Logging's own formatting is **not** applied.
  *
  * Args:
@@ -254,7 +260,7 @@ NON_NULL(2) void print_u8(const uint8_t val, const sendchar_func_t func);
 /**
  * Print a list of numbers using the given function.
  *
- * .. note::
+ * .. caution::
  *    Logging's own formatting is **not** applied.
  *
  * Args:

@@ -24,7 +24,7 @@ void housekeeping_task_user(void) {
 /**
  * This file uses a bit of magic to invoke initializer and finalizer functions on QMK.
  *
- * They are stored in special linker sections. See :doc:`rst/utils/sections` for details.
+ * They are stored in special linker sections. See :doc:`/utils/sections` for details.
  */
 
 /**

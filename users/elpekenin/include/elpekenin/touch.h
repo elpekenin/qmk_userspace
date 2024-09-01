@@ -4,7 +4,7 @@
 /**
  * Generic(ish) driver for touch screens.
  *
- * .. note::
+ * .. danger::
  *   Only ``XPT2046`` has been implemented/tested.
  */
 

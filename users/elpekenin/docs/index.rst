@@ -1,7 +1,7 @@
 elpekenin's userspace
 =====================
 
-.. warning::
+.. caution::
   This is not an usual QMK external userspace. Instead I use a custom tool  (`qmk_build <https://github.com/elpekenin/qmk_build>`_) to compile.
   The reason for this convoluted setup is to have an easy(TM) way of  keeping me code out of tree while easily updating the QMK's core code.
   Having a fork wasn't good enough for me.
@@ -38,10 +38,10 @@ This documentation is built using:
 Keep in mind that docs might be out of date with the actual code. However I've put quite some effort in generating it automatically from
 doc-comments in the code, in hopes to reduce this friction. If you find anything out-of-sync please let me know.
 
+
 .. toctree::
     :hidden:
-    :glob:
 
-    elpekenin
-    rst/*
-    rst/utils/*
+    src/index
+    headers/index
+    utils/index

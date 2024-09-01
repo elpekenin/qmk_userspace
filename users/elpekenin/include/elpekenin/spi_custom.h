@@ -18,7 +18,7 @@
 /**
  * Some patching on QMK's ``spi_master.h`` driver, to allow using multiple buses.
  *
- * .. note::
+ * .. caution::
  *   The following must be set up:
  *    * :c:macro:`SPI_DRIVERS`
  *    * :c:macro:`SPI_SCK_PINS`

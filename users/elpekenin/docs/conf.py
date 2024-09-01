@@ -1,8 +1,6 @@
 import sys
 from pathlib import Path
 
-print(sys.executable)
-
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
@@ -10,6 +8,7 @@ project = "QMK userspace"
 copyright = "2024, elpekenin"
 author = "elpekenin"
 release = ""
+
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -73,7 +72,7 @@ hawkmoth_root = str(ELPEKENIN)
 hawkmoth_source_uri = (  # link to the source code on GitHub
     "https://github.com/elpekenin/qmk_userspace/tree/main/users/elpekenin/{source}#L{line}"
 )
-hawkmoth_napoleon_transform = None
+hawkmoth_napoleon_transform = None  # apply napoleon transform to every docstring
 
 INCLUDE_DIRS = [
     ACCESS,

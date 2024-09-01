@@ -8,10 +8,10 @@
  *   * ``0``: Success.
  *   * Othewise: Failure.
  *
- * .. note::
+ * .. seealso::
  *   Most values here come from ``#include <errno.h>``.
  *
- *   See Linux's documentation for details.
+ *   Check out Linux's documentation for details.
  */
 
 /**

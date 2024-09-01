@@ -23,7 +23,7 @@
 /**
  * Set the seed for the RNG.
  *
- * .. note::
+ * .. tip::
  *   I do it by reading ADC's noise twice and multiplying the values.
  */
 void rng_set_seed(uint16_t seed);

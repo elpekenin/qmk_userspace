@@ -19,7 +19,7 @@
 /**
  * Configure a list of "pin" names, aka: identifiers for register(s) output.
  *
- * .. warning::
+ * .. caution::
  *   You will get a build error if :c:macro:`N_SIPO_PINS` is not correctly set up.
  */
 #define configure_sipo_pins(pin_names...) \
@@ -29,7 +29,7 @@
 /**
  * Update the state of a pin in the internal buffer.
  *
- * .. note::
+ * .. hint::
  *   This will not apply the setting yet, because of performance issues.
  *
  *   You should call :c:func:`send_sipo_state` to get it flushed.
