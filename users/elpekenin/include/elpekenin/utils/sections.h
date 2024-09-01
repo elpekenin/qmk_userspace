@@ -1,6 +1,17 @@
 // Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+/**
+ * Utilities to add elements into specific linker sections, and then iterate over those sections.
+ *
+ */
+
+/**
+ * ----
+ */
+
+// -- barrier --
+
 #pragma once
 
 #include <stdbool.h>
@@ -70,27 +81,28 @@
 /* Stop lights as a marker that we aren't running. */
 #define DEINIT_RGB 1020
 
-
-/** Signature for an initializer function. */
+/**
+ * Signature for an initializer function.
+ */
 typedef void   (*init_fn)(void);
-/** Signature for a finalizer function. */
-typedef void   (*deinit_fn)(bool jump_to_bootloader);
-/** Signature for a low-level function called by :c:func:`printf`. */
-typedef int8_t (*sendchar_func_t)(uint8_t character);
-
-#define FULL_SECTION_NAME(name, func, prio) SECTION(STR(LD_NAME(name)) "." #prio "." #func)
 
 /**
- * Macro to iterate all elements on a linker section.
- *
- * Args:
- *     type: Type of the elements in this section.
- *     name: Name of the section to be iterated.
- *     var: Name of the variable used on the ``for``
+ * Signature for a finalizer function.
  */
-#define FOREACH_SECTION(type, name, var) \
-    extern type LD_START(name), LD_END(name); \
-    for (type *var = &LD_START(name); var < &LD_END(name); ++var)
+typedef void   (*deinit_fn)(bool jump_to_bootloader);
+
+/**
+ * Signature for a low-level function called by :c:func:`printf`.
+ */
+typedef int8_t (*sendchar_func_t)(uint8_t character);
+
+/**
+ * ----
+ */
+
+// -- barrier --
+
+#define FULL_SECTION_NAME(name, func, prio) SECTION(STR(LD_NAME(name)) "." #prio "." #func)
 
 /**
  * Put a function in the pre-initialization section.
@@ -148,3 +160,19 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  */
 #define PEKE_SENDCHAR(func) \
     FULL_SECTION_NAME(sendchar, func, 0) USED static sendchar_func_t __##func = func
+
+/**
+ * ----
+ */
+
+/**
+ * Macro to iterate all elements on a linker section.
+ *
+ * Args:
+ *     type: Type of the elements in this section.
+ *     name: Name of the section to be iterated.
+ *     var: Name of the variable used on the ``for``
+ */
+#define FOREACH_SECTION(type, name, var) \
+    extern type LD_START(name), LD_END(name); \
+    for (type *var = &LD_START(name); var < &LD_END(name); ++var)

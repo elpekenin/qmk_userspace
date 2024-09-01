@@ -2,10 +2,9 @@ elpekenin's userspace
 =====================
 
 .. warning::
-
-    This is not an usual QMK external userspace. Instead I use a custom tool (`qmk_build <https://github.com/elpekenin/qmk_build>`_) to compile.
-    The reason for this convoluted setup is to have an easy(TM) way of keeping me code out of tree while easily updating the QMK's core code.
-    Having a fork wasn't good enough for me.
+  This is not an usual QMK external userspace. Instead I use a custom tool  (`qmk_build <https://github.com/elpekenin/qmk_build>`_) to compile.
+  The reason for this convoluted setup is to have an easy(TM) way of  keeping me code out of tree while easily updating the QMK's core code.
+  Having a fork wasn't good enough for me.
 
 ----
 
@@ -41,9 +40,8 @@ doc-comments in the code, in hopes to reduce this friction. If you find anything
 
 .. toctree::
     :hidden:
+    :glob:
 
-    rst/elpekenin
-    rst/errno
-    rst/sections
-    rst/logging
-    rst/crash
+    elpekenin
+    rst/*
+    rst/utils/*

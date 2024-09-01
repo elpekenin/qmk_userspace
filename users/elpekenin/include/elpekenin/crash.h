@@ -1,6 +1,16 @@
 // Copyright 2024 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+/**
+ * Utilities to check why (if) last execution crashed.
+ */
+
+/**
+ * ----
+ */
+
+// -- barrier --
+
 #pragma once
 
 #include <stdbool.h>
@@ -9,7 +19,9 @@
 
 #include "elpekenin/utils/compiler.h"
 
-/** Check if program crashed on previous execution. */
+/**
+ * Check if program crashed on previous execution.
+ */
 bool program_crashed(void);
 
 /**
@@ -19,14 +31,19 @@ bool program_crashed(void);
  *     depth: Pointer to your variable, will be set to
  *            how deep the backtrace is.
  *
- * Returns:
+ * Return:
  *     Call stack that crashed the program (NULL if didn't
  *     crash)
  */
 NON_NULL(1) RETURN_NO_NULL WRITE_ONLY(1) backtrace_t *get_crash_call_stack(uint8_t *depth);
 
-/** Tiny utility to print the information about last crash. */
-void print_crash_call_stack(void);
+/**
+ * Store the information that next run will read.
+ *
+ * Args:
+ *     msg: A text that will be stored along backtrace.
+ */
+void set_crash_info(const char *msg);
 
 /**
  * Clear the structure that holds crash information.
@@ -36,9 +53,6 @@ void print_crash_call_stack(void);
 void clear_crash_info(void);
 
 /**
- * Store the information that next run will read.
- *
- * Args:
- *     msg: A text that will be stored along backtrace.
+ * Tiny utility to print the information about last crash.
  */
-void set_crash_info(const char *msg);
+void print_crash_call_stack(void);

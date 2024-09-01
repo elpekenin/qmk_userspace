@@ -15,6 +15,25 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Some patching on QMK's ``spi_master.h`` driver, to allow using multiple buses.
+ *
+ * .. note::
+ *   The following must be set up:
+ *    * :c:macro:`SPI_DRIVERS`
+ *    * :c:macro:`SPI_SCK_PINS`
+ *    * :c:macro:`SPI_MOSI_PINS`
+ *    * :c:macro:`SPI_MISO_PINS`
+ *
+ *   They will be automatically configured with their single-driver counterparts, if available.
+ */
+
+/**
+ * ----
+ */
+
+// -- barrier --
+
 #pragma once
 
 #include <stdbool.h>
@@ -87,11 +106,24 @@
 #    endif
 #endif
 
-typedef int16_t spi_status_t;
-
+/** */
+typedef enum {
+    /** */
+    SPI_STATUS_SUCCESS =
 #define SPI_STATUS_SUCCESS (0)
+    SPI_STATUS_SUCCESS,
+
+    /** */
+    SPI_STATUS_ERROR =
 #define SPI_STATUS_ERROR (-1)
+    SPI_STATUS_ERROR,
+
+    /** */
+    SPI_STATUS_TIMEOUT =
 #define SPI_STATUS_TIMEOUT (-2)
+    SPI_STATUS_TIMEOUT,
+} spi_status_t;
+
 
 #define SPI_TIMEOUT_IMMEDIATE (0)
 #define SPI_TIMEOUT_INFINITE (0xFFFF)
@@ -99,19 +131,51 @@ typedef int16_t spi_status_t;
 #ifdef __cplusplus
 extern "C" {
 #endif
-void spi_custom_init(uint8_t index);
 
-bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divisor, uint8_t index);
+/**
+ * Initialize the ``n``'th driver.
+ */
+void spi_custom_init(uint8_t n);
 
-spi_status_t spi_custom_write(uint8_t data, uint8_t index);
+/**
+ * Set up the ``n``'th driver for a transmision.
+ *
+ * Args:
+ *     slavePin: The chip select pin for the target device.
+ *     lsbFirst: Whether Least Significant Bit is sent first or last.
+ *     mode: SPI clocks' mode (0-3).
+ *     divisor: Control the clock's speed.
+ *     n: Index of the driver to be used.
+ *
+ * Return:
+ *     Whether operation was successful.
+ */
+bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divisor, uint8_t n);
 
-spi_status_t spi_custom_read(uint8_t index);
+/**
+ * Send a single byte (``data``) over the ``n``'th driver.
+ */
+spi_status_t spi_custom_write(uint8_t data, uint8_t n);
 
-spi_status_t spi_custom_transmit(const uint8_t *data, uint16_t length, uint8_t index);
+/**
+ * Read a single byte (return) over the ``n``'th driver.
+ */
+spi_status_t spi_custom_read(uint8_t n);
 
-spi_status_t spi_custom_receive(uint8_t *data, uint16_t length, uint8_t index);
+/**
+ * Send ``length`` bytes from ``data`` over the ``n``'th driver.
+ */
+spi_status_t spi_custom_transmit(const uint8_t *data, uint16_t length, uint8_t n);
 
-void spi_custom_stop(uint8_t index);
+/**
+ * Read ``length`` bytes into ``data`` over the ``n``'th driver.
+ */
+spi_status_t spi_custom_receive(uint8_t *data, uint16_t length, uint8_t n);
+
+/**
+ * Undo the settings performced by :c:func:`spi_custom_start`
+ */
+void spi_custom_stop(uint8_t n);
 #ifdef __cplusplus
 }
 #endif

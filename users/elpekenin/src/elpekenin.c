@@ -22,7 +22,13 @@ void housekeeping_task_user(void) {
 }
 
 /**
- * Iterate the :c:var:`pre_init` linker section, executing all functions put into it (initializers).
+ * This file uses a bit of magic to invoke initializer and finalizer functions on QMK.
+ *
+ * They are stored in special linker sections. See :doc:`rst/utils/sections` for details.
+ */
+
+/**
+ * Iterate the ``pre_init`` linker section, executing all functions put into it (initializers).
  *
  * Then, call :c:func:`keyboard_pre_init_keymap` for ``keymap.c``-level extensions.
  */
@@ -40,7 +46,7 @@ void keyboard_pre_init_user(void) {
  *
  * Then, call :c:func:`keyboard_post_init_keymap` for ``keymap.c``-level extensions.
  *
- * Finally, iterate the :c:var:`post_init` linker section, executing all functions put into it (initializers).
+ * Finally, iterate the ``post_init`` linker section, executing all functions put into it (initializers).
  */
 void keyboard_post_init_user(void) {
     if (program_crashed()) {
@@ -60,7 +66,7 @@ void keyboard_post_init_user(void) {
  * Call :c:func:`shutdown_keymap` for ``keymap.c``-level customization
  *   If it returns ``false``, this function will exit.
  *
- * Next, iterate the :c:var:`deinit` linker section, executing all functions put into it (finalizers).
+ * Next, iterate the ``deinit`` linker section, executing all functions put into it (finalizers).
  */
 bool shutdown_user(bool jump_to_bootloader) {
     if (!shutdown_keymap(jump_to_bootloader)) {

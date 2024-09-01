@@ -38,53 +38,53 @@ bool is_initialised[] = {[0 ... SPI_COUNT-1] = false};
 
 static MUTEX_DECL(spi_mutex);
 
-static inline spi_status_t __spi_error(uint8_t index) {
-    _ = logging(SPI, LOG_ERROR, "Index %d invalid", index);
+static inline spi_status_t __spi_error(uint8_t n) {
+    _ = logging(SPI, LOG_ERROR, "n==%d invalid", n);
     return SPI_STATUS_ERROR;
 }
 
-__attribute__((weak)) void spi_custom_init(uint8_t index) {
-    if (index >= SPI_COUNT) {
-        __spi_error(index);
+__attribute__((weak)) void spi_custom_init(uint8_t n) {
+    if (n >= SPI_COUNT) {
+        __spi_error(n);
         return;
     }
 
-    if (!is_initialised[index]) {
-        is_initialised[index] = true;
+    if (!is_initialised[n]) {
+        is_initialised[n] = true;
 
 #if defined(K20x) || defined(KL2x) || defined(RP2040)
-        spi_configs[index] = (SPIConfig){NULL, 0, 0, 0};
+        spi_configs[n] = (SPIConfig){NULL, 0, 0, 0};
 #else
-        spi_configs[index] = (SPIConfig){false, NULL, 0, 0, 0, 0};
+        spi_configs[n] = (SPIConfig){false, NULL, 0, 0, 0, 0};
 #endif
 
         // Try releasing special pins for a short time
-        gpio_set_pin_input(spi_sck_pins[index]);
-        gpio_set_pin_input(spi_mosi_pins[index]);
-        gpio_set_pin_input(spi_miso_pins[index]);
+        gpio_set_pin_input(spi_sck_pins[n]);
+        gpio_set_pin_input(spi_mosi_pins[n]);
+        gpio_set_pin_input(spi_miso_pins[n]);
 
         chThdSleepMilliseconds(10);
 #if defined(USE_GPIOV1)
-        palSetPadMode(PAL_PORT(spi_sck_pins[index]), PAL_PAD(spi_sck_pins[index]), SPI_SCK_PAL_MODE);
-        palSetPadMode(PAL_PORT(spi_mosi_pins[index]), PAL_PAD(spi_mosi_pins[index]), SPI_MOSI_PAL_MODE);
-        palSetPadMode(PAL_PORT(spi_miso_pins[index]), PAL_PAD(spi_miso_pins[index]), SPI_MISO_PAL_MODE);
+        palSetPadMode(PAL_PORT(spi_sck_pins[n]), PAL_PAD(spi_sck_pins[n]), SPI_SCK_PAL_MODE);
+        palSetPadMode(PAL_PORT(spi_mosi_pins[n]), PAL_PAD(spi_mosi_pins[n]), SPI_MOSI_PAL_MODE);
+        palSetPadMode(PAL_PORT(spi_miso_pins[n]), PAL_PAD(spi_miso_pins[n]), SPI_MISO_PAL_MODE);
 #else
-        palSetPadMode(PAL_PORT(spi_sck_pins[index]), PAL_PAD(spi_sck_pins[index]), SPI_SCK_FLAGS);
-        palSetPadMode(PAL_PORT(spi_mosi_pins[index]), PAL_PAD(spi_mosi_pins[index]), SPI_MOSI_FLAGS);
-        palSetPadMode(PAL_PORT(spi_miso_pins[index]), PAL_PAD(spi_miso_pins[index]), SPI_MISO_FLAGS);
+        palSetPadMode(PAL_PORT(spi_sck_pins[n]), PAL_PAD(spi_sck_pins[n]), SPI_SCK_FLAGS);
+        palSetPadMode(PAL_PORT(spi_mosi_pins[n]), PAL_PAD(spi_mosi_pins[n]), SPI_MOSI_FLAGS);
+        palSetPadMode(PAL_PORT(spi_miso_pins[n]), PAL_PAD(spi_miso_pins[n]), SPI_MISO_FLAGS);
 #endif
-        spiStop(drivers[index]);
-        slave_pins[index] = NO_PIN;
+        spiStop(drivers[n]);
+        slave_pins[n] = NO_PIN;
     }
 }
 
-bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divisor, uint8_t index) {
-    if (index >= SPI_COUNT) {
-        __spi_error(index);
+bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divisor, uint8_t n) {
+    if (n >= SPI_COUNT) {
+        __spi_error(n);
         return false;
     }
 
-    if (slave_pins[index] != NO_PIN || slavePin == NO_PIN) {
+    if (slave_pins[n] != NO_PIN || slavePin == NO_PIN) {
         return false;
     }
 
@@ -104,77 +104,77 @@ bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divi
 #endif
 
 #if defined(K20x) || defined(KL2x)
-    spi_configs[index].tar0 = SPIx_CTARn_FMSZ(7) | SPIx_CTARn_ASC(1);
+    spi_configs[n].tar0 = SPIx_CTARn_FMSZ(7) | SPIx_CTARn_ASC(1);
 
     if (lsbFirst) {
-        spi_configs[index].tar0 |= SPIx_CTARn_LSBFE;
+        spi_configs[n].tar0 |= SPIx_CTARn_LSBFE;
     }
 
     switch (mode) {
         case 0:
             break;
         case 1:
-            spi_configs[index].tar0 |= SPIx_CTARn_CPHA;
+            spi_configs[n].tar0 |= SPIx_CTARn_CPHA;
             break;
         case 2:
-            spi_configs[index].tar0 |= SPIx_CTARn_CPOL;
+            spi_configs[n].tar0 |= SPIx_CTARn_CPOL;
             break;
         case 3:
-            spi_configs[index].tar0 |= SPIx_CTARn_CPHA | SPIx_CTARn_CPOL;
+            spi_configs[n].tar0 |= SPIx_CTARn_CPHA | SPIx_CTARn_CPOL;
             break;
     }
 
     switch (roundedDivisor) {
         case 2:
-            spi_configs[index].tar0 |= SPIx_CTARn_BR(0);
+            spi_configs[n].tar0 |= SPIx_CTARn_BR(0);
             break;
         case 4:
-            spi_configs[index].tar0 |= SPIx_CTARn_BR(1);
+            spi_configs[n].tar0 |= SPIx_CTARn_BR(1);
             break;
         case 8:
-            spi_configs[index].tar0 |= SPIx_CTARn_BR(3);
+            spi_configs[n].tar0 |= SPIx_CTARn_BR(3);
             break;
         case 16:
-            spi_configs[index].tar0 |= SPIx_CTARn_BR(4);
+            spi_configs[n].tar0 |= SPIx_CTARn_BR(4);
             break;
         case 32:
-            spi_configs[index].tar0 |= SPIx_CTARn_BR(5);
+            spi_configs[n].tar0 |= SPIx_CTARn_BR(5);
             break;
         case 64:
-            spi_configs[index].tar0 |= SPIx_CTARn_BR(6);
+            spi_configs[n].tar0 |= SPIx_CTARn_BR(6);
             break;
         case 128:
-            spi_configs[index].tar0 |= SPIx_CTARn_BR(7);
+            spi_configs[n].tar0 |= SPIx_CTARn_BR(7);
             break;
         case 256:
-            spi_configs[index].tar0 |= SPIx_CTARn_BR(8);
+            spi_configs[n].tar0 |= SPIx_CTARn_BR(8);
             break;
     }
 
 #elif defined(HT32)
-    spi_configs[index].cr0 = SPI_CR0_SELOEN;
-    spi_configs[index].cr1 = SPI_CR1_MODE | 8; // 8 bits and in master mode
+    spi_configs[n].cr0 = SPI_CR0_SELOEN;
+    spi_configs[n].cr1 = SPI_CR1_MODE | 8; // 8 bits and in master mode
 
     if (lsbFirst) {
-        spi_configs[index].cr1 |= SPI_CR1_FIRSTBIT;
+        spi_configs[n].cr1 |= SPI_CR1_FIRSTBIT;
     }
 
     switch (mode) {
         case 0:
-            spi_configs[index].cr1 |= SPI_CR1_FORMAT_MODE0;
+            spi_configs[n].cr1 |= SPI_CR1_FORMAT_MODE0;
             break;
         case 1:
-            spi_configs[index].cr1 |= SPI_CR1_FORMAT_MODE1;
+            spi_configs[n].cr1 |= SPI_CR1_FORMAT_MODE1;
             break;
         case 2:
-            spi_configs[index].cr1 |= SPI_CR1_FORMAT_MODE2;
+            spi_configs[n].cr1 |= SPI_CR1_FORMAT_MODE2;
             break;
         case 3:
-            spi_configs[index].cr1 |= SPI_CR1_FORMAT_MODE3;
+            spi_configs[n].cr1 |= SPI_CR1_FORMAT_MODE3;
             break;
     }
 
-    spi_configs[index].cpr = (roundedDivisor - 1) >> 1;
+    spi_configs[n].cpr = (roundedDivisor - 1) >> 1;
 
 #elif defined(WB32F3G71xx) || defined(WB32FQ95xx)
     if (!lsbFirst) {
@@ -185,24 +185,24 @@ bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divi
         goto err;
     }
 
-    spi_configs[index].SPI_BaudRatePrescaler = (divisor << 2);
+    spi_configs[n].SPI_BaudRatePrescaler = (divisor << 2);
 
     switch (mode) {
         case 0:
-            spi_configs[index].SPI_CPHA = SPI_CPHA_1Edge;
-            spi_configs[index].SPI_CPOL = SPI_CPOL_Low;
+            spi_configs[n].SPI_CPHA = SPI_CPHA_1Edge;
+            spi_configs[n].SPI_CPOL = SPI_CPOL_Low;
             break;
         case 1:
-            spi_configs[index].SPI_CPHA = SPI_CPHA_2Edge;
-            spi_configs[index].SPI_CPOL = SPI_CPOL_Low;
+            spi_configs[n].SPI_CPHA = SPI_CPHA_2Edge;
+            spi_configs[n].SPI_CPOL = SPI_CPOL_Low;
             break;
         case 2:
-            spi_configs[index].SPI_CPHA = SPI_CPHA_1Edge;
-            spi_configs[index].SPI_CPOL = SPI_CPOL_High;
+            spi_configs[n].SPI_CPHA = SPI_CPHA_1Edge;
+            spi_configs[n].SPI_CPOL = SPI_CPOL_High;
             break;
         case 3:
-            spi_configs[index].SPI_CPHA = SPI_CPHA_2Edge;
-            spi_configs[index].SPI_CPOL = SPI_CPOL_High;
+            spi_configs[n].SPI_CPHA = SPI_CPHA_2Edge;
+            spi_configs[n].SPI_CPOL = SPI_CPOL_High;
             break;
     }
 #elif defined(MCU_RP)
@@ -211,48 +211,48 @@ bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divi
     }
 
     // Motorola frame format and 8bit transfer data size.
-    spi_configs[index].SSPCR0 = SPI_SSPCR0_FRF_MOTOROLA | SPI_SSPCR0_DSS_8BIT;
+    spi_configs[n].SSPCR0 = SPI_SSPCR0_FRF_MOTOROLA | SPI_SSPCR0_DSS_8BIT;
     // Serial output clock = (ck_sys or ck_peri) / (SSPCPSR->CPSDVSR * (1 +
     // SSPCR0->SCR)). SCR is always set to zero, as QMK SPI API expects the
     // passed divisor to be the only value to divide the input clock by.
-    spi_configs[index].SSPCPSR = roundedDivisor; // Even number from 2 to 254
+    spi_configs[n].SSPCPSR = roundedDivisor; // Even number from 2 to 254
 
     switch (mode) {
         case 0:
-            spi_configs[index].SSPCR0 &= ~SPI_SSPCR0_SPO; // Clock polarity: low
-            spi_configs[index].SSPCR0 &= ~SPI_SSPCR0_SPH; // Clock phase: sample on first edge
+            spi_configs[n].SSPCR0 &= ~SPI_SSPCR0_SPO; // Clock polarity: low
+            spi_configs[n].SSPCR0 &= ~SPI_SSPCR0_SPH; // Clock phase: sample on first edge
             break;
         case 1:
-            spi_configs[index].SSPCR0 &= ~SPI_SSPCR0_SPO; // Clock polarity: low
-            spi_configs[index].SSPCR0 |= SPI_SSPCR0_SPH;  // Clock phase: sample on second edge transition
+            spi_configs[n].SSPCR0 &= ~SPI_SSPCR0_SPO; // Clock polarity: low
+            spi_configs[n].SSPCR0 |= SPI_SSPCR0_SPH;  // Clock phase: sample on second edge transition
             break;
         case 2:
-            spi_configs[index].SSPCR0 |= SPI_SSPCR0_SPO;  // Clock polarity: high
-            spi_configs[index].SSPCR0 &= ~SPI_SSPCR0_SPH; // Clock phase: sample on first edge
+            spi_configs[n].SSPCR0 |= SPI_SSPCR0_SPO;  // Clock polarity: high
+            spi_configs[n].SSPCR0 &= ~SPI_SSPCR0_SPH; // Clock phase: sample on first edge
             break;
         case 3:
-            spi_configs[index].SSPCR0 |= SPI_SSPCR0_SPO; // Clock polarity: high
-            spi_configs[index].SSPCR0 |= SPI_SSPCR0_SPH; // Clock phase: sample on second edge transition
+            spi_configs[n].SSPCR0 |= SPI_SSPCR0_SPO; // Clock polarity: high
+            spi_configs[n].SSPCR0 |= SPI_SSPCR0_SPH; // Clock phase: sample on second edge transition
             break;
     }
 #else
-    spi_configs[index].cr1 = 0;
+    spi_configs[n].cr1 = 0;
 
     if (lsbFirst) {
-        spi_configs[index].cr1 |= SPI_CR1_LSBFIRST;
+        spi_configs[n].cr1 |= SPI_CR1_LSBFIRST;
     }
 
     switch (mode) {
         case 0:
             break;
         case 1:
-            spi_configs[index].cr1 |= SPI_CR1_CPHA;
+            spi_configs[n].cr1 |= SPI_CR1_CPHA;
             break;
         case 2:
-            spi_configs[index].cr1 |= SPI_CR1_CPOL;
+            spi_configs[n].cr1 |= SPI_CR1_CPOL;
             break;
         case 3:
-            spi_configs[index].cr1 |= SPI_CR1_CPHA | SPI_CR1_CPOL;
+            spi_configs[n].cr1 |= SPI_CR1_CPHA | SPI_CR1_CPOL;
             break;
     }
 
@@ -260,36 +260,36 @@ bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divi
         case 2:
             break;
         case 4:
-            spi_configs[index].cr1 |= SPI_CR1_BR_0;
+            spi_configs[n].cr1 |= SPI_CR1_BR_0;
             break;
         case 8:
-            spi_configs[index].cr1 |= SPI_CR1_BR_1;
+            spi_configs[n].cr1 |= SPI_CR1_BR_1;
             break;
         case 16:
-            spi_configs[index].cr1 |= SPI_CR1_BR_1 | SPI_CR1_BR_0;
+            spi_configs[n].cr1 |= SPI_CR1_BR_1 | SPI_CR1_BR_0;
             break;
         case 32:
-            spi_configs[index].cr1 |= SPI_CR1_BR_2;
+            spi_configs[n].cr1 |= SPI_CR1_BR_2;
             break;
         case 64:
-            spi_configs[index].cr1 |= SPI_CR1_BR_2 | SPI_CR1_BR_0;
+            spi_configs[n].cr1 |= SPI_CR1_BR_2 | SPI_CR1_BR_0;
             break;
         case 128:
-            spi_configs[index].cr1 |= SPI_CR1_BR_2 | SPI_CR1_BR_1;
+            spi_configs[n].cr1 |= SPI_CR1_BR_2 | SPI_CR1_BR_1;
             break;
         case 256:
-            spi_configs[index].cr1 |= SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0;
+            spi_configs[n].cr1 |= SPI_CR1_BR_2 | SPI_CR1_BR_1 | SPI_CR1_BR_0;
             break;
     }
 #endif
 
-    slave_pins[index]  = slavePin;
-    spi_configs[index].ssport = PAL_PORT(slavePin);
-    spi_configs[index].sspad  = PAL_PAD(slavePin);
+    slave_pins[n]  = slavePin;
+    spi_configs[n].ssport = PAL_PORT(slavePin);
+    spi_configs[n].sspad  = PAL_PAD(slavePin);
 
     gpio_set_pin_output(slavePin);
-    spiStart(drivers[index], &spi_configs[index]);
-    spiSelect(drivers[index]);
+    spiStart(drivers[n], &spi_configs[n]);
+    spiSelect(drivers[n]);
 
     return true;
 
@@ -298,56 +298,56 @@ err:
     return false;
 }
 
-spi_status_t spi_custom_write(uint8_t data, uint8_t index) {
-    if (index >= SPI_COUNT) {
-        return __spi_error(index);
+spi_status_t spi_custom_write(uint8_t data, uint8_t n) {
+    if (n >= SPI_COUNT) {
+        return __spi_error(n);
     }
 
     uint8_t rxData;
-    spiExchange(drivers[index], 1, &data, &rxData);
+    spiExchange(drivers[n], 1, &data, &rxData);
 
     return rxData;
 }
 
-spi_status_t spi_custom_read(uint8_t index) {
-    if (index >= SPI_COUNT) {
-        return __spi_error(index);
+spi_status_t spi_custom_read(uint8_t n) {
+    if (n >= SPI_COUNT) {
+        return __spi_error(n);
     }
 
     uint8_t data = 0;
-    spiReceive(drivers[index], 1, &data);
+    spiReceive(drivers[n], 1, &data);
 
     return data;
 }
 
-spi_status_t spi_custom_transmit(const uint8_t *data, uint16_t length, uint8_t index) {
-    if (index >= SPI_COUNT) {
-        return __spi_error(index);
+spi_status_t spi_custom_transmit(const uint8_t *data, uint16_t length, uint8_t n) {
+    if (n >= SPI_COUNT) {
+        return __spi_error(n);
     }
 
-    spiSend(drivers[index], length, data);
+    spiSend(drivers[n], length, data);
     return SPI_STATUS_SUCCESS;
 }
 
-spi_status_t spi_custom_receive(uint8_t *data, uint16_t length, uint8_t index) {
-    if (index >= SPI_COUNT) {
-        return __spi_error(index);
+spi_status_t spi_custom_receive(uint8_t *data, uint16_t length, uint8_t n) {
+    if (n >= SPI_COUNT) {
+        return __spi_error(n);
     }
 
-    spiReceive(drivers[index], length, data);
+    spiReceive(drivers[n], length, data);
     return SPI_STATUS_SUCCESS;
 }
 
-void spi_custom_stop(uint8_t index) {
-    if (index >= SPI_COUNT) {
-        __spi_error(index);
+void spi_custom_stop(uint8_t n) {
+    if (n >= SPI_COUNT) {
+        __spi_error(n);
         return;
     }
 
-    if (slave_pins[index] != NO_PIN) {
-        spiUnselect(drivers[index]);
-        spiStop(drivers[index]);
-        slave_pins[index] = NO_PIN;
+    if (slave_pins[n] != NO_PIN) {
+        spiUnselect(drivers[n]);
+        spiStop(drivers[n]);
+        slave_pins[n] = NO_PIN;
     }
 
     chMtxUnlock(&spi_mutex);

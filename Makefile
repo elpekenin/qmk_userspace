@@ -10,6 +10,7 @@ SRC = $(KB) $(USER)
 
 # copy files into workspace
 cp:
+	rm -rf $(WORKSPACE)/$(USER)/docs
 	cp -r $(KB)/* $(WORKSPACE)/$(KB)
 	cp -r $(USER)/* $(WORKSPACE)/$(USER)
 

@@ -9,13 +9,22 @@
  *   * Othewise: Failure.
  *
  * .. note::
+ *   Most values here come from ``#include <errno.h>``.
  *
- *   Most values here come from ``#include <errno.h>``, take a look at Linux's documentation for details.
+ *   See Linux's documentation for details.
  */
 
-// barrier for comment not to be attached to the include
+/**
+ * ----
+ */
+
+// -- barrier --
+
+#pragma once
 
 #include <errno.h>
 
-/** Element not found in map. */
+/**
+ * Element not found in map.
+ */
 #define ENOTFOUND 2404 // according to docstring on errno file, user should start at 2000
