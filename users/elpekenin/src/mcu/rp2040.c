@@ -19,28 +19,22 @@ static void stop_signal(bool unused) {
 }
 PEKE_DEINIT(stop_signal, DEINIT_CORE1);
 
-
 // will be a no-op if PICO_SDK_WRAPPERS is disabled on elpekenin/mk/mcu.mk
 // these are defined by PicoSDK
 extern init_fn __preinit_array_base__, __preinit_array_end__;
 
 static void pico_sdk_init(void) {
-    for (
-        init_fn *func = &__preinit_array_base__;
-        func < &__preinit_array_end__;
-        func++
-    ) {
+    for (init_fn *func = &__preinit_array_base__; func < &__preinit_array_end__; func++) {
         (*func)();
     }
 }
 PEKE_PRE_INIT(pico_sdk_init, INIT_SDK);
 
-
 #if defined(SECOND_CORE_TASKS)
 // core0
-void __wrap_qp_internal_task(void) { }
-void __wrap_deferred_exec_task(void) { }
-void __wrap_housekeeping_task(void) { }
+void __wrap_qp_internal_task(void) {}
+void __wrap_deferred_exec_task(void) {}
+void __wrap_housekeeping_task(void) {}
 
 // core1
 extern void __real_qp_internal_task(void);
@@ -62,7 +56,8 @@ void c1_main(void) {
     chSysUnlock();
 
     // wait for everything to be configured
-    while (!ready) { }
+    while (!ready) {
+    }
 
     _ = logging(UNKNOWN, LOG_DEBUG, "Hello from core 1");
 

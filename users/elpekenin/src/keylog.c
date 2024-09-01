@@ -3,9 +3,9 @@
 
 #include <string.h>
 
-#include <quantum/action_layer.h> // get_highest_layer
-#include <quantum/action_util.h> // get_mods
-#include <quantum/logging/debug.h> // debug_config
+#include <quantum/action_layer.h>   // get_highest_layer
+#include <quantum/action_util.h>    // get_mods
+#include <quantum/logging/debug.h>  // debug_config
 #include <tmk_core/protocol/host.h> // keyboard_led_state
 
 #include "elpekenin/utils/allocator.h" // memory_heap_t
@@ -19,19 +19,17 @@
 
 #include "generated/keycode_str.h"
 
-
 // *** Internal variables ***
 
 #ifndef KEYLOG_SIZE
 #    define KEYLOG_SIZE (40)
 #endif
 
-static bool keylog_dirty = true;
+static bool keylog_dirty            = true;
 static char keylog[KEYLOG_SIZE + 1] = {
     [0 ... KEYLOG_SIZE - 1] = ' ',
-    [KEYLOG_SIZE] = '\0',
+    [KEYLOG_SIZE]           = '\0',
 }; // extra space for terminator
-
 
 // *** Replacements implementation ***
 
@@ -49,19 +47,20 @@ typedef struct PACKED {
 
 static inline replacements_t new_replacement(const char *no_mods, const char *shift, const char *al_gr) {
     return (replacements_t){
-        .strings = {
-            [NO_MODS] = no_mods,
-            [SHIFT]   = shift,
-            [AL_GR]   = al_gr,
-        }
+        .strings =
+            {
+                [NO_MODS] = no_mods,
+                [SHIFT]   = shift,
+                [AL_GR]   = al_gr,
+            },
     };
 }
 
 static new_map(replacements_t, replacements_map);
 
 static replacements_t replacements_buff[100];
-static memory_heap_t replacements_heap;
-static allocator_t replacements_allocator;
+static memory_heap_t  replacements_heap;
+static allocator_t    replacements_allocator;
 
 static void replacements_init(void) {
     chHeapObjectInit(&replacements_heap, &replacements_buff, sizeof(replacements_buff));
@@ -71,6 +70,7 @@ static void replacements_init(void) {
     map_init(replacements_map, 50, &replacements_allocator);
 
     // add replacements to the map
+    // clang-format off
     map_set(replacements_map, "0",       new_replacement(NULL,  "=",  NULL));
     map_set(replacements_map, "1",       new_replacement(NULL,  "!",  "|" ));
     map_set(replacements_map, "2",       new_replacement(NULL,  "\"", "@" ));
@@ -112,17 +112,17 @@ static void replacements_init(void) {
     map_set(replacements_map, "UP",      new_replacement("↑",   NULL, NULL));
     map_set(replacements_map, "UPPR",    new_replacement("▲",   NULL, NULL));
     map_set(replacements_map, "VOLU",    new_replacement("♪",   "♪",  NULL));
+    // clang-format on
 }
 PEKE_PRE_INIT(replacements_init, INIT_KEYLOG_MAP);
-
 
 // *** Formatting helpers ***
 
 static void skip_prefix(const char **str) {
-    char *prefixes[] = { "KC_", "RGB_", "QK_", "ES_", "TD_", "TL_" };
+    char *prefixes[] = {"KC_", "RGB_", "QK_", "ES_", "TD_", "TL_"};
 
     for (int8_t i = 0; i < ARRAY_SIZE(prefixes); ++i) {
-        char *  prefix = prefixes[i];
+        char   *prefix = prefixes[i];
         uint8_t len    = strlen(prefix);
 
         if (strncmp(prefix, *str, len) == 0) {
@@ -133,13 +133,11 @@ static void skip_prefix(const char **str) {
 }
 
 static void maybe_symbol(const char **str) {
-    int ret;
+    int            ret;
     replacements_t replacements;
 
     // disable hash logging momentarily, as a lot of strings wont be in the replacements map
-    WITHOUT_LOGGING(MAP,
-        replacements = map_get(replacements_map, *str, ret);
-    );
+    WITHOUT_LOGGING(MAP, replacements = map_get(replacements_map, *str, ret););
 
     if (LIKELY(ret == -ENOTFOUND)) {
         return;
@@ -194,11 +192,10 @@ static void apply_casing(const char **str) {
         return;
     }
 
-    char *lowercase_letters[] = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" };
+    char *lowercase_letters[] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
 
     *str = lowercase_letters[**str - 'A'];
 }
-
 
 // *** Updating the log ***
 
@@ -218,7 +215,7 @@ static void _keylog_shift_right_byte(void) {
 static void keylog_shift_right(void) {
     // pop all utf-continuation bytes
     while (is_utf8_continuation(keylog[KEYLOG_SIZE - 1])) {
-       _keylog_shift_right_byte();
+        _keylog_shift_right_byte();
     }
 
     // this is either an ascii char or the heading byte of utf
@@ -248,7 +245,6 @@ static void keylog_append(const char *str) {
     }
 }
 
-
 // *** API ***
 
 bool is_keylog_dirty(void) {
@@ -273,6 +269,7 @@ void keylog_process(uint16_t keycode, keyrecord_t *record) {
     }
 
     // dont want to show some keycodes
+    // clang-format off
     if ((IS_QK_LAYER_TAP(keycode) && !record->tap.count)
         || keycode >= QK_USER  // dont want my custom keycodes on keylog
         || IS_RGB_KEYCODE(keycode)
@@ -282,6 +279,7 @@ void keylog_process(uint16_t keycode, keyrecord_t *record) {
         || IS_MODIFIER_KEYCODE(keycode)
        )
     {
+        // clang-format on
         return;
     }
 

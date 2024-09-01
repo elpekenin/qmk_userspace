@@ -9,8 +9,8 @@
 #include "elpekenin/touch.h"
 
 bool touch_spi_init(touch_device_t device) {
-    touch_driver_t *          driver       = (touch_driver_t *)device;
-    spi_touch_comms_config_t  comms_config = driver->spi_config;
+    touch_driver_t          *driver       = (touch_driver_t *)device;
+    spi_touch_comms_config_t comms_config = driver->spi_config;
 
     // Initialize the SPI peripheral
     spi_custom_init(TOUCH_SPI_DRIVER_ID);
@@ -50,15 +50,15 @@ static inline int16_t read_coord(uint8_t cmd, spi_touch_comms_config_t comms_con
 }
 
 touch_report_t get_spi_touch_report(touch_device_t device, bool check_irq) {
-    touch_driver_t           *driver      = (touch_driver_t *)device;
+    touch_driver_t          *driver       = (touch_driver_t *)device;
     spi_touch_comms_config_t comms_config = driver->spi_config;
 
     // Static variable so previous report is stored
     // Goal: When the screen is not pressed anymore, we can see the latest point pressed
     static touch_report_t report = {
-        .x = 0,
-        .y = 0,
-        .pressed = false
+        .x       = 0,
+        .y       = 0,
+        .pressed = false,
     };
 
     if (check_irq && comms_config.irq_pin != NO_PIN && readPin(comms_config.irq_pin)) {

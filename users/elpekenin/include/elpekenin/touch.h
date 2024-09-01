@@ -42,10 +42,10 @@ typedef struct PACKED {
     /**
      * Whether it is presed.
      */
-    bool     pressed;
+    bool pressed;
 } touch_report_t;
 
-typedef enum { TOUCH_ROTATION_0, TOUCH_ROTATION_90, TOUCH_ROTATION_180, TOUCH_ROTATION_270} touch_rotation_t;
+typedef enum { TOUCH_ROTATION_0, TOUCH_ROTATION_90, TOUCH_ROTATION_180, TOUCH_ROTATION_270 } touch_rotation_t;
 
 /**
  * Configuration for SPI settings.
@@ -54,7 +54,7 @@ typedef struct PACKED {
     /**
      * Its CS pin.
      */
-    pin_t    chip_select_pin;
+    pin_t chip_select_pin;
 
     /**
      * Speed of the communications.
@@ -64,27 +64,27 @@ typedef struct PACKED {
     /**
      * Byte order.
      */
-    bool     lsb_first;
+    bool lsb_first;
 
     /**
      * SPI mode.
      */
-    uint8_t  mode;
+    uint8_t mode;
 
     /**
      * Interrup pin: flags that device is pressed.
      */
-    pin_t    irq_pin;
+    pin_t irq_pin;
 
     /**
      * Command issued to get the X coordinate.
      */
-    uint8_t  x_cmd;
+    uint8_t x_cmd;
 
     /**
      * Command issued to get the Y coordinate.
      */
-    uint8_t  y_cmd;
+    uint8_t y_cmd;
 } spi_touch_comms_config_t;
 
 /**

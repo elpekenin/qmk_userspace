@@ -9,11 +9,12 @@
 #define SIPO_BYTES ((N_SIPO_PINS + 7) / 8)
 
 static uint8_t sipo_pin_state[SIPO_BYTES] = {0};
-static bool    sipo_state_changed          = true;
+static bool    sipo_state_changed         = true;
 
 static inline void print_sipo_byte(uint8_t x) {
     uint8_t byte = sipo_pin_state[x];
 
+    // clang-format off
     _ = logging(
         SIPO,
         LOG_DEBUG,
@@ -27,6 +28,7 @@ static inline void print_sipo_byte(uint8_t x) {
         GET_BIT(byte, 6),
         GET_BIT(byte, 7)
     );
+    // clang-format on
 }
 
 static inline void print_sipo_status(void) {
@@ -39,7 +41,7 @@ static inline void print_sipo_status(void) {
     _ = logging(SIPO, LOG_DEBUG, "END");
 }
 
-void set_sipo_pin(uint8_t  position, bool state) {
+void set_sipo_pin(uint8_t position, bool state) {
     // this change makes position 0 to be the closest to the MCU, instead of being the 1st bit of the last byte
     uint8_t byte_offset = SIPO_BYTES - 1 - (position / 8);
     uint8_t bit_offset  = position % 8;
@@ -55,7 +57,7 @@ void set_sipo_pin(uint8_t  position, bool state) {
 
     if (state)
         // add data starting on the least significant bit
-        sipo_pin_state[byte_offset] |=  (1 << bit_offset);
+        sipo_pin_state[byte_offset] |= (1 << bit_offset);
     else
         sipo_pin_state[byte_offset] &= ~(1 << bit_offset);
 }
@@ -70,7 +72,7 @@ void send_sipo_state(void) {
 
     spi_custom_init(REGISTERS_SPI_DRIVER_ID);
 
-    if(!spi_custom_start(SIPO_CS_PIN, false, REGISTERS_SPI_MODE, REGISTERS_SPI_DIV, REGISTERS_SPI_DRIVER_ID)) {
+    if (!spi_custom_start(SIPO_CS_PIN, false, REGISTERS_SPI_MODE, REGISTERS_SPI_DIV, REGISTERS_SPI_DRIVER_ID)) {
         _ = logging(SIPO, LOG_ERROR, "%s (init SPI)", __func__);
         return;
     }

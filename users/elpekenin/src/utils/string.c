@@ -6,7 +6,6 @@
 
 #include "elpekenin/utils/shortcuts.h"
 
-
 bool is_utf8(char c) {
     return GET_BIT(c, 7); // 1xxx xxxx
 }
@@ -27,7 +26,7 @@ const char *pretty_bytes(size_t n, char *buffer, int16_t buffer_size) {
     const static char *magnitudes[] = {"kb", "mb", "gb"};
 
     int8_t index = 0;
-    size_t  copy  = n / 1024;
+    size_t copy  = n / 1024;
     while (copy >= 1024) {
         copy /= 1024;
         index++;

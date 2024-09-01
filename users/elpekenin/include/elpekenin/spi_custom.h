@@ -49,17 +49,19 @@
 
 #if !defined(SPI_DRIVERS)
 #    if defined(SPI_DRIVER)
-#        define SPI_DRIVERS { &SPI_DRIVER }
+#        define SPI_DRIVERS \
+            { &SPI_DRIVER }
 #    else
 #        error "Select drivers for SPI"
 #    endif
 #endif
 
-#define SPI_COUNT (ARRAY_SIZE((SPIDriver* [])SPI_DRIVERS))
+#define SPI_COUNT (ARRAY_SIZE((SPIDriver *[])SPI_DRIVERS))
 
 #if !defined(SPI_SCK_PINS)
 #    if defined(SPI_SCK_PIN)
-#        define SPI_SCK_PINS { SPI_SCK_PIN }
+#        define SPI_SCK_PINS \
+            { SPI_SCK_PIN }
 #    else
 #        error "Select pins for SCK"
 #    endif
@@ -67,7 +69,8 @@
 
 #if !defined(SPI_MOSI_PINS)
 #    if defined(SPI_MOSI_PIN)
-#        define SPI_MOSI_PINS { SPI_MOSI_PIN }
+#        define SPI_MOSI_PINS \
+            { SPI_MOSI_PIN }
 #    else
 #        error "Select pins for MOSI"
 #    endif
@@ -75,12 +78,12 @@
 
 #ifndef SPI_MISO_PINS
 #    if defined(SPI_MISO_PIN)
-#        define SPI_MISO_PINS { SPI_MISO_PIN }
+#        define SPI_MISO_PINS \
+            { SPI_MISO_PIN }
 #    else
 #        error "Select pins for MISO"
 #    endif
 #endif
-
 
 #ifndef SPI_SCK_PAL_MODE
 #    if defined(USE_GPIOV1)
@@ -111,19 +114,18 @@ typedef enum {
     /** */
     SPI_STATUS_SUCCESS =
 #define SPI_STATUS_SUCCESS (0)
-    SPI_STATUS_SUCCESS,
+        SPI_STATUS_SUCCESS,
 
     /** */
     SPI_STATUS_ERROR =
 #define SPI_STATUS_ERROR (-1)
-    SPI_STATUS_ERROR,
+        SPI_STATUS_ERROR,
 
     /** */
     SPI_STATUS_TIMEOUT =
 #define SPI_STATUS_TIMEOUT (-2)
-    SPI_STATUS_TIMEOUT,
+        SPI_STATUS_TIMEOUT,
 } spi_status_t;
-
 
 #define SPI_TIMEOUT_IMMEDIATE (0)
 #define SPI_TIMEOUT_INFINITE (0xFFFF)
@@ -179,4 +181,3 @@ void spi_custom_stop(uint8_t n);
 #ifdef __cplusplus
 }
 #endif
-

@@ -22,7 +22,6 @@ void set_game_device(painter_device_t device) {
     game_token = defer_exec(10, game_callback, NULL);
 }
 
-
 static void game_init(void) {
     game = new_snake_game();
 }

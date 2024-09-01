@@ -16,18 +16,18 @@
 
 // *** Track heap usage ***
 
-static size_t n_known = 0;
+static size_t             n_known = 0;
 static const allocator_t *known_allocators[100];
 
 // TODO: per-allocator stats
 typedef struct PACKED {
     allocator_t *allocator;
-    void * ptr;
-    size_t size;
+    void        *ptr;
+    size_t       size;
 } alloc_info_t;
 
 // size is fixed to prevent the tracker to be dynamic (use malloc) itself
-static alloc_info_t alloc_info_buff[100] = {0};
+static alloc_info_t  alloc_info_buff[100] = {0};
 static memory_pool_t alloc_info_pool;
 
 static void alloc_pool_init(void) {
@@ -44,7 +44,7 @@ const allocator_t **get_known_allocators(int8_t *n) {
 size_t get_used_heap(void) {
     size_t used = 0;
 
-    int8_t n;
+    int8_t              n;
     const allocator_t **allocators = get_known_allocators(&n);
 
     for (int8_t i = 0; i < n; ++i) {
@@ -56,11 +56,7 @@ size_t get_used_heap(void) {
 }
 
 static inline alloc_info_t *find_info(void *ptr) {
-    for (
-        alloc_info_t *info = alloc_info_buff;
-        info < &alloc_info_buff[ARRAY_SIZE(alloc_info_buff)];
-        ++info
-    ) {
+    for (alloc_info_t *info = alloc_info_buff; info < &alloc_info_buff[ARRAY_SIZE(alloc_info_buff)]; ++info) {
         if (info->ptr == ptr) {
             return info;
         }
@@ -85,16 +81,16 @@ static void memory_allocated(allocator_t *allocator, void *ptr, size_t size) {
         known_allocators[n_known++] = allocator;
     }
 
-    alloc_info_t *info = chPoolAlloc(&alloc_info_pool);
-    bool pushed = info != NULL;
+    alloc_info_t *info   = chPoolAlloc(&alloc_info_pool);
+    bool          pushed = info != NULL;
 
     if (LIKELY(pushed)) {
         allocator->used += size;
 
         *info = (alloc_info_t){
             .allocator = allocator,
-            .ptr = ptr,
-            .size = size,
+            .ptr       = ptr,
+            .size      = size,
         };
     }
 
@@ -106,8 +102,8 @@ static void memory_freed(void *ptr) {
         return;
     }
 
-    alloc_info_t *info = find_info(ptr);
-    bool poped = info != NULL;
+    alloc_info_t *info  = find_info(ptr);
+    bool          poped = info != NULL;
 
     if (LIKELY(poped)) {
         info->allocator->used -= info->size;
@@ -148,7 +144,7 @@ static void *ch_core_malloc(allocator_t *allocator, size_t size) {
 
 allocator_t ch_core_allocator = {
     .malloc = ch_core_malloc,
-    .name   = "ChibiOS core"
+    .name   = "ChibiOS core",
 };
 
 static void *manual_realloc(allocator_t *allocator, void *ptr, size_t new_size) {
@@ -190,15 +186,15 @@ static void *manual_realloc(allocator_t *allocator, void *ptr, size_t new_size) 
     return new_ptr;
 }
 
-#if CH_CFG_USE_MEMPOOLS == TRUE
+#    if CH_CFG_USE_MEMPOOLS == TRUE
 static void ch_pool_free(allocator_t *allocator, void *ptr) {
     memory_pool_t *pool = (memory_pool_t *)allocator->arg;
     return chPoolFree(pool, ptr);
 }
 
 static void *ch_pool_malloc(allocator_t *allocator, size_t size) {
-    memory_pool_t *pool = (memory_pool_t *)allocator->arg;
-    size_t n_items = size / pool->object_size;
+    memory_pool_t *pool    = (memory_pool_t *)allocator->arg;
+    size_t         n_items = size / pool->object_size;
 
     // ensure we get asked for a single item's size
     if (n_items != 1 || n_items * pool->object_size != size) {
@@ -210,16 +206,16 @@ static void *ch_pool_malloc(allocator_t *allocator, size_t size) {
 }
 
 allocator_t new_ch_pool_allocator(memory_pool_t *pool, const char *name) {
-    return (allocator_t) {
-        .free    = ch_pool_free,
-        .malloc  = ch_pool_malloc,
-        .name    = name,
-        .arg     = pool,
+    return (allocator_t){
+        .free   = ch_pool_free,
+        .malloc = ch_pool_malloc,
+        .name   = name,
+        .arg    = pool,
     };
 }
-#endif
+#    endif
 
-#if CH_CFG_USE_HEAP == TRUE
+#    if CH_CFG_USE_HEAP == TRUE
 static void ch_heap_free(allocator_t *allocator, void *ptr) {
     return chHeapFree(ptr);
 }
@@ -229,7 +225,7 @@ static void *ch_heap_malloc(allocator_t *allocator, size_t size) {
 }
 
 allocator_t new_ch_heap_allocator(memory_heap_t *heap, const char *name) {
-    return (allocator_t) {
+    return (allocator_t){
         .free    = ch_heap_free,
         .malloc  = ch_heap_malloc,
         .realloc = manual_realloc,
@@ -237,7 +233,7 @@ allocator_t new_ch_heap_allocator(memory_heap_t *heap, const char *name) {
         .arg     = heap,
     };
 }
-#endif
+#    endif
 #endif
 
 PURE allocator_t *get_default_allocator(void) {

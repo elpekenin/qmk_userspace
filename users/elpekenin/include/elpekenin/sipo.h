@@ -22,8 +22,8 @@
  * .. warning::
  *   You will get a build error if :c:macro:`N_SIPO_PINS` is not correctly set up.
  */
-#define configure_sipo_pins(pin_names...)           \
-    enum { pin_names, __SIPO_PINS }; \
+#define configure_sipo_pins(pin_names...) \
+    enum { pin_names, __SIPO_PINS };      \
     _Static_assert(__SIPO_PINS <= N_SIPO_PINS, "Defined more pin names than the amount configured")
 
 /**

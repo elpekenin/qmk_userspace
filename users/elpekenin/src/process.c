@@ -36,7 +36,6 @@
 #    include "elpekenin/xap.h"
 #endif
 
-
 // *** Logic start ***
 
 #if defined(AUTOCORRECT_ENABLE)
@@ -91,7 +90,6 @@ PEKE_PRE_INIT(autocorrect_enable, INIT_AUTOCORRECT);
 bool keylog_enabled = true;
 #endif
 
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     char buff[15];
 
@@ -113,9 +111,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
 
         bool ret;
-        WITHOUT_DEBUG(
-            ret = process_rgb_matrix(keycode, record);
-        );
+        WITHOUT_DEBUG(ret = process_rgb_matrix(keycode, record););
         return ret;
     }
 #endif
@@ -144,10 +140,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
 
             if (pressed) {
-                send_string(
-                    "// Copyright 2024 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>\n"
-                    "// SPDX-License-Identifier: GPL-2.0-or-later\n"
-                );
+                send_string("// Copyright 2024 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>\n"
+                            "// SPDX-License-Identifier: GPL-2.0-or-later\n");
             }
             return false;
 
@@ -205,25 +199,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
 #endif
 
-    case PK_CRSH:
-        set_crash_info("test");
-        NVIC_SystemReset();
-        return false;
+        case PK_CRSH:
+            set_crash_info("test");
+            NVIC_SystemReset();
+            return false;
 
-    case PK_PCSH:
-        if (pressed) {
-            print_crash_call_stack();
-        }
-        return false;
+        case PK_PCSH:
+            if (pressed) {
+                print_crash_call_stack();
+            }
+            return false;
 
-    case PK_SIZE:
-        if (pressed) {
-            _ = logging(UNKNOWN, LOG_INFO, "Binary takes %s", pretty_bytes(get_flash_size(), buff, sizeof(buff)));
-        }
-        return false;
+        case PK_SIZE:
+            if (pressed) {
+                _ = logging(UNKNOWN, LOG_INFO, "Binary takes %s", pretty_bytes(get_flash_size(), buff, sizeof(buff)));
+            }
+            return false;
 
-    default:
-        break;
+        default:
+            break;
     }
 
     return true;

@@ -22,14 +22,14 @@ static inline void __split_size_err(void) {
 
 // *** Callbacks ***
 
-WEAK void build_info_sync_keymap_callback(void) { }
+WEAK void build_info_sync_keymap_callback(void) {}
 
 void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
     if (m2s_size != sizeof(build_info_t)) {
         return __split_size_err();
     }
 
-    build_info_t *received_build_info = (build_info_t *)m2s_buffer;
+    build_info_t* received_build_info = (build_info_t*)m2s_buffer;
 
     set_build_info(*received_build_info);
     build_info_sync_keymap_callback();
@@ -41,7 +41,7 @@ void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint
     }
 
     void shutdown_quantum(bool jump_to_bootloader);
-    shutdown_quantum(*(bool *)m2s_buffer);
+    shutdown_quantum(*(bool*)m2s_buffer);
 }
 
 void user_ee_clr_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
@@ -52,8 +52,7 @@ void user_ee_clr_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_
     eeconfig_init();
 }
 
-
-extern void xap_receive_base(const void *data);
+extern void xap_receive_base(const void* data);
 
 void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
     if (m2s_size != XAP_EPSIZE) {
@@ -63,20 +62,18 @@ void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_siz
     xap_receive_base(m2s_buffer);
 }
 
-
 // *** Periodic tasks ***
 
-static inline uint32_t build_info_sync_callback(uint32_t trigger_time, void *cb_arg) {
+static inline uint32_t build_info_sync_callback(uint32_t trigger_time, void* cb_arg) {
     build_info_t build_info = get_build_info();
     transaction_rpc_send(RPC_ID_BUILD_INFO, sizeof(build_info_t), &build_info);
     return 30000;
 }
 
-static inline uint32_t slave_log_sync_callback(uint32_t trigger_time, void *cb_arg) {
+static inline uint32_t slave_log_sync_callback(uint32_t trigger_time, void* cb_arg) {
     user_logging_master_poll();
     return 3000;
 }
-
 
 // *** Exposed to other places ***
 
@@ -88,7 +85,7 @@ void reset_ee_slave(void) {
     transaction_rpc_send(RPC_ID_USER_EE_CLR, 0, NULL);
 }
 
-void xap_execute_slave(const void *data) {
+void xap_execute_slave(const void* data) {
     if (!is_keyboard_master_impl()) {
         return;
     }

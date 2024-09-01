@@ -13,7 +13,7 @@
 // Base SPI support
 
 bool qp_comms_spi_init(painter_device_t device) {
-    painter_driver_t *     driver       = (painter_driver_t *)device;
+    painter_driver_t      *driver       = (painter_driver_t *)device;
     qp_comms_spi_config_t *comms_config = (qp_comms_spi_config_t *)driver->comms_config;
 
     // Initialize the SPI peripheral
@@ -27,7 +27,7 @@ bool qp_comms_spi_init(painter_device_t device) {
 }
 
 bool qp_comms_spi_start(painter_device_t device) {
-    painter_driver_t *     driver       = (painter_driver_t *)device;
+    painter_driver_t      *driver       = (painter_driver_t *)device;
     qp_comms_spi_config_t *comms_config = (qp_comms_spi_config_t *)driver->comms_config;
     return spi_custom_start(DUMMY_PIN, comms_config->lsb_first, comms_config->mode, comms_config->divisor, SCREENS_SPI_DRIVER_ID);
 }
@@ -48,7 +48,7 @@ uint32_t qp_comms_spi_send_data(painter_device_t device, const void *data, uint3
 }
 
 void qp_comms_spi_stop(painter_device_t device) {
-    painter_driver_t *     driver       = (painter_driver_t *)device;
+    painter_driver_t      *driver       = (painter_driver_t *)device;
     qp_comms_spi_config_t *comms_config = (qp_comms_spi_config_t *)driver->comms_config;
 
     spi_custom_stop(SCREENS_SPI_DRIVER_ID);
@@ -67,7 +67,7 @@ bool qp_comms_spi_dc_reset_init(painter_device_t device) {
         return false;
     }
 
-    painter_driver_t *              driver       = (painter_driver_t *)device;
+    painter_driver_t               *driver       = (painter_driver_t *)device;
     qp_comms_spi_dc_reset_config_t *comms_config = (qp_comms_spi_dc_reset_config_t *)driver->comms_config;
 
     // Set up D/C as output low, if specified
@@ -91,7 +91,7 @@ bool qp_comms_spi_dc_reset_init(painter_device_t device) {
 }
 
 uint32_t qp_comms_spi_dc_reset_send_data(painter_device_t device, const void *data, uint32_t byte_count) {
-    painter_driver_t *              driver       = (painter_driver_t *)device;
+    painter_driver_t               *driver       = (painter_driver_t *)device;
     qp_comms_spi_dc_reset_config_t *comms_config = (qp_comms_spi_dc_reset_config_t *)driver->comms_config;
 
     set_sipo_pin(comms_config->dc_pin, true);
@@ -107,7 +107,7 @@ uint32_t qp_comms_spi_dc_reset_send_data(painter_device_t device, const void *da
 }
 
 void qp_comms_spi_dc_reset_send_command(painter_device_t device, uint8_t cmd) {
-    painter_driver_t *              driver       = (painter_driver_t *)device;
+    painter_driver_t               *driver       = (painter_driver_t *)device;
     qp_comms_spi_dc_reset_config_t *comms_config = (qp_comms_spi_dc_reset_config_t *)driver->comms_config;
 
     set_sipo_pin(comms_config->dc_pin, false);
@@ -124,7 +124,7 @@ void qp_comms_spi_dc_reset_send_command(painter_device_t device, uint8_t cmd) {
 // SPI with D/C and RST pins but sending one byte at a time, needed for some devices
 
 void qp_comms_spi_dc_reset_single_byte_send_command(painter_device_t device, uint8_t cmd) {
-    painter_driver_t *              driver       = (painter_driver_t *)device;
+    painter_driver_t               *driver       = (painter_driver_t *)device;
     qp_comms_spi_dc_reset_config_t *comms_config = (qp_comms_spi_dc_reset_config_t *)driver->comms_config;
 
     set_sipo_pin(comms_config->dc_pin, false);
@@ -138,7 +138,7 @@ void qp_comms_spi_dc_reset_single_byte_send_command(painter_device_t device, uin
 }
 
 uint32_t qp_comms_spi_dc_reset_single_byte_send_data(painter_device_t device, const void *data, uint32_t byte_count) {
-    painter_driver_t *              driver       = (painter_driver_t *)device;
+    painter_driver_t               *driver       = (painter_driver_t *)device;
     qp_comms_spi_dc_reset_config_t *comms_config = (qp_comms_spi_dc_reset_config_t *)driver->comms_config;
 
     uint32_t       bytes_remaining = byte_count;
@@ -180,4 +180,4 @@ void qp_comms_spi_dc_reset_single_byte_bulk_command_sequence(painter_device_t de
     }
 }
 #    endif // QUANTUM_PAINTER_SPI_DC_RESET_ENABLE
-#endif // QUANTUM_PAINTER_SPI_ENABLE
+#endif     // QUANTUM_PAINTER_SPI_ENABLE

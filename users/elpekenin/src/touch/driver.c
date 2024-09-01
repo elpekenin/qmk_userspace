@@ -8,7 +8,7 @@
 #include "elpekenin/touch.h"
 
 WEAK bool touch_spi_init(touch_device_t device) {
-    touch_driver_t           *driver      = (touch_driver_t *)device;
+    touch_driver_t          *driver       = (touch_driver_t *)device;
     spi_touch_comms_config_t comms_config = driver->spi_config;
 
     // Initialize the SPI peripheral
@@ -56,8 +56,9 @@ void report_from(int16_t x, int16_t y, touch_driver_t *driver, touch_report_t *r
 
     // Apply updside-down adjustment
     if (driver->upside_down) {
-        report->x = driver->width - x;
         _ = logging(TOUCH, LOG_DEBUG, "Upside: (%d, %d)", x, y);
+
+        report->x = driver->width - x;
     }
 
     uint16_t _x = x;
@@ -70,14 +71,13 @@ void report_from(int16_t x, int16_t y, touch_driver_t *driver, touch_report_t *r
             report->y = _y;
             break;
 
-
         case TOUCH_ROTATION_90:
             report->x = driver->height - _y;
             report->y = _x;
             break;
 
         case TOUCH_ROTATION_180:
-            report->x = driver->width  - _x;
+            report->x = driver->width - _x;
             report->y = driver->height - _y;
             break;
 
@@ -91,15 +91,15 @@ void report_from(int16_t x, int16_t y, touch_driver_t *driver, touch_report_t *r
 }
 
 WEAK touch_report_t get_spi_touch_report(touch_device_t device, bool check_irq) {
-    touch_driver_t           *driver      = (touch_driver_t *)device;
+    touch_driver_t          *driver       = (touch_driver_t *)device;
     spi_touch_comms_config_t comms_config = driver->spi_config;
 
     // Static variable so previous report is stored
     // Goal: When the screen is not pressed anymore, we can see the latest point pressed
     static touch_report_t report = {
-        .x = 0,
-        .y = 0,
-        .pressed = false
+        .x       = 0,
+        .y       = 0,
+        .pressed = false,
     };
 
     if (check_irq && readPin(comms_config.irq_pin)) {

@@ -26,24 +26,22 @@
 #    include "elpekenin/keylog.h"
 #endif
 
-
 // *** Macro magic for defer_exec handling ***
 
-#define TASK(__name) \
-    static deferred_token     __name##_token = INVALID_DEFERRED_TOKEN; \
-    static qp_callback_args_t __name##_args  = {0}; \
-    static uint32_t __name##_task_callback(uint32_t trigger_time, void *cb_arg); \
-    void set_##__name##_device(painter_device_t device) { \
-        __name##_args.device = device; \
-        cancel_deferred_exec(__name##_token); \
+#define TASK(__name)                                                                                  \
+    static deferred_token     __name##_token = INVALID_DEFERRED_TOKEN;                                \
+    static qp_callback_args_t __name##_args  = {0};                                                   \
+    static uint32_t           __name##_task_callback(uint32_t trigger_time, void *cb_arg);            \
+    void                      set_##__name##_device(painter_device_t device) {                        \
+        __name##_args.device = device;                                           \
+        cancel_deferred_exec(__name##_token);                                    \
         __name##_token = defer_exec(10, __name##_task_callback, &__name##_args); \
     }
-
 
 // *** Internal variables ***
 
 static deferred_executor_t    scrolling_text_executors[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS] = {0};
-static scrolling_text_state_t scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS] = {0};
+static scrolling_text_state_t scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS]    = {0};
 
 TASK(logging)
 TASK(uptime)
@@ -66,16 +64,15 @@ typedef struct {
     anim_phase_t state;
     char         curr[65]; // u64 mask + '\0'
     char         dest[65]; // u64 mask + '\0'
-    void       (*callback)(void *);
+    void (*callback)(void *);
 } glitch_text_state_t;
 
 static glitch_text_state_t heap_stats_extra = {0};
-static glitch_text_state_t layer_extra = {0};
+static glitch_text_state_t layer_extra      = {0};
 
 // *** Asset handling ***
 
 // Ported to zig :)
-
 
 // *** Build info ***
 
@@ -99,12 +96,11 @@ void draw_commit(painter_device_t device) {
         real_height = width;
     }
 
-    uint16_t x = real_width  - hash_width;
+    uint16_t x = real_width - hash_width;
     uint16_t y = real_height - font->line_height;
 
     qp_drawtext_recolor(device, x, y, font, get_build_info().commit, HSV_RED, HSV_WHITE);
 }
-
 
 // *** Scrolling text ***
 
@@ -143,7 +139,6 @@ static int render_scrolling_text_state(scrolling_text_state_t *state) {
     }
     state->width = width;
 
-
     // draw it
     bool ret = qp_drawtext_recolor(state->device, state->x, state->y, state->font, (const char *)slice, state->fg.hsv888.h, state->fg.hsv888.s, state->fg.hsv888.v, state->bg.hsv888.h, state->bg.hsv888.s, state->bg.hsv888.v);
 
@@ -180,11 +175,7 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
     _ = logging(SCROLL, LOG_DEBUG, "%s: entry", __func__);
 
     scrolling_text_state_t *scrolling_state = NULL;
-    for (
-        scrolling_text_state_t *state = scrolling_text_states;
-        state < &scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS];
-        ++state
-    ) {
+    for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS]; ++state) {
         if (state->device == NULL) {
             scrolling_state = state;
             break;
@@ -222,16 +213,18 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
 
     // Draw the first string
     if (render_scrolling_text_state(scrolling_state) != 0) {
-        scrolling_state->device = NULL; // disregard the allocated scroling slot
         _ = logging(SCROLL, LOG_ERROR, "%s: fail (render 1st step)", __func__);
+
+        scrolling_state->device = NULL; // disregard the allocated scroling slot
         return INVALID_DEFERRED_TOKEN;
     }
 
     // Set up the timer
     scrolling_state->defer_token = defer_exec_advanced(scrolling_text_executors, QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS, delay, scrolling_text_callback, scrolling_state);
     if (scrolling_state->defer_token == INVALID_DEFERRED_TOKEN) {
-        scrolling_state->device = NULL; // disregard the allocated scrolling slot
         _ = logging(SCROLL, LOG_ERROR, "%s: fail (setup executor)", __func__);
+
+        scrolling_state->device = NULL; // disregard the allocated scrolling slot
         return INVALID_DEFERRED_TOKEN;
     }
 
@@ -240,16 +233,12 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
 }
 
 void extend_scrolling_text(deferred_token scrolling_token, const char *str) {
-    for (
-        scrolling_text_state_t *state = scrolling_text_states;
-        state < &scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS];
-        ++state
-    ) {
+    for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS]; ++state) {
         if (state->defer_token == scrolling_token) {
             uint8_t cur_len = strlen(state->str);
             uint8_t new_len = strlen(str);
             uint8_t len     = cur_len + new_len + 1;
-            char *  new_pos = realloc_with(scrolling_allocator, state->str, len);
+            char   *new_pos = realloc_with(scrolling_allocator, state->str, len);
 
             if (new_pos == NULL) {
                 _ = logging(SCROLL, LOG_ERROR, "%s: fail (realloc)", __func__);
@@ -269,11 +258,7 @@ void stop_scrolling_text(deferred_token scrolling_token) {
         return;
     }
 
-    for (
-        scrolling_text_state_t *state = scrolling_text_states;
-        state < &scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS];
-        ++state
-    ) {
+    for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS]; ++state) {
         if (state->defer_token == scrolling_token) {
             // Clear screen and de-allocate
             qp_rect(state->device, state->x, state->y, state->x + state->width, state->y + state->font->line_height, HSV_BLACK, true);
@@ -293,7 +278,6 @@ void stop_scrolling_text(deferred_token scrolling_token) {
     _ = logging(QP, LOG_ERROR, "404 scrolling token");
 }
 
-
 // *** Callbacks ***
 
 static uint32_t scrolling_text_tick_callback(uint32_t trigger_time, void *cb_arg) {
@@ -310,7 +294,7 @@ static uint32_t logging_task_callback(uint32_t trigger_time, void *cb_arg) {
 
 static uint32_t uptime_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
- 
+
     if (args->device == NULL || args->font == NULL) {
         return 1000;
     }
@@ -318,12 +302,10 @@ static uint32_t uptime_task_callback(uint32_t trigger_time, void *cb_arg) {
     div_t result = div(trigger_time, MS_IN_A_DAY);
     // uint8_t days = result.quot;
 
-    result = div(result.rem, MS_IN_AN_HOUR);
-    uint8_t hours = result.quot;
-
-    result = div(result.rem, MS_IN_A_MIN);
+    result          = div(result.rem, MS_IN_AN_HOUR);
+    uint8_t hours   = result.quot;
+    result          = div(result.rem, MS_IN_A_MIN);
     uint8_t minutes = result.quot;
-
     uint8_t seconds = result.rem / MS_IN_A_SEC;
 
     char uptime_str[16];
@@ -353,24 +335,11 @@ static void draw_heap(void *cb_arg) {
         return;
     }
 
-    int16_t width = qp_drawtext(
-        args->device,
-        args->x,
-        args->y,
-        args->font,
-        // space to align the ":" with flash
-        " Heap: "
-    );
+    // heading space to align the ":" with flash
+    int16_t width = qp_drawtext(args->device, args->x, args->y, args->font, " Heap: ");
 
-    qp_drawtext(
-        args->device,
-        args->x + width,
-        args->y,
-        args->font,
-        state->curr
-    );
+    qp_drawtext(args->device, args->x + width, args->y, args->font, state->curr);
 }
-
 
 static uint32_t glitch_text_callback(uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
@@ -440,19 +409,14 @@ static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
     glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
 
-    size_t used  = get_used_heap();
+    size_t used = get_used_heap();
 
-    char buff[100];
+    char   buff[100];
     size_t buff_size = sizeof(buff);
 
     static size_t last_used = 0;
 
-    if (
-        args->device == NULL
-        || args->font == NULL
-        || last_used == used
-        || state->running
-    ) {
+    if (args->device == NULL || args->font == NULL || last_used == used || state->running) {
         return 1000;
     }
 
@@ -464,28 +428,14 @@ static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
         strlcpy(buff, "Flash: ", sizeof(buff));
 
         size_t offset = strlen(buff);
-        pretty_bytes(
-            get_used_flash(),
-            buff + offset,
-            buff_size - offset
-        );
+        pretty_bytes(get_used_flash(), buff + offset, buff_size - offset);
 
         strlcat(buff, "/", sizeof(buff));
 
         offset = strlen(buff);
-        pretty_bytes(
-            get_flash_size(),
-            buff + offset,
-            buff_size - offset
-        );
+        pretty_bytes(get_flash_size(), buff + offset, buff_size - offset);
 
-        qp_drawtext(
-            args->device,
-            args->x,
-            args->y - args->font->line_height,
-            args->font,
-            buff
-        );
+        qp_drawtext(args->device, args->x, args->y - args->font->line_height, args->font, buff);
     }
 
     last_used      = used;
@@ -497,11 +447,7 @@ static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
     strlcat(buff, "/", sizeof(buff));
 
     offset = strlen(buff);
-    pretty_bytes(
-        get_heap_size(),
-        buff + offset,
-        buff_size - offset
-    );
+    pretty_bytes(get_heap_size(), buff + offset, buff_size - offset);
 
     // start the animation
     strlcpy(state->dest, buff, sizeof(state->dest));
@@ -525,15 +471,7 @@ static uint32_t keylog_task_callback(uint32_t trigger_time, void *cb_arg) {
     uint16_t    height = qp_get_height(args->device);
 
     int16_t textwidth = qp_textwidth(args->font, keylog);
-    qp_rect(
-        args->device,
-        0,
-        height - args->font->line_height,
-        width - textwidth,
-        height,
-        HSV_BLACK,
-        true
-    );
+    qp_rect(args->device, 0, height - args->font->line_height, width - textwidth, height, HSV_BLACK, true);
 
     // default to white, change it based on WPM (if enabled)
     HSV color = {HSV_WHITE};
@@ -552,15 +490,7 @@ static uint32_t keylog_task_callback(uint32_t trigger_time, void *cb_arg) {
     }
 #    endif
 
-    qp_drawtext_recolor(
-        args->device,
-        width - textwidth,
-        height - args->font->line_height,
-        args->font,
-        keylog,
-        color.h, color.s, color.v,
-        HSV_BLACK
-    );
+    qp_drawtext_recolor(args->device, width - textwidth, height - args->font->line_height, args->font, keylog, color.h, color.s, color.v, HSV_BLACK);
 
     return 10;
 }
@@ -579,14 +509,7 @@ static void draw_layer(void *cb_arg) {
     uint8_t hue = rng_min_max(0, 255);
     uint8_t sat = state->running ? 255 : 0;
 
-    qp_drawtext_recolor(
-        args->device,
-        args->x, args->y,
-        args->font,
-        state->curr,
-        hue, sat, 255,
-        HSV_BLACK
-    );
+    qp_drawtext_recolor(args->device, args->x, args->y, args->font, state->curr, hue, sat, 255, HSV_BLACK);
 }
 
 static uint32_t layer_task_callback(uint32_t trigger_time, void *cb_arg) {
@@ -626,27 +549,27 @@ static void elpekenin_qp_init(void) {
 
     size_t spacing = font->line_height + 2;
 
-    logging_args.font = font;
-    logging_args.x = 160;
-    logging_args.y = 100;
+    logging_args.font                   = font;
+    logging_args.x                      = 160;
+    logging_args.y                      = 100;
     logging_args.scrolling_args.n_chars = 18;
-    logging_args.scrolling_args.delay = 500;
+    logging_args.scrolling_args.delay   = 500;
 
     uptime_args.font = font;
-    uptime_args.x = 50;
-    uptime_args.y = 55;
+    uptime_args.x    = 50;
+    uptime_args.y    = 55;
 
-    heap_stats_args.font = font;
-    heap_stats_args.x = 50;
-    heap_stats_args.y = uptime_args.y + 2 * spacing;
+    heap_stats_args.font      = font;
+    heap_stats_args.x         = 50;
+    heap_stats_args.y         = uptime_args.y + 2 * spacing;
     heap_stats_extra.callback = draw_heap;
-    heap_stats_args.extra = &heap_stats_extra;
+    heap_stats_args.extra     = &heap_stats_extra;
 
-    layer_args.font = font;
-    layer_args.x = 70;
-    layer_args.y = heap_stats_args.y + spacing;
+    layer_args.font      = font;
+    layer_args.x         = 70;
+    layer_args.y         = heap_stats_args.y + spacing;
     layer_extra.callback = draw_layer;
-    layer_args.extra = &layer_extra;
+    layer_args.extra     = &layer_extra;
 
 #if defined(KEYLOG_ENABLE)
     keylog_args.font = fira_code;

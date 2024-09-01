@@ -269,9 +269,9 @@ NON_NULL(1) NON_NULL(3) READ_ONLY(1) void print_u8_array(const uint8_t *list, co
  *
  * Severity will be ``LOG_DEBUG`` if ``success`` is ``true``, else ``LOG_ERROR``.
  */
-#define log_success(success, feature, msg, args...) \
-    do { \
-        log_level_t level = success ? LOG_DEBUG : LOG_ERROR; \
-        const char *out = (success) ? "OK" : "Error"; \
-        _ = logging(feature, level, msg ": %s", ##args, out); \
-    } while(0)
+#define log_success(success, feature, msg, args...)                           \
+    do {                                                                      \
+        log_level_t level = success ? LOG_DEBUG : LOG_ERROR;                  \
+        const char *out   = (success) ? "OK" : "Error";                       \
+        _                 = logging(feature, level, msg ": %s", ##args, out); \
+    } while (0)

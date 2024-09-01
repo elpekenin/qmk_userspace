@@ -20,21 +20,20 @@
 #include "elpekenin/logging.h"
 #include "elpekenin/spi_custom.h"
 
-
-static pin_t slave_pins[] = {[0 ... SPI_COUNT-1] = NO_PIN};
+static pin_t slave_pins[] = {[0 ... SPI_COUNT - 1] = NO_PIN};
 
 static pin_t spi_sck_pins[]  = SPI_SCK_PINS;
 static pin_t spi_mosi_pins[] = SPI_MOSI_PINS;
 static pin_t spi_miso_pins[] = SPI_MISO_PINS;
-_Static_assert(ARRAY_SIZE(spi_sck_pins)  == SPI_COUNT, "SPI_SCK_PINS has to match size with SPI_DRIVERS");
+_Static_assert(ARRAY_SIZE(spi_sck_pins) == SPI_COUNT, "SPI_SCK_PINS has to match size with SPI_DRIVERS");
 _Static_assert(ARRAY_SIZE(spi_mosi_pins) == SPI_COUNT, "SPI_MOSI_PINS has to match size with SPI_DRIVERS");
 _Static_assert(ARRAY_SIZE(spi_miso_pins) == SPI_COUNT, "SPI_MISO_PINS has to match size with SPI_DRIVERS");
 
-SPIDriver * drivers[] = SPI_DRIVERS;
+SPIDriver *drivers[] = SPI_DRIVERS;
 
 static SPIConfig spi_configs[SPI_COUNT];
 
-bool is_initialised[] = {[0 ... SPI_COUNT-1] = false};
+bool is_initialised[] = {[0 ... SPI_COUNT - 1] = false};
 
 static MUTEX_DECL(spi_mutex);
 
@@ -283,7 +282,7 @@ bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divi
     }
 #endif
 
-    slave_pins[n]  = slavePin;
+    slave_pins[n]         = slavePin;
     spi_configs[n].ssport = PAL_PORT(slavePin);
     spi_configs[n].sspad  = PAL_PAD(slavePin);
 

@@ -7,10 +7,10 @@
 #include "elpekenin/logging.h"
 #include "elpekenin/placeholders.h"
 
-
 static bool suspend_changed     = true;
 static bool suspend_debug_state = true;
 static bool keyboard_booted     = false;
+
 void suspend_power_down_user(void) {
     // good amount of logic would be lost, so we call housekeeping function while suspended
     if (!suspend_changed) {
@@ -42,6 +42,7 @@ void suspend_wakeup_init_user(void) {
 
     // restore debug and log event after suspend
     debug_config.enable = suspend_debug_state;
+
     _ = logging(UNKNOWN, LOG_DEBUG, "waking up...");
 
     suspend_wakeup_init_keymap();

@@ -35,7 +35,7 @@ int expand_if_needed(void **array) {
     // allocate more space if needed
     if (UNLIKELY(header->length == header->capacity)) {
         size_t current_size = header->item_size * header->capacity;
-        size_t total_size    = sizeof(header_t) + current_size * 2;
+        size_t total_size   = sizeof(header_t) + current_size * 2;
 
         header_t *new_header = realloc_with(header->allocator, header, total_size);
         if (UNLIKELY(new_header == NULL)) {
@@ -49,4 +49,3 @@ int expand_if_needed(void **array) {
 
     return 0;
 }
-

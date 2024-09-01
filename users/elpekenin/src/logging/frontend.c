@@ -17,6 +17,7 @@
 // *** Actual logging ***
 
 // stringify log levels
+// clang-format off
 static const char *level_str[] = {
     [LOG_NONE]  = "UNREACHABLE",
     [LOG_DEBUG] = "DEBUG",
@@ -24,9 +25,11 @@ static const char *level_str[] = {
     [LOG_WARN]  = "WARN",
     [LOG_ERROR] = "ERROR",
 };
+// clang-format on
 ASSERT_LEVELS(level_str);
 
 // stringify features
+// clang-format off
 static const char *feature_str[] = { // sorted alphabetically
     [UNKNOWN] = "",
     [ALLOC]   = "ALLOC",
@@ -39,9 +42,11 @@ static const char *feature_str[] = { // sorted alphabetically
     [SPI]     = "SPI",
     [TOUCH]   = "TOUCH",
 };
+// clang-format on
 ASSERT_FEATURES(feature_str);
 
 // logging level for each feature
+// clang-format off
 log_level_t feature_levels[] = { // sorted alphabetically
     [UNKNOWN] = LOG_DEBUG,
     [ALLOC]   = LOG_WARN,
@@ -54,6 +59,7 @@ log_level_t feature_levels[] = { // sorted alphabetically
     [SPI]     = LOG_WARN,
     [TOUCH]   = LOG_WARN,
 };
+// clang-format on
 ASSERT_FEATURES(feature_levels);
 
 log_level_t get_level_for(feature_t feature) {
@@ -65,12 +71,14 @@ static inline void __logging_error(void) {
 }
 
 void set_level_for(feature_t feature, log_level_t level) {
+    // clang-format off
     if (
         (feature < UNKNOWN) // is this possible ?
         || (level < LOG_NONE)
         || (feature >= __N_FEATURES__)
         || (level >= __N_LEVELS__)
     ) {
+        // clang-format on
         return __logging_error();
     }
 
@@ -80,10 +88,12 @@ void set_level_for(feature_t feature, log_level_t level) {
 void step_level_for(feature_t feature, bool increase) {
     log_level_t level = get_level_for(feature);
 
+    // clang-format off
     if (
         ((level == LOG_NONE) && !increase)
         || (((level + 1) == __N_LEVELS__) && increase)
     ) {
+        // clang-format on
         return __logging_error();
     }
 
@@ -116,7 +126,7 @@ NON_NULL(1) READ_ONLY(1) static token_t get_token(const char **str) {
 
                 case 'S': // %LS
                     return LS_SPEC;
-                
+
                 default:
                     return INVALID_SPEC;
             }
@@ -189,22 +199,22 @@ WEAK const char *log_time(void) {
     return buff;
 }
 
-
 static MUTEX_DECL(logging_mutex);
 
 int _;
 
 static bool ready = false;
+
 void logging_ready(void) {
     ready = true;
 }
 PEKE_POST_INIT(logging_ready, POST_INIT_CORE1);
 
 int logging(feature_t feature, log_level_t level, const char *msg, ...) {
-    va_list args;
+    va_list     args;
     const char *p_fmt = fmt;
 
-    int ret = 0;
+    int  ret    = 0;
     bool locked = false;
 
     // message filtered out, quit
@@ -238,6 +248,7 @@ int logging(feature_t feature, log_level_t level, const char *msg, ...) {
         switch (get_token(&p_fmt)) {
             case INVALID_SPEC: // unreachable, guarded by set_logging_fmt
                 _ = logging(LOGGER, LOG_ERROR, "???");
+
                 ret = -EINVAL;
                 goto exit;
 
@@ -249,7 +260,7 @@ int logging(feature_t feature, log_level_t level, const char *msg, ...) {
                 putchar_(*p_fmt);
                 break;
 
-            // ----------
+                // ----------
 
             case F_SPEC: // print feature name
                 printf("%s", feature_str[feature]);
@@ -312,14 +323,10 @@ void print_u8_array(const uint8_t *list, const size_t len, const sendchar_func_t
 
 void dump_stack(void) {
     backtrace_t call_stack[50];
-    uint8_t depth = backtrace_unwind(call_stack, ARRAY_SIZE(call_stack));
+    uint8_t     depth = backtrace_unwind(call_stack, ARRAY_SIZE(call_stack));
 
     _ = logging(UNKNOWN, LOG_ERROR, "Crash traceback");
-    for (
-        backtrace_t *stack_frame = call_stack;
-        stack_frame < &call_stack[depth];
-        ++stack_frame
-    ) { // 1 to ignore `dump_stack` itself
+    for (backtrace_t *stack_frame = call_stack; stack_frame < &call_stack[depth]; ++stack_frame) {
         _ = logging(UNKNOWN, LOG_ERROR, "%s@%p", stack_frame->name, stack_frame->function);
     }
 }

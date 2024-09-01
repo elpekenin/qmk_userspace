@@ -12,7 +12,6 @@
 #    include "elpekenin/touch.h"
 #endif
 
-
 // *** Max string length helper ***
 
 #define MAX_PAYLOAD (XAP_EPSIZE - sizeof(xap_broadcast_header_t))
@@ -27,7 +26,6 @@
  */
 #define _MAX_STR_LEN(base_type) (MAX_PAYLOAD - sizeof(base_type) - 1)
 
-
 // *** Identifiers ***
 
 typedef enum {
@@ -39,7 +37,6 @@ typedef enum {
 } _xap_msg_id_t;
 
 typedef uint8_t xap_msg_id_t;
-
 
 // *** Messages ***
 
@@ -53,7 +50,6 @@ typedef struct PACKED {
 
 void xap_screen_pressed(uint8_t screen_id, touch_report_t report);
 
-
 typedef struct PACKED {
     xap_msg_id_t msg_id;
     uint8_t      screen_id;
@@ -62,14 +58,12 @@ typedef struct PACKED {
 void xap_screen_released(uint8_t screen_id);
 #endif
 
-
 typedef struct PACKED {
     xap_msg_id_t msg_id;
     uint8_t      layer;
 } layer_change_msg_t;
 
 void xap_layer(layer_state_t state);
-
 
 typedef struct PACKED {
     xap_msg_id_t msg_id;
@@ -89,7 +83,6 @@ typedef struct PACKED {
 _Static_assert(sizeof(keyevent_msg_t) == MAX_PAYLOAD, "wrong size for keyevent_msg_t");
 
 NON_NULL(2) READ_ONLY(2) void xap_keyevent(uint16_t keycode, keyrecord_t *record);
-
 
 typedef struct PACKED {
     xap_msg_id_t msg_id;

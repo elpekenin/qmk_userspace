@@ -31,7 +31,7 @@ typedef struct PACKED {
      *
      * As granted by QMK's ``version.h``
      */
-    char               commit[COMMIT_TEXT_LEN];
+    char commit[COMMIT_TEXT_LEN];
 
     /**
      * Set of features enabled on this build.

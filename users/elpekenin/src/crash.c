@@ -26,7 +26,6 @@ typedef struct _crash_info_t {
 SECTION(".no_init") static crash_info_t crash_info;
 static crash_info_t copied_crash_info = {0};
 
-
 // *** API ***
 
 static void copy_crash_info(void) {
@@ -39,7 +38,7 @@ bool program_crashed(void) {
 }
 
 void set_crash_info(const char *msg) {
-    crash_info.magic = MAGIC_VALUE;
+    crash_info.magic       = MAGIC_VALUE;
     crash_info.stack_depth = backtrace_unwind(crash_info.call_stack, DEPTH);
     strlcpy(crash_info.msg, msg, sizeof(crash_info.msg));
 }
@@ -59,7 +58,7 @@ void print_crash_call_stack(void) {
     backtrace_t *call_stack = get_crash_call_stack(&depth);
 
     // first entry is the error handler, skip it
-    _ =  logging(UNKNOWN, LOG_WARN, "Crash (%s)", copied_crash_info.msg);
+    _ = logging(UNKNOWN, LOG_WARN, "Crash (%s)", copied_crash_info.msg);
     for (int8_t i = 1; i < depth; ++i) {
         _ = logging(UNKNOWN, LOG_ERROR, "%s", call_stack[i].name);
         _ = logging(UNKNOWN, LOG_ERROR, "%p", call_stack[i].address);
@@ -71,20 +70,19 @@ void clear_crash_info(void) {
     memset(&crash_info, 0, sizeof(crash_info));
 }
 
-
 // *** IRQ Handlers ***
 
-#define HANDLER(__func, __name) \
+#define HANDLER(__func, __name)            \
     INTERRUPT NORETURN void __func(void) { \
-        set_crash_info(__name); \
-        NVIC_SystemReset(); \
+        set_crash_info(__name);            \
+        NVIC_SystemReset();                \
     }
 
 HANDLER(_unhandled_exception, "Unknown")
-HANDLER(HardFault_Handler,    "Hard")
-HANDLER(BusFault_Handler,     "Bus")
-HANDLER(UsageFault_Handler,   "Usage")
-HANDLER(MemManage_Handler,    "MemMan")
+HANDLER(HardFault_Handler, "Hard")
+HANDLER(BusFault_Handler, "Bus")
+HANDLER(UsageFault_Handler, "Usage")
+HANDLER(MemManage_Handler, "MemMan")
 
 // defined by ChibiOS, for context swap (?)
 // HANDLER(NMI_Handler);
