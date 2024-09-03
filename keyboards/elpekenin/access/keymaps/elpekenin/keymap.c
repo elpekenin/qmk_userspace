@@ -98,7 +98,7 @@ void keyboard_post_init_keymap(void) {
     set_keylog_device(ili9341);
 #        endif
 
-#        if defined (TOUCH_SCREEN_ENABLE)
+#        if defined(TOUCH_SCREEN_ENABLE)
     defer_exec(10, read_touch_callback, NULL);
 #        endif
 

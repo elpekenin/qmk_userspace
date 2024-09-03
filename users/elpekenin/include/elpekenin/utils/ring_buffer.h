@@ -1,46 +1,89 @@
 // Copyright 2024 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+/**
+ * Implementation of a `ring buffer <https://en.wikipedia.org/wiki/Circular_buffer>`_.
+ *
+ * Tiny wrapper on top of an array.
+ */
+
+/**
+ * ----
+ */
+
+// -- barrrier --
+
 #pragma once
 
 #include <quantum/util.h> // ARRAY_SIZE
 
-// a ring buffer is a convenience wrapper for an array
+/**
+ * Create a new ring buffer.
+ *
+ * Args:
+ *     type: Of the values being stored.
+ *     size: Capacity of the buffer.
+ *     name: Of the ring buffer variable to be created.
+ */
+#define new_rbuf(type, size, name) \
+    struct {                       \
+        size_t next_in;            \
+        size_t next_out;           \
+        type   values[size];       \
+    } name = {0}
 
-#define new_rbuf(__type, __size, __name) \
-    struct { \
-        size_t next_in; \
-        size_t next_out; \
-        __type values[__size]; \
-    } __name = {0}
-
-#define rbuf_push(__buf, __value) \
-    do { \
-        __buf.values[__buf.next_in] = __value; \
-        __buf.next_in = (__buf.next_in + 1) % ARRAY_SIZE(__buf.values); \
-        if (__buf.next_in == __buf.next_out) { \
-            __buf.next_out = (__buf.next_out + 1) % ARRAY_SIZE(__buf.values); \
-        } \
+/**
+ * Insert an element into a buffer.
+ */
+#define rbuf_push(rbuf, value)                                                    \
+    do {                                                                          \
+        rbuf.values[rbuf.next_in] = value;                                        \
+        rbuf.next_in              = (rbuf.next_in + 1) % ARRAY_SIZE(rbuf.values); \
+        if (rbuf.next_in == rbuf.next_out) {                                      \
+            rbuf.next_out = (rbuf.next_out + 1) % ARRAY_SIZE(rbuf.values);        \
+        }                                                                         \
     } while (0)
 
-#define rbuf_pop(__buf, __max, __ptr) ({ \
-    size_t i = 0; \
-    size_t max = (__max == 0) ? rbuf_size(__buf) : __max; \
-    while (i < max && __buf.next_out != __buf.next_in) { \
-        __ptr[i++] = __buf.values[__buf.next_out]; \
-        __buf.next_out = (__buf.next_out + 1) % ARRAY_SIZE(__buf.values); \
-    } \
-    /* bytes extracted */ \
-    i; \
-})
+/**
+ * Read data from a buffer.
+ *
+ * Args:
+ *     rbuf: The ring buffer.
+ *     max: Elements to be read at most. 0 -> Read everything
+ *     dest: Memory where data is read.
+ *
+ * Return:
+ *     Number of bytes read.
+ */
+#define rbuf_pop(rbuf, max, dest)                                          \
+    ({                                                                     \
+        size_t i   = 0;                                                    \
+        size_t _max = (max == 0) ? rbuf_size(rbuf) : max;                   \
+        while (i < _max && rbuf.next_out != rbuf.next_in) {                 \
+            dest[i++]     = rbuf.values[rbuf.next_out];                    \
+            rbuf.next_out = (rbuf.next_out + 1) % ARRAY_SIZE(rbuf.values); \
+        }                                                                  \
+        /* bytes extracted */                                              \
+        i;                                                                 \
+    })
 
-#define rbuf_clear(__buf) \
-    do { \
-        __buf.next_in = __buf.next_out = 0; \
+/**
+ * Mark a buffer as empty.
+ *
+ * .. note::
+ *   Does not zero out the memory.
+ */
+#define rbuf_clear(rbuf)                  \
+    do {                                  \
+        rbuf.next_in = rbuf.next_out = 0; \
     } while (0)
 
-#define rbuf_size(__buf) \
-    ARRAY_SIZE(__buf.values)
+/**
+ * Get the size of a buffer.
+ */
+#define rbuf_size(rbuf) ARRAY_SIZE(rbuf.values)
 
-#define rbuf_full(__buf) \
-    __buf.next_out == __buf.next_in - 1
+/**
+ * Check if the buffer is completely filled.
+ */
+#define rbuf_full(rbuf) rbuf.next_out == rbuf.next_in - 1

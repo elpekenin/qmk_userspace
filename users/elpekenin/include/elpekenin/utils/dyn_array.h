@@ -1,23 +1,75 @@
 // Copyright 2024 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+/**
+ * Dynamic (grows as needed) array of elements.
+ */
+
+/**
+ * ----
+ */
+
+// -- barrier --
+
 #pragma once
 
 #include "elpekenin/errno.h"
 #include "elpekenin/utils/allocator.h"
 #include "elpekenin/utils/compiler.h"
 
+/**
+ * Metadata stored for a dynamic array.
+ */
 typedef struct PACKED {
+    /**
+     * The allocator it will use to grow.
+     */
     allocator_t *allocator;
-    size_t       capacity;  // allocated slots
-    size_t       length;    // filled slots
-    size_t       item_size;
+
+    /**
+     * How many of slots the array has allocated.
+     */
+    size_t capacity;
+
+    /**
+     * How many slots are currently used.
+     */
+    size_t length;
+
+    /**
+     * Size of each element type, to allocate size accordingly.
+     */
+    size_t item_size;
 } header_t;
 
-#define new_array(__type, __size, __allocator) (__type *)_new_array(sizeof(__type), __size, __allocator)
+/**
+ * ----
+ */
+
+/**
+ * Create a new dynamic array.
+ *
+ * Args:
+ *     type: The type of the elements in the container.
+ *     size: Initial size of the array. Useful to prevent extra allocation calls/wasted space.
+ *     allocator: Used to grow.
+ *
+ * Return:
+ *    A pointer to the first element in the newly created array.
+ */
+#define new_array(type, size, allocator) (type *)_new_array(sizeof(type), size, allocator)
+
+/**
+ * Internal function used by :c:macro:`new_array`.
+ *
+ * .. hint::
+ *   You really shouldn't use this, but the macro that provides some convenience.
+ */
 READ_ONLY(3) void *_new_array(size_t item_size, size_t initial_size, allocator_t *allocator);
 
-
+/**
+ * Given a dynamic array, access its metadata.
+ */
 PURE READ_ONLY(1) static inline header_t *get_header(void *array) {
     if (UNLIKELY(array == NULL)) {
         return NULL;
@@ -26,6 +78,9 @@ PURE READ_ONLY(1) static inline header_t *get_header(void *array) {
     return ((header_t *)array) - 1;
 }
 
+/**
+ * Convenience to get the length of a dynamic array.
+ */
 PURE READ_ONLY(1) static inline size_t array_len(void *array) {
     header_t *header = get_header(array);
 
@@ -36,24 +91,47 @@ PURE READ_ONLY(1) static inline size_t array_len(void *array) {
     return header->length;
 }
 
+/**
+ * Check if ``array`` is full (``capacity == length``). If so, make it bigger.
+ *
+ * Return:
+ *     Whether operation was successful. See :doc:`/headers/errno` for details.
+ *
+ * .. attention::
+ *   So far, this grow duplicates capacity, beware your memory usage and initialize
+ *   the array with a better size if needed.
+ */
 WARN_UNUSED int expand_if_needed(void **array);
 
-#define array_append(__array, __value) ({ \
-    /* unless we needed extra space and failed to allocate, append the item */ \
-    int ret = expand_if_needed((void **)&__array); \
-    if (ret == 0) { \
-        header_t *header = get_header(__array); \
-        if (header == NULL) { \
-            ret = -ENOMEM; \
-        } else { \
-            __array[header->length++] = __value; \
-        } \
-    } \
-    \
-    ret; \
-})
+/**
+ * Put a new element into an array.
+ *
+ * Return:
+ *     Whether operation was successful. See :doc:`/headers/errno` for details.
+ */
+#define array_append(array, value)                                                 \
+    ({                                                                             \
+        /* unless we needed extra space and failed to allocate, append the item */ \
+        int ret = expand_if_needed((void **)&array);                               \
+        if (ret == 0) {                                                            \
+            header_t *header = get_header(array);                                  \
+            if (header == NULL) {                                                  \
+                ret = -ENOMEM;                                                     \
+            } else {                                                               \
+                array[header->length++] = value;                                   \
+            }                                                                      \
+        }                                                                          \
+                                                                                   \
+        ret;                                                                       \
+    })
 
-static inline void array_pop(void *array, size_t n_items) {
+/**
+ * Remove ``n`` elements from the array.
+ *
+ * .. note::
+ *   Does not zero out the memory, but mark it as "can be used".
+ */
+static inline void array_pop(void *array, size_t n) {
     header_t *header = get_header(array);
-    header->length -= n_items;
+    header->length -= n;
 }

@@ -5,6 +5,9 @@
 KB=elpekenin/access
 KM=elpekenin
 
+# add this back?
+# -e CC=qmk-arm-gcc
+
 for SIDE in left right
 do
     qmk compile \
@@ -13,7 +16,6 @@ do
         --compiledb \
         -e MAKECMDGOALS=uf2-split-$SIDE \
         -e TARGET=$SIDE \
-        # -e CC=qmk-arm-gcc \
         > errors.log 2>&1 \
         || (cat errors.log && exit 1)
 done

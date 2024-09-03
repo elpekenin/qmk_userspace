@@ -1,9 +1,22 @@
 // Copyright 2024 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-// Details over:
-//     https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
-//     https://developer.arm.com/documentation/dui0491/i/Compiler-specific-Features/Function-attributes
+/**
+ * Abstract away some compiler-specific features.
+ *
+ * .. note::
+ *   So far, just a few of GCC's attributes.
+ *
+ * .. seealso::
+ *   `GCC Docs <https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html>`_
+ *
+ *   `ARM Docs <https://developer.arm.com/documentation/dui0491/i/Compiler-specific-Features/Function-attributes>`_
+ *
+ * .. attention::
+ *   Documenting this file is not really feasible, take a look at its source.
+ */
+
+// -- barrier--
 
 #pragma once
 
@@ -14,7 +27,6 @@
 #ifndef _ATTR
 #    define _ATTR(x) __attribute__((x))
 #endif
-
 
 // define an item as an alias to another one
 #ifndef ALIAS
@@ -78,7 +90,7 @@
 
 // printf-like function (format + va_args), harcoded assumption that they are correlative
 #ifndef PRINTF
-#    define PRINTF(x) _ATTR(format(printf, x, x+1))
+#    define PRINTF(x) _ATTR(format(printf, x, x + 1))
 #endif
 
 // function return does not depend on external state
@@ -111,7 +123,7 @@
 // function is not available (got removed)
 #ifndef UNAVAILABLE
 #    define UNAVAILABLE(x) _ATTR(unavailable(x))
-#endif 
+#endif
 
 // condition is unlikely, may get some optimization
 #ifndef UNLIKELY

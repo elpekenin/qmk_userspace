@@ -89,6 +89,10 @@ INCLUDE_DIRS = [
     QMK / "quantum",
     QMK / "quantum" / "keymap_extras",
     QMK / "quantum" / "logging",
+    QMK / "quantum" / "painter",
+    QMK / "quantum" / "process_keycode",
+    QMK / "quantum" / "rgb_matrix",
+    QMK / "quantum" / "rgb_matrix" / "animations",
     QMK / "quantum" / "send_string",
     QMK / "quantum" / "sequencer",
     QMK / "quantum" / "unicode",
@@ -159,10 +163,23 @@ hawkmoth_clang = [
 
     # provided by build system
     "-DMCU_RP",
-    "-DINIT_EE_HANDS_RIGHT",
     "-DPROTOCOL_CHIBIOS",
+
+    "-DINIT_EE_HANDS_RIGHT",
+    "-DRGB_MATRIX_LED_COUNT=58",
+
+    "-DAUTOCORRECT_ENABLE",
     "-DEEPROM_WEAR_LEVELING",
-    "-DUNICODE_COMMON_ENABLE",
+    "-DKEYLOG_ENABLE",
+    "-DKEY_OVERRIDE_ENABLE",
+    "-DQUANTUM_PAINTER_ENABLE",
+    "-DRGB_MATRIX_ENABLE",
+    "-DSPLIT_ENABLE",
+    "-DTAP_DANCE_ENABLE",
+    "-DTOUCH_SCREEN_ENABLE",
+    "-DTRI_LAYER_ENABLE",
     "-DUCIS_ENABLE",
+    "-DUNICODE_COMMON_ENABLE",
+    "-DWPM_ENABLE",
     "-DXAP_ENABLE",
 ]

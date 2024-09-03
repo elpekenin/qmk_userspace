@@ -36,13 +36,13 @@
 #define INIT_ALLOC 1010
 
 /* Set up buffers that allow logging onto screens. */
-#define INIT_QP_LOG     1020
+#define INIT_QP_LOG 1020
 /* Set up custom :c:func:`sendchar` function, which :c:func:`printf` calls. */
-#define INIT_SENDCHAR   1021 /* after QP logging has been init */
+#define INIT_SENDCHAR 1021 /* after QP logging has been init */
 /* Configure a format string for :c:func:`logging`. */
 #define INIT_LOG_FORMAT 1022
 /* Set up zig-level code. */
-#define INIT_ZIG        1023 /* early on, but with logging available */
+#define INIT_ZIG 1023 /* early on, but with logging available */
 
 /* Make a copy of crash data, so we dont lose the information. */
 #define INIT_CRASH 1030
@@ -50,16 +50,16 @@
 #define INIT_BUILD 1030 /* before split, so that we send the right thing over wire */
 
 /* Set up structs that configure screens' drawing. */
-#define INIT_QP_TASKS_ARGS  1040
+#define INIT_QP_TASKS_ARGS 1040
 /* Set up custom keylog feature. */
-#define INIT_KEYLOG_MAP     1040
+#define INIT_KEYLOG_MAP 1040
 /* Set up custom RGB indicators feature. */
 #define INIT_INDICATORS_MAP 1040
 
 /* Set up custom split communications. */
-#define INIT_SPLIT       1050
+#define INIT_SPLIT 1050
 /* Set up QMK's trilayer feature. */
-#define INIT_TRI_LAYER   1050
+#define INIT_TRI_LAYER 1050
 /* Enable QMK's autocorrect setup. */
 #define INIT_AUTOCORRECT 1050
 
@@ -69,13 +69,12 @@
 /* Flag second core that everything is set up. */
 #define POST_INIT_CORE1 9990
 
-
 /* Stopping second core is first on the list. */
 #define DEINIT_CORE1 1000
 /* Warn computer we shutting down/restarting. */
 #define DEINIT_XAP 1010
 /* Clean up screens. */
-#define DEINIT_QP  1020
+#define DEINIT_QP 1020
 /* Run zig-level cleanup code. */
 #define DEINIT_ZIG 1020
 /* Stop lights as a marker that we aren't running. */
@@ -84,12 +83,12 @@
 /**
  * Signature for an initializer function.
  */
-typedef void   (*init_fn)(void);
+typedef void (*init_fn)(void);
 
 /**
  * Signature for a finalizer function.
  */
-typedef void   (*deinit_fn)(bool jump_to_bootloader);
+typedef void (*deinit_fn)(bool jump_to_bootloader);
 
 /**
  * Signature for a low-level function called by :c:func:`printf`.
@@ -111,8 +110,7 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  *     func: The function to be added.
  *     prio: Its priority, lower number -> called earlier
  */
-#define PEKE_PRE_INIT(func, prio) \
-    FULL_SECTION_NAME(pre_init, func, prio) USED static init_fn __##func = func
+#define PEKE_PRE_INIT(func, prio) FULL_SECTION_NAME(pre_init, func, prio) USED static init_fn __##func = func
 
 /**
  * Put a function in the post-initialization section.
@@ -121,8 +119,7 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  *     func: The function to be added.
  *     prio: Its priority, lower number -> called earlier
  */
-#define PEKE_POST_INIT(func, prio) \
-    FULL_SECTION_NAME(post_init, func, prio) USED static init_fn __##func = func
+#define PEKE_POST_INIT(func, prio) FULL_SECTION_NAME(post_init, func, prio) USED static init_fn __##func = func
 
 /**
  * Put a function in the second core's initialization section.
@@ -130,8 +127,7 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  * Args:
  *     func: The function to be added.
  */
-#define PEKE_CORE1_INIT(func) \
-    FULL_SECTION_NAME(core1_init, func, 0) USED static init_fn __##func = func
+#define PEKE_CORE1_INIT(func) FULL_SECTION_NAME(core1_init, func, 0) USED static init_fn __##func = func
 
 /**
  * Put a function in the second core's mainloop section.
@@ -139,8 +135,7 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  * Args:
  *     func: The function to be added.
  */
-#define PEKE_CORE1_LOOP(func) \
-    FULL_SECTION_NAME(core1_loop, func, 0) USED static init_fn __##func = func
+#define PEKE_CORE1_LOOP(func) FULL_SECTION_NAME(core1_loop, func, 0) USED static init_fn __##func = func
 
 /**
  * Put a function in the finalizer section.
@@ -149,8 +144,7 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  *     func: The function to be added.
  *     prio: Its priority, lower number -> called earlier
  */
-#define PEKE_DEINIT(func, prio) \
-    FULL_SECTION_NAME(deinit, func, prio) USED static deinit_fn __##func = func
+#define PEKE_DEINIT(func, prio) FULL_SECTION_NAME(deinit, func, prio) USED static deinit_fn __##func = func
 
 /**
  * Put a function in the section that implements :c:func:`printf`'s logic.
@@ -158,8 +152,7 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  * Args:
  *     func: The function to be added.
  */
-#define PEKE_SENDCHAR(func) \
-    FULL_SECTION_NAME(sendchar, func, 0) USED static sendchar_func_t __##func = func
+#define PEKE_SENDCHAR(func) FULL_SECTION_NAME(sendchar, func, 0) USED static sendchar_func_t __##func = func
 
 /**
  * ----
@@ -173,6 +166,6 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  *     name: Name of the section to be iterated.
  *     var: Name of the variable used on the ``for``
  */
-#define FOREACH_SECTION(type, name, var) \
+#define FOREACH_SECTION(type, name, var)      \
     extern type LD_START(name), LD_END(name); \
     for (type *var = &LD_START(name); var < &LD_END(name); ++var)

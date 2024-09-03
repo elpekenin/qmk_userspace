@@ -26,14 +26,19 @@ const char *get_layer_name(layer_names_t layer) {
     switch (layer) {
         case _QWERTY:
             return " QWERTY ";
+
         case _FN1:
             return " F-KEYS ";
+
         case _FN2:
             return " NUMPAD ";
+
         case _FN3:
             return "SYMBOLS ";
+
         case _RST:
             return "  UTILS ";
+
         default:
             return "????????";
     }

@@ -1,6 +1,24 @@
 // Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+/**
+ * Utilities on top of XAP.
+ *
+ * .. seealso::
+ *    QMK's `documentation <https://github.com/qmk/qmk_firmware/blob/xap/docs/xap_0.3.0.md>`_ about XAP.
+ *
+ * .. caution::
+ *   XAP is still work in progress.
+ *
+ *   `Pull Request <https://github.com/qmk/qmk_firmware/pull/13733>`_ for the feature.
+ */
+
+/**
+ * ----
+ */
+
+// -- barrier --
+
 #pragma once
 
 #include <quantum/quantum.h>
@@ -16,16 +34,6 @@
 
 #define MAX_PAYLOAD (XAP_EPSIZE - sizeof(xap_broadcast_header_t))
 
-/* the final type will be
- *
- * struct {
- *     base_type;
- *     string;
- *     byte; // make sure we have a terminator
- * }
- */
-#define _MAX_STR_LEN(base_type) (MAX_PAYLOAD - sizeof(base_type) - 1)
-
 // *** Identifiers ***
 
 typedef enum {
@@ -36,55 +44,185 @@ typedef enum {
     _SHUTDOWN,
 } _xap_msg_id_t;
 
+/**
+ * Identifier for each type of message.
+ */
 typedef uint8_t xap_msg_id_t;
+
+/**
+ * ----
+ */
 
 // *** Messages ***
 
 #if defined(TOUCH_SCREEN_ENABLE)
+/**
+ * Inform about a screen press event.
+ */
 typedef struct PACKED {
+    /**
+     * Identify this message.
+     */
     xap_msg_id_t msg_id;
-    uint8_t      screen_id;
-    uint16_t     x;
-    uint16_t     y;
+
+    /**
+     * Identify the screen.
+     */
+    uint8_t screen_id;
+
+    /**
+     * X-coord of the touchpoint.
+     */
+    uint16_t x;
+
+    /**
+     * Y-coord of the touchpoint.
+     */
+    uint16_t y;
 } screen_pressed_msg_t;
 
+/**
+ * Send a message to PC's client about a screen press event.
+ */
 void xap_screen_pressed(uint8_t screen_id, touch_report_t report);
 
+/**
+ * ----
+ */
+
+/**
+ * Information about a screen release event.
+ */
 typedef struct PACKED {
+    /**
+     * Identify this message.
+     */
     xap_msg_id_t msg_id;
-    uint8_t      screen_id;
+
+    /**
+     * Identify the screen.
+     */
+    uint8_t screen_id;
 } screen_released_msg_t;
 
+/**
+ * Send a message to PC's client about a screen release event.
+ */
 void xap_screen_released(uint8_t screen_id);
+
+/**
+ * ----
+ */
 #endif
 
+/**
+ * Information about a layer change event.
+ */
 typedef struct PACKED {
+    /**
+     * Identify this message.
+     */
     xap_msg_id_t msg_id;
-    uint8_t      layer;
-} layer_change_msg_t;
 
+    /**
+     * Layer state.
+     */
+    layer_state_t layer;
+} layer_change_msg_t;
+_Static_assert(sizeof(layer_state_t) == 1, "Client code expects layer to be u8");
+
+/**
+ * Send a message to PC's client about a layer change event.
+ */
 void xap_layer(layer_state_t state);
 
-typedef struct PACKED {
-    xap_msg_id_t msg_id;
-    uint16_t     keycode;
-    bool         pressed;
-    uint8_t      layer;
-    uint8_t      row;
-    uint8_t      col;
-    uint8_t      mods;
-} _keyevent_msg_t;
+/**
+ * ----
+ */
 
+/**
+ * Information about a key event.
+ */
 typedef struct PACKED {
-    _keyevent_msg_t base;
-    char            str[_MAX_STR_LEN(_keyevent_msg_t)];
-    uint8_t         null;
+    /**
+     * Internal type used to hold event's information.
+     *
+     * Defined an inner struct instead of plain attributes to compute space left for the string.
+     */
+    struct PACKED _base {
+        /**
+         * Identify this message.
+         */
+        xap_msg_id_t msg_id;
+
+        /**
+         * Keycode involved.
+         */
+        uint16_t keycode;
+
+        /**
+         * Whether it got pressed or released.
+         */
+        bool pressed;
+
+        /**
+         * Highest layer currently enabled.
+         */
+        uint8_t layer;
+
+        /**
+         * Electrical row of the key.
+         */
+        uint8_t row;
+
+        /**
+         * Electrical column of the key.
+         */
+        uint8_t col;
+
+        /**
+         * Current modifiers.
+         */
+        uint8_t mods;
+    } base;
+
+    /**
+     * String representation of the keycode.
+     */
+    char str[MAX_PAYLOAD - sizeof(struct _base) - 1];
+
+    /**
+     * Ensure we have a null terminator byte.
+     */
+    uint8_t null;
 } keyevent_msg_t;
 _Static_assert(sizeof(keyevent_msg_t) == MAX_PAYLOAD, "wrong size for keyevent_msg_t");
 
+/**
+ * Send a message to PC's client about a key event.
+ */
 NON_NULL(2) READ_ONLY(2) void xap_keyevent(uint16_t keycode, keyrecord_t *record);
 
+/**
+ * ----
+ */
+
+/**
+ * Information about shutdown event.
+ */
 typedef struct PACKED {
+    /**
+     * Identify this message.
+     */
     xap_msg_id_t msg_id;
-    bool         bootloader;
+
+    /**
+     * Whether MCU is rebooting or jumping to bootloader.
+     */
+    bool bootloader;
 } shutdown_msg_t;
+
+/**
+ * Send a message to PC's client about a shutdown event.
+ */
+void xap_shutdown(bool bootloader);

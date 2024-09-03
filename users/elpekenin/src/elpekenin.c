@@ -17,6 +17,12 @@ PEKE_PRE_INIT(elpekenin_zig_init, INIT_ZIG);
 extern void elpekenin_zig_deinit(bool);
 PEKE_DEINIT(elpekenin_zig_deinit, DEINIT_ZIG);
 
+#if defined(XAP_ENABLE)
+#    include "elpekenin/xap.h"
+
+PEKE_DEINIT(xap_shutdown, DEINIT_XAP);
+#endif
+
 void housekeeping_task_user(void) {
     housekeeping_task_keymap();
 }

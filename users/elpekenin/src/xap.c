@@ -65,4 +65,3 @@ void xap_shutdown(bool jump_to_bootloader) {
 
     xap_broadcast_user(&msg, sizeof(msg));
 }
-PEKE_DEINIT(xap_shutdown, DEINIT_XAP);

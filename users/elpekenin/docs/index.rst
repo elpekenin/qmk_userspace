@@ -42,6 +42,6 @@ doc-comments in the code, in hopes to reduce this friction. If you find anything
 .. toctree::
     :hidden:
 
-    src/index
-    headers/index
-    utils/index
+    src/_index
+    headers/_index
+    utils/_index
