@@ -26,6 +26,12 @@
             "branch": "rgb_pr"
         },
         {
+            // 22538-ish
+            "operation": "merge",
+            "repo": "https://github.com/elpekenin/qmk_firmware",
+            "branch": "feature/rtt"
+        },
+        {
             "operation": "checkout",
             "files": ["drivers/painter/il91874"],
             "repo": "https://github.com/elpekenin/qmk_firmware",
@@ -42,10 +48,6 @@
         {
             "operation": "diff",
             "file": "generic_rotation.diff"
-        },
-        {
-            "operation": "diff",
-            "file": "print_no_console.diff"
         },
         {
             "operation": "diff",

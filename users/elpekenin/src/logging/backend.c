@@ -5,6 +5,15 @@
 
 #include "elpekenin/utils/sections.h"
 
+#if defined(SEGGER_RTT_ENABLE)
+#    include <lib/RTT/SEGGER_RTT.h>
+
+static int8_t sendchar_rtt_hook(uint8_t c) {
+    return SEGGER_RTT_PutChar(0, c);
+}
+PEKE_SENDCHAR(sendchar_rtt_hook);
+#endif
+
 // default logging provided by QMK
 //    - USB via console endpoint, if CONSOLE_ENABLE
 //    - no-op otherwise

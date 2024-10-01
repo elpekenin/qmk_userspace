@@ -15,6 +15,8 @@ SRC += $(USER_SRC)/build_info.c \
        $(USER_SRC)/power.c \
        $(USER_SRC)/process.c
 
+DEBUG_ENABLE = yes
+
 # Default configuration
 AUTOCORRECT_ENABLE ?= yes
 DEFERRED_EXEC_ENABLE ?= yes
