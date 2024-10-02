@@ -15,6 +15,12 @@
 */
 
 /*
+ * NOTE: clang thinks this is a header, due to .h extension
+ * and formats this is a way that breaks the linker
+ */
+// clang-format off
+
+/*
  * RP2040 memory setup.
  */
 MEMORY

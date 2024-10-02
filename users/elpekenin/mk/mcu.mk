@@ -3,7 +3,7 @@ ifeq ($(MCU_SERIES), RP2040)
 
     # custom script to keep preinit symbol from SDK, needed to init wrappers
     # bake a custom LD with some macros for other similar custom sections
-    # NOTE: gcc -E doesnt seem to like .ld's
+    # NOTE: gcc -E does not seem to like .ld's
     # TODO: decouple to reuse on other boards
     $(shell gcc -E $(USER_PATH)/ld/custom_rp2040.h \
                 -P \

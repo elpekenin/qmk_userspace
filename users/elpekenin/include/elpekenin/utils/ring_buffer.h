@@ -57,9 +57,10 @@
  */
 #define rbuf_pop(rbuf, max, dest)                                          \
     ({                                                                     \
-        size_t i   = 0;                                                    \
-        size_t _max = (max == 0) ? rbuf_size(rbuf) : max;                   \
-        while (i < _max && rbuf.next_out != rbuf.next_in) {                 \
+        size_t i = 0;                                                      \
+                                                                           \
+        size_t _max = (max == 0) ? rbuf_size(rbuf) : max;                  \
+        while (i < _max && rbuf.next_out != rbuf.next_in) {                \
             dest[i++]     = rbuf.values[rbuf.next_out];                    \
             rbuf.next_out = (rbuf.next_out + 1) % ARRAY_SIZE(rbuf.values); \
         }                                                                  \

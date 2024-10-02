@@ -6,6 +6,6 @@
 #include_next <mcuconf.h>
 
 #if defined(MCU_RP)
-#    undef  RP_CORE1_START
+#    undef RP_CORE1_START
 #    define RP_CORE1_START TRUE
 #endif

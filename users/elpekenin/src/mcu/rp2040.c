@@ -73,6 +73,7 @@ void c1_main(void) {
         }
     }
 #else
-    while (true) {}
+    while (true) {
+    }
 #endif
 }

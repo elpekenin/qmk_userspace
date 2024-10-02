@@ -136,7 +136,7 @@ static void maybe_symbol(const char **str) {
     int            ret;
     replacements_t replacements;
 
-    // disable hash logging momentarily, as a lot of strings wont be in the replacements map
+    // disable hash logging momentarily, as a lot of strings won't be in the replacements map
     WITHOUT_LOGGING(MAP, replacements = map_get(replacements_map, *str, ret););
 
     if (LIKELY(ret == -ENOTFOUND)) {

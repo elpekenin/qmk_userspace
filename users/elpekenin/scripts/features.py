@@ -1,11 +1,10 @@
 #! /usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-"""
-Define a new struct type which holds whether selected features are enabled or not.
+"""Define a new struct type which holds whether selected features are enabled or not.
+
 Also provides a function to draw the state on a QP screen.
 """
 
@@ -13,13 +12,13 @@ import sys
 from pathlib import Path
 from typing import Callable
 
-from scripts import *
+import utils
 
 # == User configuration here ==
 TEXT_COLOR = "HSV_BLACK"
 BACKGROUND_COLOR = "HSV_WHITE"
 
-# Capitalization here doesnt matter, code will format it
+# Capitalization here does not matter, code will format it
 FEATURES = sorted(
     {
         "AUDIO",
@@ -39,7 +38,7 @@ FEATURES = sorted(
         "UNICODE_COMMON",
         "WPM",
         "XAP",
-    }
+    },
 )
 SHORT_NAMES = {
     "QUANTUM_PAINTER": "PAINTER",
@@ -51,8 +50,8 @@ OUTPUT_NAME = "features"
 MAX_WIDTH = max(map(len, FEATURES))
 
 # *** Templates ***
-H_FILE = lines(
-    H_HEADER,
+H_FILE = utils.lines(
+    utils.H_HEADER,
     "",
     "#include <stdbool.h>",
     "#include <stdint.h>",
@@ -68,8 +67,8 @@ H_FILE = lines(
     "",
 )
 
-C_FILE = lines(
-    C_HEADER,
+C_FILE = utils.lines(
+    utils.C_HEADER,
     "",
     f'#include "{OUTPUT_NAME}.h"',
     "",
@@ -84,8 +83,8 @@ C_FILE = lines(
     "",
 )
 
-DRAW_FILE = lines(
-    C_HEADER,
+DRAW_FILE = utils.lines(
+    utils.C_HEADER,
     "",
     "#include <quantum/color.h>",
     "",
@@ -122,7 +121,8 @@ def _get_type() -> str:
         if bits <= size:
             return f"uint{size}_t"
 
-    raise ValueError("Too many features, unsupported")
+    msg = "Too many features, unsupported"
+    raise ValueError(msg)
 
 
 def _for_all_features(func: Callable) -> str:
@@ -134,7 +134,7 @@ def _h_generator(feature: str) -> str:
 
 
 def _c_generator(feature: str) -> str:
-    return lines(
+    return utils.lines(
         f"    #if defined({feature.upper()}_ENABLE)",
         f"        features.{feature.lower()} = true;",
         "    #endif",
@@ -147,11 +147,11 @@ def _draw_generator(feature: str) -> str:
     short_name = SHORT_NAMES.get(feature, feature)
     name = short_name.replace("_", " ").title()
 
-    return lines(
-        f'    qp_drawtext_recolor(device, x, y, font, features.{feature.lower()} ? "{name}: On " : "{name}: Off", {TEXT_COLOR}, {BACKGROUND_COLOR});',
-        #                         intentional space so it overwrites previous "Off"         ^^^
+    return utils.lines(
+        f'    qp_drawtext_recolor(device, x, y, font, features.{feature.lower()} ? "{name}: On " : "{name}: Off", {TEXT_COLOR}, {BACKGROUND_COLOR});',  # noqa: E501
+        #                         intentional space so it overwrites previous "Off"         ^^^  # noqa: E501
         "    y += font_height;",
-        "    // next text doesnt fit vertically",
+        "    // next text does not fit vertically",
         "    if ((y + font_height) > height) {",
         "        // shift half the screen to the right, if not done already",
         "        if (!shifted) {",
@@ -159,7 +159,7 @@ def _draw_generator(feature: str) -> str:
         "            x = width / 2;",
         "            y = 0;",
         "        } else {",
-        '           _ = logging(QP, LOG_WARN, "Cant fit more features");',
+        '           _ = logging(QP, LOG_WARN, "Can\'t fit more features");',
         "           return;",
         "        }",
         "    }",
@@ -169,29 +169,25 @@ def _draw_generator(feature: str) -> str:
 
 if __name__ == "__main__":
     # -- Handle args
-    if len(sys.argv) != 2:
-        print(f"{CLI_ERROR} {current_filename(__file__)} <output_folder>")
-        exit(1)
+    if len(sys.argv) != 2:  # noqa: PLR2004
+        msg = f"{utils.CLI_ERROR} {utils.filename(__file__)} <output_folder>"
+        raise SystemExit(msg)
 
     output_dir = Path(sys.argv[1])
     if not output_dir.exists() or not output_dir.is_dir():
-        print(f"Invalid path {output_dir}")
-        exit(1)
+        msg = f"Invalid path {output_dir}"
+        raise SystemExit(msg)
 
     # Gen files
     type_ = _get_type()  # Work out the union type needed
     gen_h = _for_all_features(_h_generator)
-    with open(output_dir / f"{OUTPUT_NAME}.h", "w") as f:
+    with (output_dir / f"{OUTPUT_NAME}.h").open("w") as f:
         f.write(H_FILE.format(type=type_, generated_code=gen_h))
 
     gen_c = _for_all_features(_c_generator)
-    with open(output_dir / f"{OUTPUT_NAME}.c", "w") as f:
+    with (output_dir / f"{OUTPUT_NAME}.c").open("w") as f:
         f.write(C_FILE.format(generated_code=gen_c))
 
     gen_draw = _for_all_features(_draw_generator)
-    with open(output_dir / f"{OUTPUT_NAME}_draw.c", "w") as f:
+    with (output_dir / f"{OUTPUT_NAME}_draw.c").open("w") as f:
         f.write(DRAW_FILE.format(generated_code=gen_draw))
-
-else:
-    print("Dont try to import this")
-    exit(1)

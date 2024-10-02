@@ -11,7 +11,6 @@
 #include "elpekenin/utils/sections.h"
 #include "elpekenin/utils/shortcuts.h"
 
-
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     if (!rgb_matrix_indicators_advanced_keymap(led_min, led_max)) {
         return false;
@@ -28,6 +27,7 @@ bool led_update_user(led_t led_state) {
     // i dont really want debug here:
     //    - rgb matrix mode [NOEEPROM]: x
     //    - rgb matrix set hsv [NOEEPROM]: x, y, z
+    // clang-format off
     WITHOUT_DEBUG(
         if (led_state.caps_lock) {
             rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
@@ -36,6 +36,7 @@ bool led_update_user(led_t led_state) {
             rgb_matrix_mode_noeeprom(RGB_MATRIX_CYCLE_LEFT_RIGHT);
         }
     );
+    // clang-format on
 
     return false;
 }
@@ -46,7 +47,7 @@ WEAK bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max
 
 void rgb_shutdown(bool jump_to_bootloader) {
     if (jump_to_bootloader) {
-        // off for bootlaoder
+        // off for bootloader
         rgb_matrix_set_color_all(RGB_OFF);
     } else {
         // red for reboot

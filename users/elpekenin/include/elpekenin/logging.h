@@ -61,7 +61,7 @@ typedef enum {
 } feature_t; // ALWAYS ADD AT THE END, FOR ASSERT TO WORK
 
 /**
- * Different level of severity. Used to filter out messsages.
+ * Different level of severity. Used to filter out messages.
  *
  * .. warning::
  *   If you want to add a new one, it has to be the last element.
@@ -111,7 +111,7 @@ typedef enum {
  *     ...: Variadic arguments to fill the specifiers in ``msg``.
  *
  * Return:
- *    Whether message could be emited.
+ *    Whether message could be emitted.
  *
  *    .. seealso::
  *      :doc:`errno`
@@ -192,7 +192,7 @@ extern int _;
  */
 
 /**
- * Get the severity of the message being emited.
+ * Get the severity of the message being emitted.
  *
  * This may be used by a :c:type:`sendchar_func_t` internally.
  */
@@ -201,7 +201,7 @@ PURE log_level_t get_message_level(void);
 /**
  * Get a string representing the current time.
  *
- * By default, seconds since boot, but it can be overwriten.
+ * By default, seconds since boot, but it can be overwritten.
  */
 RETURN_NO_NULL const char *log_time(void);
 

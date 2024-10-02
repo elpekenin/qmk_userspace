@@ -1,7 +1,7 @@
 // Copyright 2024 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-// Having this file on 'users/elpekenin/include' doesnt work, even though it is on path, there's probably something like:
+// Having this file on 'users/elpekenin/include' does not work, even though it is on path, there's probably something like:
 // >>> #include "$(USER_PATH)/config.h"
 
 #pragma once
@@ -10,7 +10,6 @@
 #include "elpekenin/qp/config.h"
 #include "elpekenin/rgb/matrix/config.h"
 #include "elpekenin/split/config.h"
-
 
 #define MAX_DEFERRED_EXECUTORS 32
 

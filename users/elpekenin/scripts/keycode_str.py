@@ -1,22 +1,21 @@
 #! /usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-"""
-Create a u16 -> char * mapping
+"""Create a u16 -> char * mapping.
 
-Step 1) Get keycode information from qmk.keycodes
+1. Get keycode information from qmk.keycodes
+2. Specialize it with the keycodes and/or alises within keymap.c file
 
-Step 2) Specialize it with the keycodes and/or alises within keymap.c file
-
-Assumes layers written as: [<layer>] = LAYOUT(.*)(
-i.e. Layers with explicit numbering/naming
-     Numbering and LAYOUT on the same line
+NOTE: Assumes layers written as: ``[<layer>] = LAYOUT(.*)(``. That is
+  - Layers with explicit numbering/naming
+  - Numbering and LAYOUT on the same line
 """
 
 # NOTE: Has to be run from QMK's base folder
+
+from __future__ import annotations
 
 import re
 import sys
@@ -26,11 +25,10 @@ from pathlib import Path
 QMK = Path(__file__).parent
 
 sys.path.append(str(QMK / "users" / "elpekenin" / "scripts"))
-from scripts import *
+import utils  # noqa: E402  # depends on sys.path hacking
 
 sys.path.append(str(QMK / "lib" / "python"))
-from qmk import keycodes
-
+from qmk import keycodes  # noqa: E402  # depends on sys.path hacking
 
 COMMENT = re.compile(r"//(.*)")
 MULTI_COMMENT = re.compile(r"/\*(.*?)\*/")
@@ -38,10 +36,15 @@ LAYOUT = re.compile(r"\[(.*)\]( *)=( *)LAYOUT(.*)\(")
 
 OUTPUT_NAME = "keycode_str"
 
-H_FILE = lines(H_HEADER, "", "const char *get_keycode_name(uint16_t keycode);", "")
+H_FILE = utils.lines(
+    utils.H_HEADER,
+    "",
+    "const char *get_keycode_name(uint16_t keycode);",
+    "",
+)
 
-C_FILE = lines(
-    C_HEADER,
+C_FILE = utils.lines(
+    utils.C_HEADER,
     "",
     "#include <quantum/quantum.h>",
     "",
@@ -53,7 +56,8 @@ C_FILE = lines(
     "}};",
     "",
     "const char *get_keycode_name(uint16_t keycode) {{",
-    # no keycode whatsoever, without this, tap/hold keys seems to cause noise on keylogger
+    # no keycode whatsoever
+    # without this, tap/hold keys seems to cause noise on keylogger
     # maybe they inject a "dummy" event with keycode = KC_NO instead of actual value (?)
     "    if (keycode == KC_NO) {{",
     "        return NULL;",
@@ -72,7 +76,7 @@ C_FILE = lines(
 
 
 def _read_file(keymap_path: Path) -> str:
-    with open(keymap_path, "r") as f:
+    with keymap_path.open() as f:
         return f.read()
 
 
@@ -96,6 +100,10 @@ def _extract_keycodes(clean_file: str) -> list[str]:
     parens = 0
 
     layout = LAYOUT.search(clean_file)
+    if layout is None:
+        msg = "No layout found"
+        raise SystemExit(msg)
+
     start = layout.start()
 
     for char in clean_file[start:]:
@@ -114,7 +122,7 @@ def _extract_keycodes(clean_file: str) -> list[str]:
 
             if accumulated:  # if gathered a layer of keycodes, store it
                 accumulated = ", ".join(
-                    [i.strip() for i in accumulated.replace("\n", "").split(", ")]
+                    [i.strip() for i in accumulated.replace("\n", "").split(", ")],
                 )
                 layers.append(accumulated)
                 accumulated = ""
@@ -137,19 +145,22 @@ def _keymap_data(layers: list[str]) -> str:
 
 if __name__ == "__main__":
     # -- Handle args
-    if len(sys.argv) < 3:  # executable, output path, keymap path
-        print(f"{CLI_ERROR} {current_filename(__file__)} <output_path> <keymap_path>")
-        exit(1)
+    if len(sys.argv) < 3:  # noqa: PLR2004  # executable, output path, keymap path
+        msg = (
+            f"{utils.CLI_ERROR} {utils.filename(__file__)}"
+            " <output_path> <keymap_path>"
+        )
+        raise SystemExit(msg)
 
     output_dir = Path(sys.argv[1])
-    if not dir_exists(output_dir):
-        print(f"Invalid path {output_dir}")
-        exit(1)
+    if not utils.dir_exists(output_dir):
+        msg = f"Invalid path {output_dir}"
+        raise SystemExit(msg)
 
     keymap_file = Path(sys.argv[2]) / "keymap.c"
-    if not file_exists(keymap_file):
-        print(f"Invalid keymap {keymap_file}")
-        exit(1)
+    if not utils.file_exists(keymap_file):
+        msg = f"Invalid keymap {keymap_file}"
+        raise SystemExit(msg)
 
     # parse file
     raw = _read_file(keymap_file)
@@ -159,23 +170,19 @@ if __name__ == "__main__":
     # generate file
     spec = keycodes.load_spec("latest")
     qmk_data = ""
-    for _, entry in spec["keycodes"].items():
+    for entry in spec["keycodes"].values():
         keycode = entry["key"]
         qmk_data += f'    [{keycode}] = "{keycode}",\n'
 
     keymap_data = _keymap_data(layers)
 
-    with open(output_dir / f"{OUTPUT_NAME}.c", "w") as f:
+    with (output_dir / f"{OUTPUT_NAME}.c").open("w") as f:
         f.write(
             C_FILE.format(
                 qmk_data=qmk_data,
                 keymap_data=keymap_data,
-            )
+            ),
         )
 
-    with open(output_dir / f"{OUTPUT_NAME}.h", "w") as f:
+    with (output_dir / f"{OUTPUT_NAME}.h").open("w") as f:
         f.write(H_FILE)
-
-else:
-    print("Dont try to import this")
-    exit(1)

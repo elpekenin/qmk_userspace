@@ -40,7 +40,7 @@ typedef struct PACKED {
     uint16_t y;
 
     /**
-     * Whether it is presed.
+     * Whether it is pressed.
      */
     bool pressed;
 } touch_report_t;
@@ -72,7 +72,7 @@ typedef struct PACKED {
     uint8_t mode;
 
     /**
-     * Interrup pin: flags that device is pressed.
+     * Interrupt pin: flags that device is pressed.
      */
     pin_t irq_pin;
 

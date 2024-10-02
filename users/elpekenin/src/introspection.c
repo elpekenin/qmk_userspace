@@ -68,7 +68,7 @@ void td_grv_finished(tap_dance_state_t *state, void *build_info) {
         return;
     }
 
-    // TODO: Change tap-hold decision so this doesnt work funny
+    // TODO: Change tap-hold decision so this does not work funny
     send_string_with_delay("``` " SS_LSFT("\n\n") "``` ", 10);
     tap_code16(UP);
 }

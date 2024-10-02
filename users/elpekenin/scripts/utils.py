@@ -1,25 +1,16 @@
 #! /usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-"""
-Small snippets re-used across scripts.
-"""
+"""Small snippets re-used across scripts."""
 
+from functools import partial
 from pathlib import Path
 
-if __name__ == "__main__":
-    print("Dont try to run this")
-    exit(1)
 
-
-import os
-from functools import partial
-
-
-def lines(*args) -> str:
+def lines(*args: str) -> str:
+    """Create a multi-line string based on input lines."""
     return "\n".join([*args])
 
 
@@ -37,21 +28,25 @@ H_HEADER = f"{C_HEADER}\n\n#pragma once"
 MK_HEADER = _HEADER(comment="#")
 
 
-def current_filename(path: str) -> str:
-    return os.path.basename(path)
+def filename(path: str) -> str:
+    """Get filename out of a string."""
+    return Path(path).name
 
 
 def dir_exists(path: Path) -> bool:
+    """Check if path is an existing directory."""
     return path.exists() and path.is_dir()
 
 
 def file_exists(path: Path) -> bool:
+    """Check if path is an existing file."""
     return path.exists() and path.is_file()
 
 
-def debug(*args, **kwargs):
-    with open("debug.log", "a") as f:
-        print(*args, **kwargs, file=f)
+def debug(*args: object, **kwargs: object) -> None:
+    """Store logging in a file."""
+    with Path("debug.log").open("a") as f:
+        print(*args, **kwargs, file=f)  # type: ignore[call-overload]
 
 
 __all__ = [
@@ -59,7 +54,7 @@ __all__ = [
     "C_HEADER",
     "H_HEADER",
     "MK_HEADER",
-    "current_filename",
+    "filename",
     "debug",
     "dir_exists",
     "file_exists",

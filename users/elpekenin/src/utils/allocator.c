@@ -102,15 +102,15 @@ static void memory_freed(void *ptr) {
         return;
     }
 
-    alloc_info_t *info  = find_info(ptr);
-    bool          poped = info != NULL;
+    alloc_info_t *info   = find_info(ptr);
+    bool          popped = info != NULL;
 
-    if (LIKELY(poped)) {
+    if (LIKELY(popped)) {
         info->allocator->used -= info->size;
         chPoolFree(&alloc_info_pool, ptr);
     }
 
-    log_success(poped, ALLOC, "%s", __func__);
+    log_success(popped, ALLOC, "%s", __func__);
 }
 
 static inline void *calloc_shim(allocator_t *allocator, size_t nmemb, size_t size) {

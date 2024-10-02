@@ -3,7 +3,7 @@ index d159dacc55..dc87e88ef4 100644
 --- a/tmk_core/protocol.mk
 +++ b/tmk_core/protocol.mk
 @@ -39,10 +39,6 @@ endif
- 
+
  ifeq ($(strip $(CONSOLE_ENABLE)), yes)
      OPT_DEFS += -DCONSOLE_ENABLE
 -else
@@ -11,5 +11,5 @@ index d159dacc55..dc87e88ef4 100644
 -    OPT_DEFS += -DNO_PRINT
 -    OPT_DEFS += -DNO_DEBUG
  endif
- 
+
  ifeq ($(strip $(NKRO_ENABLE)), yes)

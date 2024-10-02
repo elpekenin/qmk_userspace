@@ -26,5 +26,7 @@ SpaceInEmptyParentheses: 'false'
 SpacesBeforeTrailingComments: 1
 TabWidth: '4'
 UseTab: Never
-
+---
+Language: Json
+DisableFormat: true
 ...

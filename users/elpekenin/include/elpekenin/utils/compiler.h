@@ -73,7 +73,7 @@
 #    define NO_ACCESS(x) _ATTR(access(none, x))
 #endif
 
-// function arg cant be NULL
+// function arg can't be NULL
 #ifndef NON_NULL
 #    define NON_NULL(x) _ATTR(nonnull(x))
 #endif
@@ -88,7 +88,7 @@
 #    define PACKED _ATTR(packed)
 #endif
 
-// printf-like function (format + va_args), harcoded assumption that they are correlative
+// printf-like function (format + va_args), hardcoded assumption that they are correlative
 #ifndef PRINTF
 #    define PRINTF(x) _ATTR(format(printf, x, x + 1))
 #endif
@@ -145,12 +145,12 @@
 #    define WARN_UNUSED _ATTR(warn_unused_result)
 #endif
 
-// item can be overriden
+// item can be overridden
 #ifndef WEAK
 #    define WEAK _ATTR(weak)
 #endif
 
-// item can be overriden
+// item can be overridden
 #ifndef WEAKREF
 #    define WEAKREF(x) _ATTR(weakref(x))
 #endif

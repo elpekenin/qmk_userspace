@@ -24,7 +24,7 @@
 #define GET_BIT(val, n) (((val) >> (n)) & 1)
 
 /**
- * Wrap some code such that it doesnt spit logging.
+ * Wrap some code such that it does not spit logging.
  *
  * .. note::
  *   Silences QMK messages, not (granted) `logging` ones.

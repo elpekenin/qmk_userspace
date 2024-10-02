@@ -6,7 +6,7 @@
  *
  * Integers representing a function's status:
  *   * ``0``: Success.
- *   * Othewise: Failure.
+ *   * Otherwise: Failure.
  *
  * .. seealso::
  *   Most values here come from ``#include <errno.h>``.

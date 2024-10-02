@@ -47,7 +47,7 @@
 #define F11 KC_F11
 #define F12 KC_F12
 
-#define RABK LSFT(LABK) /* cant use S(), it gets redefined */
+#define RABK LSFT(LABK) /* can't use S(), it gets redefined */
 
 #define PIPE KC(PIPE)
 #define AT   KC(AT)

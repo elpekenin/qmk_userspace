@@ -14,9 +14,9 @@ static int8_t sendchar_xap_hook(uint8_t c) {
     rbuf_push(rbuf, c);
 
     if (c == '\n' || rbuf_full(rbuf)) {
-        char buff[MAX_PAYLOAD_SIZE];
+        char   buff[MAX_PAYLOAD_SIZE];
         size_t size = rbuf_pop(rbuf, sizeof(buff) - 1, buff);
-        buff[size] = '\0';
+        buff[size]  = '\0';
         xap_broadcast(0x00, buff, size);
     }
 

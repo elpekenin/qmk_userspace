@@ -22,12 +22,12 @@
 #include "elpekenin/utils/ld.h"
 
 /* Start at 1000 because alphabetical order.
- * Does not take extra resouces, is the name of a linker section, not a value.
+ * Does not take extra resources, is the name of a linker section, not a value.
  * 1000 instead of 100 or 10 provides plenty of room to tweak order in the future.
  */
 
 /*
- * Run RP's SDK initialization procedures as soon as posible.
+ * Run RP's SDK initialization procedures as soon as possible.
  * Otherwise we will likely crash due to broken stdlib functions.
  */
 #define INIT_SDK 1000

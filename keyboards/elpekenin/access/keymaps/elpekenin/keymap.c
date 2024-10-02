@@ -9,6 +9,7 @@
 #include "elpekenin/qp/graphics.h"
 #include "elpekenin/utils/sections.h"
 
+// clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_QWERTY] = LAYOUT(
         ESC,     N1,      N2,      N3,      N4,      N5,             N6,      N7,      N8,      N9,      N0,      BSPC,
@@ -54,14 +55,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         XXXXXXX, XXXXXXX, _______, _______,     DB_TOGG,                 DB_TOGG,      _______, XXXXXXX, XXXXXXX, XXXXXXX
     ),
 };
+// clang-format on
 
 const char fmt[] = "%M\n";
+
 void logging_format(void) {
     UNUSED int ret = set_logging_fmt(fmt);
 }
 PEKE_PRE_INIT(logging_format, INIT_LOG_FORMAT);
 
-#if defined(QUANTUM_PAINTER_ENABLE) && defined (TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND
+#if defined(QUANTUM_PAINTER_ENABLE) && defined(TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND
 static uint32_t read_touch_callback(uint32_t trigger_time, void *cb_arg) {
     uint32_t interval = TOUCH_MS;
 

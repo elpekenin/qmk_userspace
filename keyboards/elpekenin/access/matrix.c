@@ -68,11 +68,10 @@ PEKE_CORE1_LOOP(core1_scan);
 bool matrix_scan_custom(matrix_row_t *current_matrix) {
     __matrix_scan(scanned_matrix);
     return __matrix_changed(current_matrix, scanned_matrix);
-
 }
 #endif
 
-#if defined(QUANTUM_PAINTER_ENABLE) && defined (TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND
+#if defined(QUANTUM_PAINTER_ENABLE) && defined(TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND
 bool is_ili9341_pressed(void) {
     return matrix_is_on(9, 0);
 }

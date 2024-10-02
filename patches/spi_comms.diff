@@ -6,29 +6,29 @@ index 4e6067394b..0f8f651859 100644
  // Copyright 2021 Nick Brassel (@tzarc)
 +// Copyright 2023 Pablo Martinez (@elpekenin)
  // SPDX-License-Identifier: GPL-2.0-or-later
- 
+
  #ifdef QUANTUM_PAINTER_SPI_ENABLE
 @@ -9,7 +10,7 @@
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  // Base SPI support
- 
+
 -bool qp_comms_spi_init(painter_device_t device) {
 +WEAK bool qp_comms_spi_init(painter_device_t device) {
      painter_driver_t *     driver       = (painter_driver_t *)device;
      qp_comms_spi_config_t *comms_config = (qp_comms_spi_config_t *)driver->comms_config;
- 
+
 @@ -23,14 +24,14 @@ bool qp_comms_spi_init(painter_device_t device) {
      return true;
  }
- 
+
 -bool qp_comms_spi_start(painter_device_t device) {
 +WEAK bool qp_comms_spi_start(painter_device_t device) {
      painter_driver_t *     driver       = (painter_driver_t *)device;
      qp_comms_spi_config_t *comms_config = (qp_comms_spi_config_t *)driver->comms_config;
- 
+
      return spi_start(comms_config->chip_select_pin, comms_config->lsb_first, comms_config->mode, comms_config->divisor);
  }
- 
+
 -uint32_t qp_comms_spi_send_data(painter_device_t device, const void *data, uint32_t byte_count) {
 +WEAK uint32_t qp_comms_spi_send_data(painter_device_t device, const void *data, uint32_t byte_count) {
      uint32_t       bytes_remaining = byte_count;
@@ -37,16 +37,16 @@ index 4e6067394b..0f8f651859 100644
 @@ -45,7 +46,7 @@ uint32_t qp_comms_spi_send_data(painter_device_t device, const void *data, uint3
      return byte_count - bytes_remaining;
  }
- 
+
 -void qp_comms_spi_stop(painter_device_t device) {
 +WEAK void qp_comms_spi_stop(painter_device_t device) {
      painter_driver_t *     driver       = (painter_driver_t *)device;
      qp_comms_spi_config_t *comms_config = (qp_comms_spi_config_t *)driver->comms_config;
      spi_stop();
 @@ -64,7 +65,7 @@ const painter_comms_vtable_t spi_comms_vtable = {
- 
+
  #    ifdef QUANTUM_PAINTER_SPI_DC_RESET_ENABLE
- 
+
 -bool qp_comms_spi_dc_reset_init(painter_device_t device) {
 +WEAK bool qp_comms_spi_dc_reset_init(painter_device_t device) {
      if (!qp_comms_spi_init(device)) {
@@ -55,7 +55,7 @@ index 4e6067394b..0f8f651859 100644
 @@ -90,36 +91,28 @@ bool qp_comms_spi_dc_reset_init(painter_device_t device) {
      return true;
  }
- 
+
 -uint32_t qp_comms_spi_dc_reset_send_data(painter_device_t device, const void *data, uint32_t byte_count) {
 +WEAK uint32_t qp_comms_spi_dc_reset_send_data(painter_device_t device, const void *data, uint32_t byte_count) {
      painter_driver_t *              driver       = (painter_driver_t *)device;
@@ -63,7 +63,7 @@ index 4e6067394b..0f8f651859 100644
      gpio_write_pin_high(comms_config->dc_pin);
      return qp_comms_spi_send_data(device, data, byte_count);
  }
- 
+
 -void qp_comms_spi_dc_reset_send_command(painter_device_t device, uint8_t cmd) {
 +WEAK void qp_comms_spi_dc_reset_send_command(painter_device_t device, uint8_t cmd) {
      painter_driver_t *              driver       = (painter_driver_t *)device;
@@ -71,7 +71,7 @@ index 4e6067394b..0f8f651859 100644
      gpio_write_pin_low(comms_config->dc_pin);
      spi_write(cmd);
  }
- 
+
 -void qp_comms_spi_dc_reset_bulk_command_sequence(painter_device_t device, const uint8_t *sequence, size_t sequence_len) {
 -    painter_driver_t *              driver       = (painter_driver_t *)device;
 -    qp_comms_spi_dc_reset_config_t *comms_config = (qp_comms_spi_dc_reset_config_t *)driver->comms_config;
@@ -96,7 +96,7 @@ index 4e6067394b..0f8f651859 100644
 @@ -140,6 +133,67 @@ const painter_comms_with_command_vtable_t spi_comms_with_dc_vtable = {
      .bulk_command_sequence = qp_comms_spi_dc_reset_bulk_command_sequence,
  };
- 
+
 +////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +// SPI with D/C and RST pins but sending one byte at a time, needed for some devices
 +
@@ -159,7 +159,7 @@ index 4e6067394b..0f8f651859 100644
 +    .bulk_command_sequence = qp_comms_spi_dc_reset_single_byte_bulk_command_sequence,
 +};
  #    endif // QUANTUM_PAINTER_SPI_DC_RESET_ENABLE
- 
+
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 diff --git a/drivers/painter/comms/qp_comms_spi.h b/drivers/painter/comms/qp_comms_spi.h
 index c39ea95f72..156cb6fd70 100644
@@ -171,23 +171,23 @@ index c39ea95f72..156cb6fd70 100644
  // SPDX-License-Identifier: GPL-2.0-or-later
 +
  #pragma once
- 
+
  #ifdef QUANTUM_PAINTER_SPI_ENABLE
 @@ -9,6 +11,10 @@
  #    include "gpio.h"
  #    include "qp_internal.h"
- 
+
 +#    if !defined(WEAK)
 +#        define WEAK __attribute__((weak))
 +#    endif
 +
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  // Base SPI support
- 
+
 @@ -45,6 +51,12 @@ void     qp_comms_spi_dc_reset_bulk_command_sequence(painter_device_t device, co
- 
+
  extern const painter_comms_with_command_vtable_t spi_comms_with_dc_vtable;
- 
+
 +void     qp_comms_spi_dc_reset_single_byte_send_command(painter_device_t device, uint8_t cmd);
 +uint32_t qp_comms_spi_dc_reset_single_byte_send_data(painter_device_t device, const void* data, uint32_t byte_count);
 +void     qp_comms_spi_dc_reset_single_byte_bulk_command_sequence(painter_device_t device, const uint8_t* sequence, size_t sequence_len);
@@ -195,5 +195,5 @@ index c39ea95f72..156cb6fd70 100644
 +extern const painter_comms_with_command_vtable_t spi_comms_with_dc_single_byte_vtable;
 +
  #    endif // QUANTUM_PAINTER_SPI_DC_RESET_ENABLE
- 
+
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -52,7 +52,7 @@ NON_NULL(1) static inline void draw_game(game_state_t *state) {
     // clear canvas
     position_t board_end = to_pixels((position_t){.x = GAME_COLS, .y = GAME_ROWS});
     qp_rect(state->device, board_start.x, board_start.y, board_end.x, board_end.y, HSV_BLACK, true);
-    // smal outline
+    // small outline
     qp_rect(state->device, board_start.x - 1, board_start.y - 1, board_end.x + 1, board_end.y + 1, HSV_WHITE, false);
 
     if (!state->playing) {
@@ -60,7 +60,7 @@ NON_NULL(1) static inline void draw_game(game_state_t *state) {
         if (font == NULL) {
             _ = logging(QP, LOG_ERROR, "Font was NULL");
         } else {
-            const char text[]  = "Ded, git gut.";
+            const char text[]  = "Dead, git gut.";
             int16_t    text_w  = qp_textwidth(font, text);
             uint16_t   board_w = board_end.x - board_start.x;
             uint16_t   board_h = board_end.y - board_start.y;

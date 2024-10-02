@@ -10,7 +10,7 @@
 
 static char           qp_log[LOG_N_LINES][LOG_N_CHARS + 1];
 static uint8_t        qp_log_current_col;
-static char *         qp_log_pointers[LOG_N_LINES];
+static char          *qp_log_pointers[LOG_N_LINES];
 static deferred_token qp_log_tokens[LOG_N_LINES];
 static bool           qp_log_redraw;
 static log_level_t    qp_log_levels[LOG_N_LINES];
@@ -62,6 +62,7 @@ void qp_log_clear(void) {
     }
 }
 
+// clang-format off
 static const HSV log_colors[] = {
     [LOG_NONE]  = {HSV_WHITE},
     [LOG_DEBUG] = {0, 0, 100},
@@ -69,6 +70,7 @@ static const HSV log_colors[] = {
     [LOG_WARN]  = {HSV_ORANGE},
     [LOG_ERROR] = {HSV_RED},
 };
+// clang-format on
 ASSERT_LEVELS(log_colors);
 
 void qp_logging_backend_render(qp_callback_args_t *args) {
@@ -83,15 +85,7 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
     qp_log_redraw = false;
 
     // Clear space
-    qp_rect(
-        args->device,
-        args->x,
-        args->y,
-        qp_get_width(args->device),
-        args->y + LOG_N_LINES * args->font->line_height,
-        HSV_BLACK,
-        true
-    );
+    qp_rect(args->device, args->x, args->y, qp_get_width(args->device), args->y + LOG_N_LINES * args->font->line_height, HSV_BLACK, true);
 
     uint16_t y = args->y;
     for (int8_t i = 0; i < LOG_N_LINES; ++i) {
@@ -108,27 +102,9 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
         HSV fg = log_colors[qp_log_levels[i]];
 
         if (text_fits) {
-            qp_drawtext_recolor(
-                args->device,
-                args->x,
-                y,
-                args->font,
-                (const char *)qp_log_pointers[i],
-                fg.h, fg.s, fg.v,
-                bg.h, bg.s, bg.v
-            );
+            qp_drawtext_recolor(args->device, args->x, y, args->font, (const char *)qp_log_pointers[i], fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
         } else {
-            qp_log_tokens[i] = draw_scrolling_text_recolor(
-                args->device,
-                args->x,
-                y,
-                args->font,
-                (const char *)qp_log_pointers[i],
-                args->scrolling_args.n_chars,
-                args->scrolling_args.delay,
-                fg.h, fg.s, fg.v,
-                bg.h, bg.s, bg.v
-            );
+            qp_log_tokens[i] = draw_scrolling_text_recolor(args->device, args->x, y, args->font, (const char *)qp_log_pointers[i], args->scrolling_args.n_chars, args->scrolling_args.delay, fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
         }
     }
 }

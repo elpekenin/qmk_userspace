@@ -49,8 +49,7 @@
 
 #if !defined(SPI_DRIVERS)
 #    if defined(SPI_DRIVER)
-#        define SPI_DRIVERS \
-            { &SPI_DRIVER }
+#        define SPI_DRIVERS {&SPI_DRIVER}
 #    else
 #        error "Select drivers for SPI"
 #    endif
@@ -60,8 +59,7 @@
 
 #if !defined(SPI_SCK_PINS)
 #    if defined(SPI_SCK_PIN)
-#        define SPI_SCK_PINS \
-            { SPI_SCK_PIN }
+#        define SPI_SCK_PINS {SPI_SCK_PIN}
 #    else
 #        error "Select pins for SCK"
 #    endif
@@ -69,8 +67,7 @@
 
 #if !defined(SPI_MOSI_PINS)
 #    if defined(SPI_MOSI_PIN)
-#        define SPI_MOSI_PINS \
-            { SPI_MOSI_PIN }
+#        define SPI_MOSI_PINS {SPI_MOSI_PIN}
 #    else
 #        error "Select pins for MOSI"
 #    endif
@@ -78,8 +75,7 @@
 
 #ifndef SPI_MISO_PINS
 #    if defined(SPI_MISO_PIN)
-#        define SPI_MISO_PINS \
-            { SPI_MISO_PIN }
+#        define SPI_MISO_PINS {SPI_MISO_PIN}
 #    else
 #        error "Select pins for MISO"
 #    endif
@@ -140,7 +136,7 @@ extern "C" {
 void spi_custom_init(uint8_t n);
 
 /**
- * Set up the ``n``'th driver for a transmision.
+ * Set up the ``n``'th driver for a transmission.
  *
  * Args:
  *     slavePin: The chip select pin for the target device.

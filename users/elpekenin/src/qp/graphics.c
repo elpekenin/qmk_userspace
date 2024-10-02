@@ -283,7 +283,7 @@ void stop_scrolling_text(deferred_token scrolling_token) {
 static uint32_t scrolling_text_tick_callback(uint32_t trigger_time, void *cb_arg) {
     static uint32_t last_scrolling_text_exec = 0;
     deferred_exec_advanced_task(scrolling_text_executors, QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS, &last_scrolling_text_exec);
-    return 100; // 100ms sounds fast enough for me, text moving at +10 frames/second doesnt sound too readable for me
+    return 100; // 100ms sounds fast enough for me, text moving at +10 frames/second does not sound too readable for me
 }
 
 static uint32_t logging_task_callback(uint32_t trigger_time, void *cb_arg) {
@@ -385,7 +385,7 @@ static uint32_t glitch_text_callback(uint32_t trigger_time, void *cb_arg) {
         }
     }
 
-    // this is an index, -1 prevents out of bouds str[len]
+    // this is an index, -1 prevents out of bounds str[len]
     uint16_t pos = gen_random_pos(len - 1, &state->mask);
 
     switch (state->state) {

@@ -6,7 +6,6 @@
 #include <quantum/keyboard.h>
 #include <quantum/logging/print.h>
 
-
 #include "elpekenin/logging.h"
 #include "elpekenin/split/transactions.h"
 #include "elpekenin/utils/compiler.h"
@@ -23,10 +22,10 @@ typedef struct PACKED {
 
 typedef struct PACKED {
     split_logging_header_t header;
+
     char buff[RPC_S2M_BUFFER_SIZE - sizeof(split_logging_header_t)];
 } split_logging_t;
 _Static_assert(sizeof(split_logging_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
-
 
 // *** Slave ***
 
@@ -38,10 +37,9 @@ static int8_t sendchar_split_hook(uint8_t c) {
         return 0;
     }
 
-    if (
-        c >= '\n' // terminator/non-printable chars
+    if (c >= '\n'      // terminator/non-printable chars
         && !is_utf8(c) // only accept ASCII
-    ) { 
+    ) {
         rbuf_push(slave_rbuf, c);
     }
 
@@ -53,6 +51,7 @@ void user_logging_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8
     split_logging_t data = {0};
 
     size_t size = rbuf_pop(slave_rbuf, ARRAY_SIZE(data.buff), data.buff);
+
     data.header.bytes = size;
 
     // work out the data
@@ -67,7 +66,6 @@ void user_logging_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8
     // copy data on send buffer
     memcpy(s2m_buffer, &data, sizeof(split_logging_t));
 }
-
 
 // *** Master ***
 
@@ -89,11 +87,15 @@ void user_logging_master_poll(void) {
 
     // flush if asked to
     if (data.header.flush || rbuf_full(master_rbuf)) {
-        char buff[100];
+        char   buff[100];
         size_t size = rbuf_pop(master_rbuf, sizeof(buff), buff);
-        buff[size] = '\0';
+        buff[size]  = '\0';
 
         // keep retrying until we get to write it
-        while (logging(UNKNOWN, LOG_DEBUG, "*****\n" "%s" "*****\n", buff) == -EINVAL) {}
+        while (true) {
+            if (logging(UNKNOWN, LOG_DEBUG, "*****\n%s*****\n", buff) == 0) {
+                break;
+            }
+        }
     }
 }

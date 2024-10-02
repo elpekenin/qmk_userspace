@@ -5,7 +5,7 @@ index 2da96c73ac..252c28848f 100644
 @@ -49,6 +49,37 @@ void qp_surface_update_dirty(surface_dirty_data_t *dirty, uint16_t x, uint16_t y
      }
  }
- 
+
 +void qp_surface_apply_rotation(surface_painter_device_t *surface, uint16_t *x, uint16_t *y) {
 +    uint16_t w = surface->base.panel_width;
 +    uint16_t h = surface->base.panel_height;
@@ -49,7 +49,7 @@ index 71f82e924d..38f8f59bd3 100644
  void qp_surface_increment_pixdata_location(surface_viewport_data_t *viewport);
  void qp_surface_update_dirty(surface_dirty_data_t *dirty, uint16_t x, uint16_t y);
 +void qp_surface_apply_rotation(surface_painter_device_t *surface, uint16_t *x, uint16_t *y);
- 
+
  #endif // QUANTUM_PAINTER_SURFACE_ENABLE
 
 diff --git a/drivers/painter/generic/qp_surface_mono1bpp.c b/drivers/painter/generic/qp_surface_mono1bpp.c
@@ -59,7 +59,7 @@ index c66b56519d..14918d5bec 100644
 @@ -15,6 +15,8 @@ static inline void setpixel_mono1bpp(surface_painter_device_t *surface, uint16_t
      uint16_t w = surface->base.panel_width;
      uint16_t h = surface->base.panel_height;
- 
+
 +    qp_surface_apply_rotation(surface, &x, &y);
 +
      // Drop out if it's off-screen
@@ -73,7 +73,7 @@ index 8883ed541d..0bc81b3ddf 100644
 @@ -15,6 +15,8 @@ static inline void setpixel_rgb565(surface_painter_device_t *surface, uint16_t x
      uint16_t w = surface->base.panel_width;
      uint16_t h = surface->base.panel_height;
- 
+
 +    qp_surface_apply_rotation(surface, &x, &y);
 +
      // Drop out if it's off-screen

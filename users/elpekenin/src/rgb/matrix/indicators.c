@@ -15,12 +15,11 @@
 #include "elpekenin/utils/dyn_array.h"
 #include "elpekenin/utils/sections.h"
 
-
 // *** Definitions ***
 
-static indicator_t indicator_buff[25];
+static indicator_t   indicator_buff[25];
 static memory_heap_t indicator_heap;
-static allocator_t indicator_allocator;
+static allocator_t   indicator_allocator;
 
 static indicator_t *indicators;
 
@@ -35,8 +34,8 @@ static void indicators_init(void) {
 
     // QMK keycodes
     array_append(indicators, keycode_in_layer_indicator(QK_BOOT, _RST, RGB_RED));
-    array_append(indicators, keycode_in_layer_indicator(QK_RBT,  _RST, RGB_RED));
-    array_append(indicators, keycode_in_layer_indicator(EE_CLR,  _RST, RGB_RED));
+    array_append(indicators, keycode_in_layer_indicator(QK_RBT, _RST, RGB_RED));
+    array_append(indicators, keycode_in_layer_indicator(EE_CLR, _RST, RGB_RED));
     array_append(indicators, keycode_in_layer_indicator(DB_TOGG, _RST, RGB_RED));
     // array_append(indicators, keycode_in_layer_indicator(AC_DICT, _RST, RGB_RED));
 
@@ -103,7 +102,7 @@ NON_NULL(4) WRITE_ONLY(4) static inline int get_ledmap_color(uint8_t layer, uint
     uint8_t hue = pgm_read_byte(&(ledmap[layer][row][col]));
     uint8_t sat = rgb_matrix_get_sat();
     uint8_t val = rgb_matrix_get_val();
-    HSV hsv = {hue, sat, val};
+    HSV     hsv = {hue, sat, val};
 
     // not "regular" colors (hue), but ones with special handling
     if (is_special_color(hue)) {
@@ -136,7 +135,6 @@ NON_NULL(4) WRITE_ONLY(4) static inline int get_ledmap_color(uint8_t layer, uint
     return 0;
 }
 
-
 // *** Callback ***
 
 bool draw_indicators(uint8_t led_min, uint8_t led_max) {
@@ -144,7 +142,7 @@ bool draw_indicators(uint8_t led_min, uint8_t led_max) {
     uint8_t layer = get_highest_layer(layer_state);
 
     indicator_fn_args_t args = {
-        .mods = mods,
+        .mods  = mods,
         .layer = layer,
     };
 
@@ -167,18 +165,13 @@ bool draw_indicators(uint8_t led_min, uint8_t led_max) {
             __errno();
 
             args.led_index = index;
-            args.keycode = keymap_key_to_keycode(layer, (keypos_t){col,row});
+            args.keycode   = keymap_key_to_keycode(layer, (keypos_t){col, row});
 
             // iterate all indicators
-            for (
-                const indicator_t *indicator = indicators;
-                indicator < &indicators[array_len(indicators)];
-                ++indicator
-            ) {
+            for (const indicator_t *indicator = indicators; indicator < &indicators[array_len(indicators)]; ++indicator) {
                 // conditionally draws
                 handle_indicator(indicator, &args);
             }
-
         }
     }
 

@@ -11,8 +11,8 @@
 #define GAME_COLS 10
 
 typedef struct PACKED {
-    bool playing;
-    movement_t direction;
+    bool             playing;
+    movement_t       direction;
     painter_device_t device;
 
     // whether end of map wraps around or kills
@@ -20,7 +20,7 @@ typedef struct PACKED {
 
     // list where to find the "order" of body parts
     // useful to identify head/tail + do rotated sprites in the future
-    uint8_t snake_len;
+    uint8_t    snake_len;
     position_t snake[100];
 
     position_t food;
