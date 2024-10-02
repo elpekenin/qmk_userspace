@@ -20,16 +20,16 @@ fn Map(V: type, export_name: []const u8, allocator: std.mem.Allocator) type {
 
         fn set(name: CStr, item: V) callconv(.C) void {
             map.put(name, item) catch |e| {
-                logging.warn(.QP, "Could not save '%s': (%p) -- (%s)", .{name, item, @errorName(e).ptr});
+                logging.warn(.QP, "Could not save '%s': (%p) -- (%s)", .{ name, item, @errorName(e).ptr });
                 return;
             };
 
-            logging.info(.QP, "Save '%s': (%p)", .{name, item});
+            logging.info(.QP, "Save '%s': (%p)", .{ name, item });
         }
 
         fn get(name: CStr) callconv(.C) V {
             const val = map.get(name) orelse null;
-            logging.info(.QP, "Read '%s': (%p)", .{name, val});
+            logging.info(.QP, "Read '%s': (%p)", .{ name, val });
             return val;
         }
 

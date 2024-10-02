@@ -15,10 +15,10 @@ const KnownMcus = [_]MCU{
             .abi = .eabi,
         },
     },
-    .{  // to run tests on computer
+    .{ // to run tests on computer
         .name = "native",
         .target = .{}, // default to native
-    }
+    },
 };
 
 fn getTarget(mcu: []const u8) std.Target.Query {
@@ -57,8 +57,8 @@ fn getFiles(b: *std.Build, options: *std.Build.Step.Options, path: []const u8, n
 
 fn getAssets(b: *std.Build) !*std.Build.Step.Options {
     const options = b.addOptions();
-    try getFiles(b, options, b.pathJoin(&.{b.build_root.path orelse @panic("No root"), "painter", "images"}), "qgf.c");
-    try getFiles(b, options, b.pathJoin(&.{b.build_root.path orelse @panic("No root"), "painter", "fonts"}), "qff");
+    try getFiles(b, options, b.pathJoin(&.{ b.build_root.path orelse @panic("No root"), "painter", "images" }), "qgf.c");
+    try getFiles(b, options, b.pathJoin(&.{ b.build_root.path orelse @panic("No root"), "painter", "fonts" }), "qff");
     return options;
 }
 
@@ -88,25 +88,25 @@ pub fn build(b: *std.Build) !void {
     elpekenin_lib.bundle_compiler_rt = target.result.os.tag == .linux;
 
     // ideally, we would only need these two paths
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = qmk});
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = elpekenin ++ "/include"});
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = qmk });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = elpekenin ++ "/include" });
 
     // ... but QMK's includes are a mess
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = chibios ++ "/common/portability/GCC"});
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = chibios ++ "/hal/include"});
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = chibios ++ "/hal/osal/rt-nil"});
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = chibios ++ "/license"});
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = chibios ++ "/rt/include"});
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = lib ++ "/printf/src/printf"});
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = platforms});
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = platforms ++ "/chibios"});
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = qmk ++ "/quantum"});
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = chibios ++ "/common/portability/GCC" });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = chibios ++ "/hal/include" });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = chibios ++ "/hal/osal/rt-nil" });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = chibios ++ "/license" });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = chibios ++ "/rt/include" });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = lib ++ "/printf/src/printf" });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = platforms });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = platforms ++ "/chibios" });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = qmk ++ "/quantum" });
 
     // ... and my 3rd_party libs are as well :P
-    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = elpekenin ++ "/3rd_party/backtrace/include"});
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = elpekenin ++ "/3rd_party/backtrace/include" });
 
     // hack newlib (c-stdlib) include path too...
-    elpekenin_lib.addSystemIncludePath(.{.cwd_relative = "/usr/include/newlib/"});
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = "/usr/include/newlib/" });
 
     const assets = try getAssets(b);
     elpekenin_lib.root_module.addImport("assets", assets.createModule());
