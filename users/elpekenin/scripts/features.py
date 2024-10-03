@@ -8,9 +8,14 @@
 Also provides a function to draw the state on a QP screen.
 """
 
-import sys
-from pathlib import Path
-from typing import Callable
+from __future__ import annotations
+
+import argparse
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
 
 import utils
 
@@ -125,7 +130,7 @@ def _get_type() -> str:
     raise ValueError(msg)
 
 
-def _for_all_features(func: Callable) -> str:
+def _for_all_features(func: Callable[[str], str]) -> str:
     return "\n".join(func(feature) for feature in FEATURES)
 
 
@@ -167,27 +172,30 @@ def _draw_generator(feature: str) -> str:
     )
 
 
-if __name__ == "__main__":
-    # -- Handle args
-    if len(sys.argv) != 2:  # noqa: PLR2004
-        msg = f"{utils.CLI_ERROR} {utils.filename(__file__)} <output_folder>"
-        raise SystemExit(msg)
+def main() -> int:
+    """Entrypoint."""
+    parser = argparse.ArgumentParser()
+    utils.add_common_args(parser)
 
-    output_dir = Path(sys.argv[1])
-    if not output_dir.exists() or not output_dir.is_dir():
-        msg = f"Invalid path {output_dir}"
-        raise SystemExit(msg)
+    args = parser.parse_args()
+    output_directory: Path = args.output_directory
 
     # Gen files
     type_ = _get_type()  # Work out the union type needed
     gen_h = _for_all_features(_h_generator)
-    with (output_dir / f"{OUTPUT_NAME}.h").open("w") as f:
+    with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
         f.write(H_FILE.format(type=type_, generated_code=gen_h))
 
     gen_c = _for_all_features(_c_generator)
-    with (output_dir / f"{OUTPUT_NAME}.c").open("w") as f:
+    with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
         f.write(C_FILE.format(generated_code=gen_c))
 
     gen_draw = _for_all_features(_draw_generator)
-    with (output_dir / f"{OUTPUT_NAME}_draw.c").open("w") as f:
+    with (output_directory / f"{OUTPUT_NAME}_draw.c").open("w") as f:
         f.write(DRAW_FILE.format(generated_code=gen_draw))
+
+    return 0
+
+
+if __name__ == "__main__":
+    utils.run(main)

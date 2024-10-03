@@ -1,9 +1,8 @@
 USER_SCRIPTS = $(USER_PATH)/scripts
 USER_GENERATED = $(USER_PATH)/generated
 
-# make sure folder exists and is empty
+# make sure folder exists
 $(shell mkdir -p $(USER_GENERATED))
-$(shell rm -rf $(USER_GENERATED)/*)
 
 # enabled_features_t
 $(shell $(USER_SCRIPTS)/features.py $(USER_GENERATED))
@@ -11,7 +10,7 @@ SRC += $(USER_GENERATED)/features.c
 
 # create a char *keycode_names[] based on qmk.keycodes.load_spec and keymap.c
 $(shell cp $(USER_SCRIPTS)/keycode_str.py $(TOP_DIR))
-$(shell $(TOP_DIR)/keycode_str.py $(USER_GENERATED) $(KEYMAP_PATH))
+$(shell $(TOP_DIR)/keycode_str.py $(USER_GENERATED) $(KEYMAP_C))
 SRC += $(USER_GENERATED)/keycode_str.c
 
 # QP assets

@@ -10,12 +10,18 @@ Also provides a function to load them into memory at once.
 
 from __future__ import annotations
 
-import sys
+import argparse
 from functools import partial
-from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import utils
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
+
+    AssetsDictT = dict[str, list[Path]]
+
 
 OUTPUT_NAME = "qp_resources"
 
@@ -33,13 +39,12 @@ C_FILE = utils.lines(
 
 MK_FILE = utils.lines(utils.MK_HEADER, "", "{generated_code}")
 
-AssetsDictT = dict[str, list[Path]]
 
+def _find_assets_impl(assets: AssetsDictT, path: Path) -> None:
+    folder = path.absolute() / "painter"
 
-def _find_assets_impl(assets: AssetsDictT, path: str) -> None:
-    folder = Path(path).absolute() / "painter"
-
-    if not utils.dir_exists(folder):
+    # no `/painter` subfolder in here, move on
+    if not folder.exists() and folder.is_dir():
         return
 
     fonts = list(folder.glob("fonts/*qff.h"))
@@ -49,7 +54,7 @@ def _find_assets_impl(assets: AssetsDictT, path: str) -> None:
     assets["images"].extend(images)
 
 
-def _find_assets(paths: list[str]) -> AssetsDictT:
+def _find_assets(paths: list[Path]) -> AssetsDictT:
     assets: AssetsDictT = {"fonts": [], "images": []}
 
     for path in paths:
@@ -58,7 +63,10 @@ def _find_assets(paths: list[str]) -> AssetsDictT:
     return assets
 
 
-def __for_all_assets(func: Callable, assets: AssetsDictT) -> str:
+def __for_all_assets(
+    func: Callable[[str, list[Path]], str],
+    assets: AssetsDictT,
+) -> str:
     return "\n".join(
         # sort assets by name
         func(asset_k, sorted(asset_v, key=lambda e: e.name))
@@ -99,19 +107,23 @@ def _mk_generator(key: str, paths: list[Path]) -> str:
     )
 
 
-if __name__ == "__main__":
-    # -- Handle args
-    if len(sys.argv) < 3:  # noqa: PLR2004  # executable, output path, paths
-        msg = f"{utils.CLI_ERROR} {utils.filename(__file__)} <paths...>"
-        raise SystemExit(msg)
+def main() -> int:
+    """Entrypoint."""
+    parser = argparse.ArgumentParser()
 
-    output_dir = Path(sys.argv[1])
-    if not utils.dir_exists(output_dir):
-        msg = f"Invalid path {output_dir}"
-        raise SystemExit(msg)
+    utils.add_common_args(parser)
+    parser.add_argument(
+        "directories",
+        nargs="+",
+        type=utils.directory_arg,
+    )
+
+    args = parser.parse_args()
+    output_directory: Path = args.output_directory
+    directories: list[Path] = args.directories
 
     # Find elements
-    assets = _find_assets(sys.argv[2:])
+    assets = _find_assets(directories)
 
     # Gen files
     _for_all_assets = partial(__for_all_assets, assets=assets)
@@ -121,13 +133,19 @@ if __name__ == "__main__":
         "",
         "void load_qp_resources(void);",
     )
-    with (output_dir / f"{OUTPUT_NAME}.h").open("w") as f:
+    with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
         f.write(H_FILE.format(generated_code=gen_h))
 
     gen_c = _for_all_assets(_c_generator)
-    with (output_dir / f"{OUTPUT_NAME}.c").open("w") as f:
+    with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
         f.write(C_FILE.format(generated_code=gen_c))
 
     gen_mk = _for_all_assets(_mk_generator)
-    with (output_dir / f"{OUTPUT_NAME}.mk").open("w") as f:
+    with (output_directory / f"{OUTPUT_NAME}.mk").open("w") as f:
         f.write(MK_FILE.format(generated_code=gen_mk))
+
+    return 0
+
+
+if __name__ == "__main__":
+    utils.run(main)

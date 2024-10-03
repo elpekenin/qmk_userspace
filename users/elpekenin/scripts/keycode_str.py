@@ -17,6 +17,7 @@ NOTE: Assumes layers written as: ``[<layer>] = LAYOUT(.*)(``. That is
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from pathlib import Path
@@ -143,24 +144,24 @@ def _keymap_data(layers: list[str]) -> str:
     return strings
 
 
-if __name__ == "__main__":
-    # -- Handle args
-    if len(sys.argv) < 3:  # noqa: PLR2004  # executable, output path, keymap path
-        msg = (
-            f"{utils.CLI_ERROR} {utils.filename(__file__)}"
-            " <output_path> <keymap_path>"
-        )
-        raise SystemExit(msg)
+def main() -> int:
+    """Entrypoint."""
+    parser = argparse.ArgumentParser()
+    utils.add_common_args(parser)
 
-    output_dir = Path(sys.argv[1])
-    if not utils.dir_exists(output_dir):
-        msg = f"Invalid path {output_dir}"
-        raise SystemExit(msg)
+    parser.add_argument(
+        "keymap",
+        help="The keymap file to analyze",
+        type=utils.file_arg,
+    )
 
-    keymap_file = Path(sys.argv[2]) / "keymap.c"
-    if not utils.file_exists(keymap_file):
-        msg = f"Invalid keymap {keymap_file}"
-        raise SystemExit(msg)
+    args = parser.parse_args()
+    output_directory: Path = args.output_directory
+    keymap_file: Path = args.keymap
+
+    if keymap_file.name != "keymap.c":
+        msg = "Keymap file should be a 'keymap.c'"
+        raise ValueError(msg)
 
     # parse file
     raw = _read_file(keymap_file)
@@ -176,7 +177,7 @@ if __name__ == "__main__":
 
     keymap_data = _keymap_data(layers)
 
-    with (output_dir / f"{OUTPUT_NAME}.c").open("w") as f:
+    with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
         f.write(
             C_FILE.format(
                 qmk_data=qmk_data,
@@ -184,5 +185,11 @@ if __name__ == "__main__":
             ),
         )
 
-    with (output_dir / f"{OUTPUT_NAME}.h").open("w") as f:
+    with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
         f.write(H_FILE)
+
+    return 0
+
+
+if __name__ == "__main__":
+    utils.run(main)

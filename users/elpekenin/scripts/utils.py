@@ -5,16 +5,24 @@
 
 """Small snippets re-used across scripts."""
 
+from __future__ import annotations
+
+import contextlib
+from argparse import ArgumentTypeError
 from functools import partial
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from argparse import ArgumentParser
+    from collections.abc import Callable, Generator
+    from typing import NoReturn, TextIO
 
 
 def lines(*args: str) -> str:
     """Create a multi-line string based on input lines."""
     return "\n".join([*args])
 
-
-CLI_ERROR = "[ERROR] Usage:"
 
 __HEADER = lines(
     "{comment} THIS FILE WAS GENERATED",
@@ -28,35 +36,87 @@ H_HEADER = f"{C_HEADER}\n\n#pragma once"
 MK_HEADER = _HEADER(comment="#")
 
 
-def filename(path: str) -> str:
-    """Get filename out of a string."""
-    return Path(path).name
+def _repr(path: Path) -> str:
+    return f"'{path.resolve()}'"
 
 
-def dir_exists(path: Path) -> bool:
-    """Check if path is an existing directory."""
-    return path.exists() and path.is_dir()
+def add_common_args(parser: ArgumentParser) -> None:
+    """Add common arguments to scripts' parsers."""
+    parser.add_argument(
+        "output_directory",
+        help="The directory into which to dump output",
+        type=directory_arg,
+    )
 
 
-def file_exists(path: Path) -> bool:
-    """Check if path is an existing file."""
-    return path.exists() and path.is_file()
+def exists(path: Path) -> None:
+    """Check if the path exists, raise otherwise."""
+    if not path.exists():
+        msg = _repr(path) + " does not exist"
+        raise ArgumentTypeError(msg)
+
+
+def file_arg(raw: str) -> Path:
+    """Conversion function for and argument expected to be a file."""
+    path = Path(raw)
+    exists(path)
+
+    if not path.is_file():
+        msg = _repr(path) + " is not a file"
+        raise ArgumentTypeError(msg)
+
+    return path
+
+
+def directory_arg(raw: str) -> Path:
+    """Conversion function for and argument expected to be a directory."""
+    path = Path(raw)
+    exists(path)
+
+    if not path.is_dir():
+        msg = _repr(path) + " is not a directory"
+        raise ArgumentTypeError(msg)
+
+    return path
+
+
+@contextlib.contextmanager
+def _debug_file() -> Generator[TextIO]:
+    """Get a handle to the log file."""
+    with Path("debug.log").open("w+") as f:
+        try:
+            yield f
+        finally:
+            pass
 
 
 def debug(*args: object, **kwargs: object) -> None:
     """Store logging in a file."""
-    with Path("debug.log").open("a") as f:
+    with _debug_file() as f:
         print(*args, **kwargs, file=f)  # type: ignore[call-overload]
 
 
-__all__ = [
-    "CLI_ERROR",
-    "C_HEADER",
-    "H_HEADER",
-    "MK_HEADER",
-    "filename",
-    "debug",
-    "dir_exists",
-    "file_exists",
-    "lines",
-]
+def run(main: Callable[[], int]) -> NoReturn:
+    """Run a script's main logic, logging errors to file."""
+    try:
+        ret = main()
+    except Exception as e:  # noqa: BLE001  # want to log any issue
+        output = True
+
+        # if plain exit call, nothing to log
+        if (
+            isinstance(e, SystemExit)
+            and len(e.args) == 1
+            and isinstance(e.args[0], int)
+        ):
+            output = False
+
+        if output:
+            import traceback
+
+            with _debug_file() as f:
+                traceback.print_exception(e, file=f)
+
+        raise e from None
+    else:
+        raise SystemExit(ret)
