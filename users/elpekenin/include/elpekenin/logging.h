@@ -29,6 +29,13 @@
 #include "elpekenin/errno.h"
 #include "elpekenin/utils/compiler.h"
 
+#if !defined(LOGGING_FORMAT)
+/**
+ * Default format for logging messages.
+ */
+#    define LOGGING_FORMAT "[%LS] (%F) %M\n"
+#endif
+
 /**
  * Different features that may emit log messages.
  *
@@ -98,7 +105,6 @@ typedef enum {
  *
  *   For example, with format of ``[%F] (%LL) -- %M | %T``, messages would look like: ``[QP] (DEBUG) -- <msg%args> | 3s``
  *
- *   You can query the current format using :c:func:`get_logging_fmt` or change it with :c:func:`set_logging_fmt`.
  */
 
 /**
@@ -129,35 +135,6 @@ typedef enum {
     PERC_SPEC,
     T_SPEC,
 } token_t;
-
-/**
- * Get length of the current logging format.
- *
- * You may use this to allocate a big-enough buffer before calling :c:func:`get_logging_fmt`.
- */
-uint8_t get_logging_fmt_len(void);
-
-/**
- * Copy the current logging format into ``dest``.
- *
- * .. tip::
- *   Destination must be big enough, use :c:func:`get_logging_fmt_len`.
- */
-NON_NULL(1) WRITE_ONLY(1) void get_logging_fmt(char *dest);
-
-/**
- * Change the logging format.
- *
- * Args:
- *     fmt: The new format, can't be longer than :c:macro:`MAX_LOG_FMT_LEN`.
- *
- * Return:
- *    Whether it could be set
- *
- *    .. seealso::
- *      :doc:`errno`
- */
-NON_NULL(1) READ_ONLY(1) WARN_UNUSED int set_logging_fmt(const char *fmt);
 
 /**
  * ----
@@ -204,15 +181,6 @@ PURE log_level_t get_message_level(void);
  * By default, seconds since boot, but it can be overwritten.
  */
 RETURN_NO_NULL const char *log_time(void);
-
-#ifndef MAX_LOG_FMT_LEN
-/**
- * Maximum length of the logging format's string.
- *
- * Default: ``255``.
- */
-#    define MAX_LOG_FMT_LEN (255)
-#endif
 
 /**
  * Check that an array has as many elements as features are defined.

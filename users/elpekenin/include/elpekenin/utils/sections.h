@@ -39,10 +39,8 @@
 #define INIT_QP_LOG 1020
 /* Set up custom :c:func:`sendchar` function, which :c:func:`printf` calls. */
 #define INIT_SENDCHAR 1021 /* after QP logging has been init */
-/* Configure a format string for :c:func:`logging`. */
-#define INIT_LOG_FORMAT 1022
 /* Set up zig-level code. */
-#define INIT_ZIG 1023 /* early on, but with logging available */
+#define INIT_ZIG 1022 /* early on, but with logging available */
 
 /* Make a copy of crash data, so we dont lose the information. */
 #define INIT_CRASH 1030
@@ -66,8 +64,8 @@
 /* Set up games. */
 #define INIT_GAME 1060
 
-/* Flag second core that everything is set up. */
-#define POST_INIT_CORE1 9990
+/* Flag that everything is set up on core 0. */
+#define INIT_DONE 9990
 
 /* Stopping second core is first on the list. */
 #define DEINIT_CORE1 1000

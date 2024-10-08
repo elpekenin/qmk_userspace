@@ -12,7 +12,7 @@ volatile static bool ready = false;
 static void start_signal(void) {
     ready = true;
 }
-PEKE_POST_INIT(start_signal, POST_INIT_CORE1);
+PEKE_POST_INIT(start_signal, INIT_DONE);
 
 static void stop_signal(bool unused) {
     ready = false;

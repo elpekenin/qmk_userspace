@@ -151,42 +151,6 @@ NON_NULL(1) READ_ONLY(1) static token_t get_token(const char **str) {
     return INVALID_SPEC;
 }
 
-// format used in the logger
-static char fmt[MAX_LOG_FMT_LEN] = "[%LS] (%F) %M\n";
-
-// current size, not max size
-uint8_t get_logging_fmt_len(void) {
-    return strlen(fmt) + 1;
-}
-
-void get_logging_fmt(char *dest) {
-    strlcpy(dest, fmt, sizeof(fmt));
-}
-
-int set_logging_fmt(const char *new_fmt) {
-    if (strlen(new_fmt) >= MAX_LOG_FMT_LEN) {
-        _ = logging(LOGGER, LOG_ERROR, "Format too long");
-        return -ENOBUFS;
-    }
-
-    const char *copy = new_fmt;
-    while (1) {
-        token_t spec = get_token(&copy);
-
-        if (spec == STR_END) {
-            strlcpy(fmt, new_fmt, sizeof(fmt));
-            return 0;
-        }
-
-        if (spec == INVALID_SPEC) {
-            _ = logging(LOGGER, LOG_ERROR, "Invalid format");
-            return -EINVAL;
-        }
-
-        copy++;
-    }
-}
-
 static log_level_t msg_level = LOG_NONE; // level of the text being logged
 
 log_level_t get_message_level(void) {
@@ -203,19 +167,20 @@ static MUTEX_DECL(logging_mutex);
 
 int _;
 
-static bool ready = false;
+static bool wrap_printf = false;
 
-void logging_ready(void) {
-    ready = true;
-}
-PEKE_POST_INIT(logging_ready, POST_INIT_CORE1);
+// static void logging_ready(void) {
+//     wrap_printf = true;
+// }
+// PEKE_POST_INIT(logging_ready, INIT_DONE);
 
 int logging(feature_t feature, log_level_t level, const char *msg, ...) {
     va_list     args;
-    const char *p_fmt = fmt;
+    const char *format = LOGGING_FORMAT;
 
-    int  ret    = 0;
-    bool locked = false;
+    int exitcode = 0;
+
+    bool has_acquired_lock = false;
 
     // message filtered out, quit
     log_level_t feat_level = feature_levels[feature];
@@ -223,18 +188,8 @@ int logging(feature_t feature, log_level_t level, const char *msg, ...) {
         goto exit;
     }
 
-    // (try) lock before running, avoid problems with two different
-    if (!chMtxTryLock(&logging_mutex)) {
-        ret = -EBUSY;
-        goto exit;
-    }
-    locked = true;
-
-    // set msg lvel
-    msg_level = level;
-
     // there seems to be some issue using logging() early on, let's alias to print while not 100% ready
-    if (!ready || true) {
+    if (!wrap_printf) {
         va_start(args, msg);
         vprintf(msg, args);
         va_end(args);
@@ -242,14 +197,26 @@ int logging(feature_t feature, log_level_t level, const char *msg, ...) {
         goto exit;
     }
 
+    // (try) lock before running actual logic
+    if (!chMtxTryLock(&logging_mutex)) {
+        exitcode = -EBUSY;
+        goto exit;
+    }
+    has_acquired_lock = true;
+
+    // set msg lvel
+    msg_level = level;
+
     // set_format does not allow setting an invalid format, just go thru it
     while (true) {
         // order specs alphabetically, special cases first
-        switch (get_token(&p_fmt)) {
-            case INVALID_SPEC: // unreachable, guarded by set_logging_fmt
-                _ = logging(LOGGER, LOG_ERROR, "???");
+        switch (get_token(&format)) {
+            case INVALID_SPEC: // reached when the logging format is invalid
+                wrap_printf = false;
 
-                ret = -EINVAL;
+                _ = logging(LOGGER, LOG_ERROR, "Invalid logging format");
+
+                exitcode = -EINVAL;
                 goto exit;
 
             case STR_END:
@@ -257,7 +224,7 @@ int logging(feature_t feature, log_level_t level, const char *msg, ...) {
                 goto exit;
 
             case NO_SPEC: // print any char
-                putchar_(*p_fmt);
+                putchar_(*format);
                 break;
 
                 // ----------
@@ -289,14 +256,14 @@ int logging(feature_t feature, log_level_t level, const char *msg, ...) {
                 break;
         }
 
-        p_fmt++;
+        format++;
     }
 
 exit:
-    if (locked) {
+    if (has_acquired_lock) {
         chMtxUnlock(&logging_mutex);
     }
-    return ret;
+    return exitcode;
 }
 
 void print_str(const char *str, const sendchar_func_t func) {

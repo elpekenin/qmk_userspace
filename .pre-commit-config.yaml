@@ -1,23 +1,29 @@
 exclude: .*3rd_party.*  # let external code unchanged
 
+ci:
+  skip:
+    - ziglang
+
 repos:
-  - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v19.1.1
-    hooks:
-      - id: clang-format
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.17.0
-    hooks:
-      - id: pyupgrade
   - repo: https://github.com/asottile/add-trailing-comma
     rev: v3.1.0
     hooks:
       - id: add-trailing-comma
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.4
+    hooks:
+      - id: codespell
+        args: [-w]  # work in place
+        exclude: .*autocorrect.*
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.17.0
+    hooks:
+      - id: pyupgrade
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.8
     hooks:
@@ -29,12 +35,10 @@ repos:
     rev: v1.11.2
     hooks:
       - id: mypy
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.4
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v19.1.1
     hooks:
-      - id: codespell
-        args: [-w]  # work in place
-        exclude: .*autocorrect.*
+      - id: clang-format
   - repo: https://github.com/elpekenin/mirrors-ziglang
     rev: v0.13.0
     hooks:
