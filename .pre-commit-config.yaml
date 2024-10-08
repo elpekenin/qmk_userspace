@@ -2,7 +2,7 @@ exclude: .*3rd_party.*  # let external code unchanged
 
 ci:
   skip:
-    - ziglang
+    - zig_fmt
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
