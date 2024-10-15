@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 
-import contextlib
+import logging
 from argparse import ArgumentTypeError
 from functools import partial
 from pathlib import Path
@@ -15,8 +15,18 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser
-    from collections.abc import Callable, Generator
-    from typing import NoReturn, TextIO
+    from collections.abc import Callable
+    from typing import NoReturn
+
+DEBUG_FILE = "debug.log"
+
+logging.basicConfig(
+    filename=DEBUG_FILE,
+)
+_logger = logging.getLogger(__name__)
+
+# exposed to other files
+debug = _logger.debug
 
 
 def lines(*args: str) -> str:
@@ -30,7 +40,7 @@ __HEADER = lines(
     "{comment} Copyright {year} Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>",
     "{comment} SPDX-License-Identifier: GPL-2.0-or-later",
 )
-_HEADER = partial(__HEADER.format, year="2023")
+_HEADER = partial(__HEADER.format, year="2023-2024")
 C_HEADER = _HEADER(comment="//")
 H_HEADER = f"{C_HEADER}\n\n#pragma once"
 MK_HEADER = _HEADER(comment="#")
@@ -80,27 +90,11 @@ def directory_arg(raw: str) -> Path:
     return path
 
 
-@contextlib.contextmanager
-def _debug_file() -> Generator[TextIO]:
-    """Get a handle to the log file."""
-    with Path("debug.log").open("w+") as f:
-        try:
-            yield f
-        finally:
-            pass
-
-
-def debug(*args: object, **kwargs: object) -> None:
-    """Store logging in a file."""
-    with _debug_file() as f:
-        print(*args, **kwargs, file=f)  # type: ignore[call-overload]
-
-
 def run(main: Callable[[], int]) -> NoReturn:
     """Run a script's main logic, logging errors to file."""
     try:
         ret = main()
-    except Exception as e:  # noqa: BLE001  # want to log any issue
+    except Exception as e:
         output = True
 
         # if plain exit call, nothing to log
@@ -112,11 +106,8 @@ def run(main: Callable[[], int]) -> NoReturn:
             output = False
 
         if output:
-            import traceback
+            logging.exception("Something went wrong in `main()`", exc_info=e)
 
-            with _debug_file() as f:
-                traceback.print_exception(e, file=f)
-
-        raise e from None
+        raise
     else:
         raise SystemExit(ret)

@@ -20,12 +20,6 @@
             "id": 20032
         },
         {
-            // #23679-ish
-            "operation": "merge",
-            "repo": "https://github.com/elpekenin/qmk_firmware",
-            "branch": "rgb_pr"
-        },
-        {
             // 22538-ish
             "operation": "merge",
             "repo": "https://github.com/elpekenin/qmk_firmware",

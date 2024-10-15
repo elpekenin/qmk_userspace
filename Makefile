@@ -14,12 +14,6 @@ cp:
 	cp -r $(KB)/* $(WORKSPACE)/$(KB)
 	cp -r $(USER)/* $(WORKSPACE)/$(USER)
 
-# run linters
-lint:
-	mkdir -p lint
-	clang-tidy $(USER_SRC) > lint/clang-tidy 2>&1 || exit 0
-	flawfinder $(USER_SRC) > lint/flawfinder 2>&1 || exit 0
-
 # build documentation
 docs:
 	cd $(WORKSPACE)/$(USER)/docs && \
@@ -41,4 +35,4 @@ native-testing:
 	gcc native_test.c -lelpekenin -Lzig-out/lib -o foo && \
 	./foo
 
-.PHONY: cp lint docs native-testing
+.PHONY: cp docs native-testing
