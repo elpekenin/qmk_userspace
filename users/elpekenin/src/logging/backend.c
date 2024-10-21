@@ -9,7 +9,11 @@
 #    include <lib/RTT/SEGGER_RTT.h>
 
 static int8_t sendchar_rtt_hook(uint8_t c) {
+#    if ENABLE_RTT == 1
     return SEGGER_RTT_PutChar(0, c);
+#    else
+    return 0;
+#    endif
 }
 PEKE_SENDCHAR(sendchar_rtt_hook);
 #endif
@@ -28,8 +32,10 @@ static int8_t user_sendchar(uint8_t c) {
 }
 
 static void init_sendchar(void) {
+#if ENABLE_SENDCHAR == 1
     print_set_sendchar(user_sendchar);
+#else
+    (void)user_sendchar;
+#endif
 }
-
-UNUSED static init_fn _ = init_sendchar;
-// PEKE_PRE_INIT(init_sendchar, INIT_SENDCHAR);
+PEKE_PRE_INIT(init_sendchar, INIT_SENDCHAR);

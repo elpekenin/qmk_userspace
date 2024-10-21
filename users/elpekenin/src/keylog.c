@@ -45,16 +45,14 @@ typedef struct PACKED {
     const char *strings[__N_MODS__];
 } replacements_t;
 
-static inline replacements_t new_replacement(const char *no_mods, const char *shift, const char *al_gr) {
-    return (replacements_t){
-        .strings =
-            {
-                [NO_MODS] = no_mods,
-                [SHIFT]   = shift,
-                [AL_GR]   = al_gr,
-            },
-    };
-}
+#define replacement(no_mods, shift, al_gr) \
+    (replacements_t) {                     \
+        .strings = {                       \
+            [NO_MODS] = no_mods,           \
+            [SHIFT]   = shift,             \
+            [AL_GR]   = al_gr,             \
+        },                                 \
+    }
 
 static new_map(replacements_t, replacements_map);
 
@@ -71,47 +69,47 @@ static void replacements_init(void) {
 
     // add replacements to the map
     // clang-format off
-    map_set(replacements_map, "0",       new_replacement(NULL,  "=",  NULL));
-    map_set(replacements_map, "1",       new_replacement(NULL,  "!",  "|" ));
-    map_set(replacements_map, "2",       new_replacement(NULL,  "\"", "@" ));
-    map_set(replacements_map, "3",       new_replacement(NULL,  NULL, "#" )); // · breaks keylog
-    map_set(replacements_map, "4",       new_replacement(NULL,  "$",  "~" ));
-    map_set(replacements_map, "5",       new_replacement(NULL,  "%",  NULL));
-    map_set(replacements_map, "6",       new_replacement(NULL,  "&",  NULL));
-    map_set(replacements_map, "7",       new_replacement(NULL,  "/",  NULL));
-    map_set(replacements_map, "8",       new_replacement(NULL,  "(",  NULL));
-    map_set(replacements_map, "9",       new_replacement(NULL,  ")",  NULL));
-    map_set(replacements_map, "_______", new_replacement("__",  NULL, NULL));
-    map_set(replacements_map, "AT",      new_replacement("@",   NULL, NULL));
-    map_set(replacements_map, "BSLS",    new_replacement("\\",  NULL, NULL));
-    map_set(replacements_map, "BSPC",    new_replacement("⇤",   NULL, NULL));
-    map_set(replacements_map, "CAPS",    new_replacement("↕",   NULL, NULL));
-    map_set(replacements_map, "COMM",    new_replacement(",",   ";",  NULL));
-    map_set(replacements_map, "DB_TOGG", new_replacement("DBG", NULL, NULL));
-    map_set(replacements_map, "DOT",     new_replacement(".",   ":",  NULL));
-    map_set(replacements_map, "DOWN",    new_replacement("↓",   NULL, NULL));
-    map_set(replacements_map, "ENT",     new_replacement("↲",   NULL, NULL));
-    map_set(replacements_map, "GRV",     new_replacement("`",   "^",  NULL));
-    map_set(replacements_map, "HASH",    new_replacement("#",   NULL, NULL));
-    map_set(replacements_map, "LBRC",    new_replacement("[",   NULL, NULL));
-    map_set(replacements_map, "LCBR",    new_replacement("{",   NULL, NULL));
-    map_set(replacements_map, "LEFT",    new_replacement("←",   NULL, NULL));
-    map_set(replacements_map, "LOWR",    new_replacement("▼",   NULL, NULL));
-    map_set(replacements_map, "MINS",    new_replacement("-",   "_",  NULL));
-    map_set(replacements_map, "NTIL",    new_replacement("´",   NULL, NULL));
-    map_set(replacements_map, "R_SPC",   new_replacement(" ",   NULL, NULL));
-    map_set(replacements_map, "RBRC",    new_replacement("]",   NULL, NULL));
-    map_set(replacements_map, "RCBR",    new_replacement("}",   NULL, NULL));
-    map_set(replacements_map, "RIGHT",   new_replacement("→",   NULL, NULL));
-    map_set(replacements_map, "PLUS",    new_replacement("+",   "*",  NULL));
-    map_set(replacements_map, "PIPE",    new_replacement("|",   NULL, NULL));
-    map_set(replacements_map, "QUOT",    new_replacement("'",   "?",  NULL));
-    map_set(replacements_map, "SPC",     new_replacement(" ",   NULL, NULL));
-    map_set(replacements_map, "TAB",     new_replacement("⇥",   NULL, NULL));
-    map_set(replacements_map, "TILD",    new_replacement("~",   NULL, NULL));
-    map_set(replacements_map, "UP",      new_replacement("↑",   NULL, NULL));
-    map_set(replacements_map, "UPPR",    new_replacement("▲",   NULL, NULL));
-    map_set(replacements_map, "VOLU",    new_replacement("♪",   "♪",  NULL));
+    map_set(replacements_map, "0",       replacement(NULL,  "=",  NULL));
+    map_set(replacements_map, "1",       replacement(NULL,  "!",  "|" ));
+    map_set(replacements_map, "2",       replacement(NULL,  "\"", "@" ));
+    map_set(replacements_map, "3",       replacement(NULL,  NULL, "#" )); // · breaks keylog
+    map_set(replacements_map, "4",       replacement(NULL,  "$",  "~" ));
+    map_set(replacements_map, "5",       replacement(NULL,  "%",  NULL));
+    map_set(replacements_map, "6",       replacement(NULL,  "&",  NULL));
+    map_set(replacements_map, "7",       replacement(NULL,  "/",  NULL));
+    map_set(replacements_map, "8",       replacement(NULL,  "(",  NULL));
+    map_set(replacements_map, "9",       replacement(NULL,  ")",  NULL));
+    map_set(replacements_map, "_______", replacement("__",  NULL, NULL));
+    map_set(replacements_map, "AT",      replacement("@",   NULL, NULL));
+    map_set(replacements_map, "BSLS",    replacement("\\",  NULL, NULL));
+    map_set(replacements_map, "BSPC",    replacement("⇤",   NULL, NULL));
+    map_set(replacements_map, "CAPS",    replacement("↕",   NULL, NULL));
+    map_set(replacements_map, "COMM",    replacement(",",   ";",  NULL));
+    map_set(replacements_map, "DB_TOGG", replacement("DBG", NULL, NULL));
+    map_set(replacements_map, "DOT",     replacement(".",   ":",  NULL));
+    map_set(replacements_map, "DOWN",    replacement("↓",   NULL, NULL));
+    map_set(replacements_map, "ENT",     replacement("↲",   NULL, NULL));
+    map_set(replacements_map, "GRV",     replacement("`",   "^",  NULL));
+    map_set(replacements_map, "HASH",    replacement("#",   NULL, NULL));
+    map_set(replacements_map, "LBRC",    replacement("[",   NULL, NULL));
+    map_set(replacements_map, "LCBR",    replacement("{",   NULL, NULL));
+    map_set(replacements_map, "LEFT",    replacement("←",   NULL, NULL));
+    map_set(replacements_map, "LOWR",    replacement("▼",   NULL, NULL));
+    map_set(replacements_map, "MINS",    replacement("-",   "_",  NULL));
+    map_set(replacements_map, "NTIL",    replacement("´",   NULL, NULL));
+    map_set(replacements_map, "R_SPC",   replacement(" ",   NULL, NULL));
+    map_set(replacements_map, "RBRC",    replacement("]",   NULL, NULL));
+    map_set(replacements_map, "RCBR",    replacement("}",   NULL, NULL));
+    map_set(replacements_map, "RIGHT",   replacement("→",   NULL, NULL));
+    map_set(replacements_map, "PLUS",    replacement("+",   "*",  NULL));
+    map_set(replacements_map, "PIPE",    replacement("|",   NULL, NULL));
+    map_set(replacements_map, "QUOT",    replacement("'",   "?",  NULL));
+    map_set(replacements_map, "SPC",     replacement(" ",   NULL, NULL));
+    map_set(replacements_map, "TAB",     replacement("⇥",   NULL, NULL));
+    map_set(replacements_map, "TILD",    replacement("~",   NULL, NULL));
+    map_set(replacements_map, "UP",      replacement("↑",   NULL, NULL));
+    map_set(replacements_map, "UPPR",    replacement("▲",   NULL, NULL));
+    map_set(replacements_map, "VOLU",    replacement("♪",   "♪",  NULL));
     // clang-format on
 }
 PEKE_PRE_INIT(replacements_init, INIT_KEYLOG_MAP);

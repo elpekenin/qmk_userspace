@@ -474,19 +474,19 @@ static uint32_t keylog_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_rect(args->device, 0, height - args->font->line_height, width - textwidth, height, HSV_BLACK, true);
 
     // default to white, change it based on WPM (if enabled)
-    HSV color = {HSV_WHITE};
+    hsv_t color = {HSV_WHITE};
 
 #    if defined(WPM_ENABLE)
     uint8_t wpm = get_current_wpm();
 
     if (wpm > 10) {
-        color = (HSV){HSV_RED};
+        color = (hsv_t){HSV_RED};
     }
     if (wpm > 30) {
-        color = (HSV){HSV_YELLOW};
+        color = (hsv_t){HSV_YELLOW};
     }
     if (wpm > 50) {
-        color = (HSV){HSV_GREEN};
+        color = (hsv_t){HSV_GREEN};
     }
 #    endif
 

@@ -10,39 +10,22 @@
 #include "elpekenin.h" // layers names and custom keycodes
 #include "elpekenin/errno.h"
 #include "elpekenin/rgb/matrix/indicators.h"
-#include "elpekenin/utils/allocator.h"
-#include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/dyn_array.h"
-#include "elpekenin/utils/sections.h"
 
 // *** Definitions ***
 
-static indicator_t   indicator_buff[25];
-static memory_heap_t indicator_heap;
-static allocator_t   indicator_allocator;
-
-static indicator_t *indicators;
-
-static void indicators_init(void) {
-    chHeapObjectInit(&indicator_heap, &indicator_buff, sizeof(indicator_buff));
-
-    indicator_allocator = new_ch_heap_allocator(&indicator_heap, "indicators heap");
-
-    indicators = new_array(indicator_t, 5, &indicator_allocator);
-
-    array_append(indicators, layer_indicator(_RST, RGB_OFF));
+static indicator_t indicators[] = {
+    LAYER_INDICATOR(_RST, RGB_OFF),
 
     // QMK keycodes
-    array_append(indicators, keycode_in_layer_indicator(QK_BOOT, _RST, RGB_RED));
-    array_append(indicators, keycode_in_layer_indicator(QK_RBT, _RST, RGB_RED));
-    array_append(indicators, keycode_in_layer_indicator(EE_CLR, _RST, RGB_RED));
-    array_append(indicators, keycode_in_layer_indicator(DB_TOGG, _RST, RGB_RED));
-    // array_append(indicators, keycode_in_layer_indicator(AC_DICT, _RST, RGB_RED));
+    KEYCODE_IN_LAYER_INDICATOR(QK_BOOT, _RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(QK_RBT, _RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(EE_CLR, _RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(DB_TOGG, _RST, RGB_RED),
+    // KEYCODE_IN_LAYER_INDICATOR(AC_DICT, _RST, RGB_RED),
 
     // custom keycodes
-    array_append(indicators, custom_keycode_in_layer_indicator(_RST, RGB_BLUE));
-}
-PEKE_PRE_INIT(indicators_init, INIT_INDICATORS_MAP);
+    CUSTOM_KEYCODE_IN_LAYER_INDICATOR(_RST, RGB_BLUE),
+};
 
 // NOTES:
 //   - Assumes (for now?) that all LEDs are mapped to a key (no underglow or w/e)
@@ -94,7 +77,7 @@ CONST static inline bool is_special_color(uint8_t hue) {
     return hue >= _MARKER_;
 };
 
-NON_NULL(4) WRITE_ONLY(4) static inline int get_ledmap_color(uint8_t layer, uint8_t row, uint8_t col, rgb_led_t *rgb) {
+NON_NULL(4) WRITE_ONLY(4) static inline int get_ledmap_color(uint8_t layer, uint8_t row, uint8_t col, rgb_t *rgb) {
     if (layer >= LEDMAP_LAYERS) {
         return -EINVAL;
     }
@@ -102,7 +85,7 @@ NON_NULL(4) WRITE_ONLY(4) static inline int get_ledmap_color(uint8_t layer, uint
     uint8_t hue = pgm_read_byte(&(ledmap[layer][row][col]));
     uint8_t sat = rgb_matrix_get_sat();
     uint8_t val = rgb_matrix_get_val();
-    HSV     hsv = {hue, sat, val};
+    hsv_t   hsv = {hue, sat, val};
 
     // not "regular" colors (hue), but ones with special handling
     if (is_special_color(hue)) {
@@ -122,11 +105,11 @@ NON_NULL(4) WRITE_ONLY(4) static inline int get_ledmap_color(uint8_t layer, uint
                 return -ENOTFOUND;
 
             case WHITE:
-                hsv = (HSV){0, 0, val};
+                hsv = (hsv_t){0, 0, val};
                 break;
 
             case BLACK:
-                hsv = (HSV){0, 0, 0};
+                hsv = (hsv_t){0, 0, 0};
                 break;
         }
     }
@@ -157,18 +140,17 @@ bool draw_indicators(uint8_t led_min, uint8_t led_max) {
             }
 
             // draw ledmap color
-            rgb_led_t rgb;
+            rgb_t rgb;
             if (get_ledmap_color(layer, row, col, &rgb) == 0) {
                 rgb_matrix_set_color(index, rgb.r, rgb.g, rgb.b);
             }
-
-            __errno();
 
             args.led_index = index;
             args.keycode   = keymap_key_to_keycode(layer, (keypos_t){col, row});
 
             // iterate all indicators
-            for (const indicator_t *indicator = indicators; indicator < &indicators[array_len(indicators)]; ++indicator) {
+            for (int8_t i = 0; i < ARRAY_SIZE(indicators); ++i) {
+                const indicator_t *indicator = &indicators[i];
                 // conditionally draws
                 handle_indicator(indicator, &args);
             }

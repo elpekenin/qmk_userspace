@@ -51,8 +51,6 @@
 #define INIT_QP_TASKS_ARGS 1040
 /* Set up custom keylog feature. */
 #define INIT_KEYLOG_MAP 1040
-/* Set up custom RGB indicators feature. */
-#define INIT_INDICATORS_MAP 1040
 
 /* Set up custom split communications. */
 #define INIT_SPLIT 1050

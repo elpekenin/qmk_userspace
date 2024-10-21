@@ -169,10 +169,12 @@ int _;
 
 static bool wrap_printf = false;
 
-// static void logging_ready(void) {
-//     wrap_printf = true;
-// }
-// PEKE_POST_INIT(logging_ready, INIT_DONE);
+static void logging_ready(void) {
+#if ENABLE_LOGGING == 1
+    wrap_printf = true;
+#endif
+}
+PEKE_POST_INIT(logging_ready, INIT_DONE);
 
 int logging(feature_t feature, log_level_t level, const char *msg, ...) {
     va_list     args;

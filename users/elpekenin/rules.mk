@@ -17,6 +17,8 @@ SRC += $(USER_SRC)/build_info.c \
 
 DEBUG_ENABLE = yes
 
+CLFAGS += -include $(USER_INCLUDE)/elpekenin/issues.h
+
 # Default configuration
 AUTOCORRECT_ENABLE ?= yes
 DEFERRED_EXEC_ENABLE ?= yes

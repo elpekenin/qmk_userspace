@@ -23,7 +23,7 @@ static void qp_log_init(void) {
     }
     qp_log_redraw = false;
 }
-PEKE_PRE_INIT(qp_log_init, PRE_INIT_QP_LOG);
+PEKE_PRE_INIT(qp_log_init, INIT_QP_LOG);
 
 static int8_t sendchar_qp_hook(uint8_t c) {
     if (c == '\n') {
@@ -63,7 +63,7 @@ void qp_log_clear(void) {
 }
 
 // clang-format off
-static const HSV log_colors[] = {
+static const hsv_t log_colors[] = {
     [LOG_NONE]  = {HSV_WHITE},
     [LOG_DEBUG] = {0, 0, 100},
     [LOG_INFO]  = {HSV_BLUE},
@@ -98,8 +98,8 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
 
         y += args->font->line_height;
 
-        HSV bg = {HSV_BLACK};
-        HSV fg = log_colors[qp_log_levels[i]];
+        hsv_t bg = {HSV_BLACK};
+        hsv_t fg = log_colors[qp_log_levels[i]];
 
         if (text_fits) {
             qp_drawtext_recolor(args->device, args->x, y, args->font, (const char *)qp_log_pointers[i], fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
