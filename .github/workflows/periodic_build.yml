@@ -24,7 +24,7 @@ jobs:
       - name: Disable safe.directory check
         run: git config --global --add safe.directory '*'
 
-      - name: Get the code in
+      - name: Copy code to container
         uses: actions/checkout@v4
 
       - name: git credentials
