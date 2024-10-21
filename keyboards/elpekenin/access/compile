@@ -4,9 +4,8 @@
 
 KB=elpekenin/access
 KM=elpekenin
-
-# add this back?
-# -e CC=qmk-arm-gcc
+LOG_FOLDER=users/elpekenin/logs
+mkdir -p $LOG_FOLDER
 
 for SIDE in left right
 do
@@ -16,6 +15,6 @@ do
         --compiledb \
         -e MAKECMDGOALS=uf2-split-$SIDE \
         -e TARGET=$SIDE \
-        > errors.log 2>&1 \
-        || (cat errors.log && exit 1)
+        > $LOG_FOLDER/compile.txt 2>&1 \
+        || exit 1
 done

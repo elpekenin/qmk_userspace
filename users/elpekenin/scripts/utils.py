@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from typing import NoReturn
 
-DEBUG_FILE = "debug.log"
+DEBUG_FILE = Path(__file__).parent.parent / "logs" / "python.txt"
 
 logging.basicConfig(
     filename=DEBUG_FILE,

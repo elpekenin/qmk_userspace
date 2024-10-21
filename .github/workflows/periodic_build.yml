@@ -64,10 +64,9 @@ jobs:
           source "$HOME/.cargo/env"
           qmk_build
 
-      # NOTE(elpekenin): for now, this is just a check of whether code builds
-      # it's never downloaded but kept here as reference for the future
-      # - name: Upload binaries
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: binaries
-      #     path: firmware/binaries/*
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Log
+          path: users/elpekenin/logs/*
