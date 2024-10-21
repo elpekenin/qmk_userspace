@@ -4,7 +4,11 @@
 
 KB=elpekenin/access
 KM=elpekenin
+
 LOG_FOLDER=users/elpekenin/logs
+OUT=$LOG_FOLDER/compile.out
+ERR=$LOG_FOLDER/compile.err
+
 mkdir -p $LOG_FOLDER
 
 for SIDE in left right
@@ -15,6 +19,6 @@ do
         --compiledb \
         -e MAKECMDGOALS=uf2-split-$SIDE \
         -e TARGET=$SIDE \
-        > $LOG_FOLDER/compile.txt 2>&1 \
-        || exit 1
+        > $OUT 2> $ERR \
+        || (cat $OUT && echo '' && cat $ERR && exit 1)
 done
