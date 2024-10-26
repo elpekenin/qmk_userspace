@@ -17,19 +17,16 @@ NOTE: Assumes layers written as: ``[<layer>] = LAYOUT(.*)(``. That is
 
 from __future__ import annotations
 
-import argparse
 import re
-import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-# make `scripts` and `qmk` visible and import them
-QMK = Path(__file__).parent
+import utils
+from qmk import keycodes  # depends on sys.path hacking
 
-sys.path.append(str(QMK / "users" / "elpekenin" / "scripts"))
-import utils  # noqa: E402  # depends on sys.path hacking
+if TYPE_CHECKING:
+    from argparse import ArgumentParser, Namespace
+    from pathlib import Path
 
-sys.path.append(str(QMK / "lib" / "python"))
-from qmk import keycodes  # noqa: E402  # depends on sys.path hacking
 
 COMMENT = re.compile(r"//(.*)")
 MULTI_COMMENT = re.compile(r"/\*(.*?)\*/")
@@ -144,52 +141,50 @@ def _keymap_data(layers: list[str]) -> str:
     return strings
 
 
-def main() -> int:
-    """Entrypoint."""
-    parser = argparse.ArgumentParser()
-    utils.add_common_args(parser)
+class Command(utils.CommandBase):
+    """Logic of this script."""
 
-    parser.add_argument(
-        "keymap",
-        help="The keymap file to analyze",
-        type=utils.file_arg,
-    )
-
-    args = parser.parse_args()
-    output_directory: Path = args.output_directory
-    keymap_file: Path = args.keymap
-
-    if keymap_file.name != "keymap.c":
-        msg = "Keymap file should be a 'keymap.c'"
-        raise ValueError(msg)
-
-    # parse file
-    raw = _read_file(keymap_file)
-    clean = _remove_comments(raw)
-    layers = _extract_keycodes(clean)
-
-    # generate file
-    spec = keycodes.load_spec("latest")
-    qmk_data = ""
-    for entry in spec["keycodes"].values():
-        keycode = entry["key"]
-        qmk_data += f'    [{keycode}] = "{keycode}",\n'
-
-    keymap_data = _keymap_data(layers)
-
-    with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
-        f.write(
-            C_FILE.format(
-                qmk_data=qmk_data,
-                keymap_data=keymap_data,
-            ),
+    @staticmethod
+    def add_args(parser: ArgumentParser) -> None:
+        """Script-specific arguments."""
+        parser.add_argument(
+            "keymap",
+            help="The keymap file to analyze",
+            type=utils.file_arg,
         )
 
-    with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
-        f.write(H_FILE)
+    def run(self, args: Namespace) -> int:
+        """Entrypoint."""
+        output_directory: Path = args.output_directory
+        keymap_file: Path = args.keymap
 
-    return 0
+        if keymap_file.name != "keymap.c":
+            msg = "Keymap file should be a 'keymap.c'"
+            raise ValueError(msg)
 
+        # parse file
+        raw = _read_file(keymap_file)
+        clean = _remove_comments(raw)
+        layers = _extract_keycodes(clean)
 
-if __name__ == "__main__":
-    utils.run(main)
+        # generate file
+        spec = keycodes.load_spec("latest")
+        qmk_data = ""
+        for entry in spec["keycodes"].values():
+            keycode = entry["key"]
+            qmk_data += f'    [{keycode}] = "{keycode}",\n'
+
+        keymap_data = _keymap_data(layers)
+
+        with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
+            f.write(
+                C_FILE.format(
+                    qmk_data=qmk_data,
+                    keymap_data=keymap_data,
+                ),
+            )
+
+        with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
+            f.write(H_FILE)
+
+        return 0

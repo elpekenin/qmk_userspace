@@ -5,11 +5,12 @@
 KB=elpekenin/access
 KM=elpekenin
 
-LOG_FOLDER=users/elpekenin/logs
+LOG_FOLDER=$(realpath ./users/elpekenin/logs)
+mkdir -p $LOG_FOLDER
+
 OUT=$LOG_FOLDER/compile.out
 ERR=$LOG_FOLDER/compile.err
 
-mkdir -p $LOG_FOLDER
 
 for SIDE in left right
 do
@@ -18,6 +19,7 @@ do
         -km $KM \
         --compiledb \
         -e MAKECMDGOALS=uf2-split-$SIDE \
+        -e LOG_FOLDER=$LOG_FOLDER \
         -e TARGET=$SIDE \
         > $OUT 2> $ERR \
         || (cat $OUT && echo '' && cat $ERR && exit 1)

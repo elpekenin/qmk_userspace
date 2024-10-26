@@ -113,4 +113,9 @@ pub fn build(b: *std.Build) !void {
 
     // generate the .a file
     b.installArtifact(elpekenin_lib);
+
+    // FIXME: broken on zig 0.13 (?)
+    // ... and its equivalent .h
+    // const header = b.addInstallFile(elpekenin_lib.getEmittedH(), "include/elpekenin/zig.h");
+    // b.getInstallStep().dependOn(&header.step);
 }

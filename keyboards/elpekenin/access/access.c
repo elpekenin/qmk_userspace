@@ -50,7 +50,7 @@ touch_device_t ili9341_touch = &ili9341_touch_driver;
 #endif
 
 void keyboard_post_init_kb(void) {
-    debug_enable = true;
+    debug_config.enable = true;
 
     UNUSED bool ret = true;
 

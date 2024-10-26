@@ -10,13 +10,13 @@ Also provides a function to load them into memory at once.
 
 from __future__ import annotations
 
-import argparse
 from functools import partial
 from typing import TYPE_CHECKING
 
 import utils
 
 if TYPE_CHECKING:
+    from argparse import ArgumentParser, Namespace
     from collections.abc import Callable
     from pathlib import Path
 
@@ -63,7 +63,7 @@ def _find_assets(paths: list[Path]) -> AssetsDictT:
     return assets
 
 
-def __for_all_assets(
+def _for_all_assets(
     func: Callable[[str, list[Path]], str],
     assets: AssetsDictT,
 ) -> str:
@@ -107,45 +107,43 @@ def _mk_generator(key: str, paths: list[Path]) -> str:
     )
 
 
-def main() -> int:
-    """Entrypoint."""
-    parser = argparse.ArgumentParser()
+class Command(utils.CommandBase):
+    """Logic of this script."""
 
-    utils.add_common_args(parser)
-    parser.add_argument(
-        "directories",
-        nargs="+",
-        type=utils.directory_arg,
-    )
+    @staticmethod
+    def add_args(parser: ArgumentParser) -> None:
+        """Script-specific arguments."""
+        parser.add_argument(
+            "directories",
+            nargs="+",
+            type=utils.directory_arg,
+        )
 
-    args = parser.parse_args()
-    output_directory: Path = args.output_directory
-    directories: list[Path] = args.directories
+    def run(self, args: Namespace) -> int:
+        """Entrypoint."""
+        output_directory: Path = args.output_directory
+        directories: list[Path] = args.directories
 
-    # Find elements
-    assets = _find_assets(directories)
+        # Find elements
+        assets = _find_assets(directories)
 
-    # Gen files
-    _for_all_assets = partial(__for_all_assets, assets=assets)
+        # Gen files
+        for_all_assets = partial(_for_all_assets, assets=assets)
 
-    gen_h = utils.lines(
-        _for_all_assets(_h_generator),
-        "",
-        "void load_qp_resources(void);",
-    )
-    with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
-        f.write(H_FILE.format(generated_code=gen_h))
+        gen_h = utils.lines(
+            for_all_assets(_h_generator),
+            "",
+            "void load_qp_resources(void);",
+        )
+        with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
+            f.write(H_FILE.format(generated_code=gen_h))
 
-    gen_c = _for_all_assets(_c_generator)
-    with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
-        f.write(C_FILE.format(generated_code=gen_c))
+        gen_c = for_all_assets(_c_generator)
+        with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
+            f.write(C_FILE.format(generated_code=gen_c))
 
-    gen_mk = _for_all_assets(_mk_generator)
-    with (output_directory / f"{OUTPUT_NAME}.mk").open("w") as f:
-        f.write(MK_FILE.format(generated_code=gen_mk))
+        gen_mk = for_all_assets(_mk_generator)
+        with (output_directory / f"{OUTPUT_NAME}.mk").open("w") as f:
+            f.write(MK_FILE.format(generated_code=gen_mk))
 
-    return 0
-
-
-if __name__ == "__main__":
-    utils.run(main)
+        return 0
