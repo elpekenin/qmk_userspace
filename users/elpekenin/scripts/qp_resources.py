@@ -107,7 +107,7 @@ def _mk_generator(key: str, paths: list[Path]) -> str:
     )
 
 
-class Command(utils.CommandBase):
+class Script(utils.ScriptBase):
     """Logic of this script."""
 
     @staticmethod

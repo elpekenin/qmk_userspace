@@ -70,7 +70,7 @@ def directory_arg(raw: str) -> Path:
     return path
 
 
-class CommandBase:
+class ScriptBase:
     """Represent a script."""
 
     @staticmethod

@@ -10,8 +10,29 @@ from typing import NoReturn
 
 import utils
 
-QMK = Path(__file__).parent.parent.parent.parent
+HERE = Path(__file__).parent
+QMK = HERE.parent.parent.parent
 LOG_FILE = "python.txt"
+
+
+def get_class(script_name: str) -> type[utils.ScriptBase]:
+    """Check if input is actually a subclass of ScriptBase."""
+    script_file = HERE / f"{script_name}.py"
+    if not script_file.exists():
+        msg = f"'{script_name}' is not a known script."
+        raise SystemExit(msg)
+
+    script_module = __import__(script_name)
+
+    cls = getattr(script_module, "Script", None)
+    if cls is None:
+        msg = f"'{script_file}' does not contain a 'Script' class."
+        raise SystemExit(msg)
+    if not issubclass(cls, utils.ScriptBase):
+        msg = f"{cls} must be a subclass of 'utils.ScriptBase'."
+        raise SystemExit(msg)
+
+    return cls
 
 
 def tweak_paths() -> None:
@@ -23,11 +44,12 @@ def main() -> NoReturn:
     """Run a script's main logic, logging errors to file."""
     tweak_paths()
 
-    command_name = sys.argv.pop(1)
+    # NOTE: we have to hack here, doing some manual parsing
+    # at this point, we can't yet defer into argparse, because
+    # there are script-specific args we dont know ahead of time
+    script_name = sys.argv.pop(1)
 
-    Command: type[utils.CommandBase] = (  # noqa: N806  # this is a class
-        __import__(command_name).Command
-    )
+    ScriptClass = get_class(script_name)  # noqa: N806  # this is a class
 
     parser = argparse.ArgumentParser()
 
@@ -37,7 +59,6 @@ def main() -> NoReturn:
         help="directory where to write generated files",
         type=utils.directory_arg,
     )
-
     parser.add_argument(
         "--log-folder",
         help="directory where to write logs",
@@ -45,7 +66,7 @@ def main() -> NoReturn:
     )
 
     # script-specific args
-    Command.add_args(parser)
+    ScriptClass.add_args(parser)
 
     args = parser.parse_args()
 
@@ -54,7 +75,7 @@ def main() -> NoReturn:
     )
 
     try:
-        ret = Command().run(args)
+        ret = ScriptClass().run(args)
     except Exception as e:
         output = True
 
@@ -67,7 +88,7 @@ def main() -> NoReturn:
             output = False
 
         if output:
-            logging.exception("Something went wrong in `Command.run()`", exc_info=e)
+            logging.exception("Something went wrong in `Script.run()`", exc_info=e)
 
         raise
     else:

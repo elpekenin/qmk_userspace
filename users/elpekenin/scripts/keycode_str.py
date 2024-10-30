@@ -141,7 +141,7 @@ def _keymap_data(layers: list[str]) -> str:
     return strings
 
 
-class Command(utils.CommandBase):
+class Script(utils.ScriptBase):
     """Logic of this script."""
 
     @staticmethod

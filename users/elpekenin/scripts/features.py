@@ -172,7 +172,7 @@ def _draw_generator(feature: str) -> str:
     )
 
 
-class Command(utils.CommandBase):
+class Script(utils.ScriptBase):
     """Logic of this script."""
 
     def run(self, args: Namespace) -> int:
