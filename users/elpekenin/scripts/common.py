@@ -80,3 +80,6 @@ class ScriptBase:
     def run(self, args: Namespace) -> int:
         """Logic of script, return exitcode."""
         raise NotImplementedError
+
+
+__all__ = ("lines",)

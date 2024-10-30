@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
-import utils
+import common
 
 # == User configuration here ==
 TEXT_COLOR = "HSV_BLACK"
@@ -55,8 +55,8 @@ OUTPUT_NAME = "features"
 MAX_WIDTH = max(map(len, FEATURES))
 
 # *** Templates ***
-H_FILE = utils.lines(
-    utils.H_HEADER,
+H_FILE = common.lines(
+    common.H_HEADER,
     "",
     "#include <stdbool.h>",
     "#include <stdint.h>",
@@ -72,8 +72,8 @@ H_FILE = utils.lines(
     "",
 )
 
-C_FILE = utils.lines(
-    utils.C_HEADER,
+C_FILE = common.lines(
+    common.C_HEADER,
     "",
     f'#include "{OUTPUT_NAME}.h"',
     "",
@@ -88,8 +88,8 @@ C_FILE = utils.lines(
     "",
 )
 
-DRAW_FILE = utils.lines(
-    utils.C_HEADER,
+DRAW_FILE = common.lines(
+    common.C_HEADER,
     "",
     "#include <quantum/color.h>",
     "",
@@ -139,7 +139,7 @@ def _h_generator(feature: str) -> str:
 
 
 def _c_generator(feature: str) -> str:
-    return utils.lines(
+    return common.lines(
         f"    #if defined({feature.upper()}_ENABLE)",
         f"        features.{feature.lower()} = true;",
         "    #endif",
@@ -152,7 +152,7 @@ def _draw_generator(feature: str) -> str:
     short_name = SHORT_NAMES.get(feature, feature)
     name = short_name.replace("_", " ").title()
 
-    return utils.lines(
+    return common.lines(
         f'    qp_drawtext_recolor(device, x, y, font, features.{feature.lower()} ? "{name}: On " : "{name}: Off", {TEXT_COLOR}, {BACKGROUND_COLOR});',  # noqa: E501
         #                         intentional space so it overwrites previous "Off"         ^^^  # noqa: E501
         "    y += font_height;",
@@ -172,7 +172,7 @@ def _draw_generator(feature: str) -> str:
     )
 
 
-class Script(utils.ScriptBase):
+class Script(common.ScriptBase):
     """Logic of this script."""
 
     def run(self, args: Namespace) -> int:

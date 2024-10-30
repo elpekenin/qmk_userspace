@@ -8,14 +8,14 @@ import sys
 from pathlib import Path
 from typing import NoReturn
 
-import utils
+import common
 
 HERE = Path(__file__).parent
 QMK = HERE.parent.parent.parent
 LOG_FILE = "python.txt"
 
 
-def get_class(script_name: str) -> type[utils.ScriptBase]:
+def get_class(script_name: str) -> type[common.ScriptBase]:
     """Check if input is actually a subclass of ScriptBase."""
     script_file = HERE / f"{script_name}.py"
     if not script_file.exists():
@@ -28,7 +28,7 @@ def get_class(script_name: str) -> type[utils.ScriptBase]:
     if cls is None:
         msg = f"'{script_file}' does not contain a 'Script' class."
         raise SystemExit(msg)
-    if not issubclass(cls, utils.ScriptBase):
+    if not issubclass(cls, common.ScriptBase):
         msg = f"{cls} must be a subclass of 'utils.ScriptBase'."
         raise SystemExit(msg)
 
@@ -57,12 +57,12 @@ def main() -> NoReturn:
     parser.add_argument(
         "output_directory",
         help="directory where to write generated files",
-        type=utils.directory_arg,
+        type=common.directory_arg,
     )
     parser.add_argument(
         "--log-folder",
         help="directory where to write logs",
-        type=utils.directory_arg,
+        type=common.directory_arg,
     )
 
     # script-specific args

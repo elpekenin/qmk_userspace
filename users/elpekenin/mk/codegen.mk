@@ -8,11 +8,13 @@ LOG_ARG = --log-folder $(LOG_FOLDER)
 $(shell mkdir -p $(USER_GENERATED))
 
 # enabled_features_t
-$(shell $(PYTHON) $(USER_SCRIPTS) features $(USER_GENERATED) $(LOG_ARG))
+$(USER_GENERATED)/features.c: FORCE
+	$(shell $(PYTHON) $(USER_SCRIPTS) features $(USER_GENERATED) $(LOG_ARG))
 SRC += $(USER_GENERATED)/features.c
 
 # create a char *keycode_names[] based on qmk.keycodes.load_spec and keymap.c
-$(shell $(PYTHON) $(USER_SCRIPTS) keycode_str $(USER_GENERATED) $(KEYMAP_C) $(LOG_ARG))
+$(USER_GENERATED)/keycode_str.c: FORCE
+	$(shell $(PYTHON) $(USER_SCRIPTS) keycode_str $(USER_GENERATED) $(KEYMAP_C) $(LOG_ARG))
 SRC += $(USER_GENERATED)/keycode_str.c
 
 # QP assets
@@ -27,9 +29,13 @@ ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
 
     # actual codegen
     QP_DIRS := $(KEYBOARD_PATHS) $(KEYMAP_PATH) $(USER_PATH)
-    $(shell $(PYTHON) $(USER_SCRIPTS) qp_resources $(USER_GENERATED) $(QP_DIRS) $(LOG_ARG))
-    SRC += $(USER_GENERATED)/qp_resources.c \
-           $(USER_GENERATED)/features_draw.c
+
+    $(USER_GENERATED)/qp_resources.c $(USER_GENERATED)/features_draw.c: FORCE
+    	$(shell $(PYTHON) $(USER_SCRIPTS) qp_resources $(USER_GENERATED) $(QP_DIRS) $(LOG_ARG))
+    SRC += $(USER_GENERATED)/qp_resources.c $(USER_GENERATED)/features_draw.c
 
     include $(USER_GENERATED)/qp_resources.mk
 endif
+
+# TODO: remove this target (always run) by actual dependencies on the generated files' targets
+FORCE:

@@ -13,7 +13,7 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING
 
-import utils
+import common
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -25,10 +25,10 @@ if TYPE_CHECKING:
 
 OUTPUT_NAME = "qp_resources"
 
-H_FILE = utils.lines(utils.H_HEADER, "", "{generated_code}")
+H_FILE = common.lines(common.H_HEADER, "", "{generated_code}")
 
-C_FILE = utils.lines(
-    utils.C_HEADER,
+C_FILE = common.lines(
+    common.C_HEADER,
     "",
     '#include "elpekenin/qp/graphics.h"',
     "",
@@ -37,7 +37,7 @@ C_FILE = utils.lines(
     "}}",
 )
 
-MK_FILE = utils.lines(utils.MK_HEADER, "", "{generated_code}")
+MK_FILE = common.lines(common.MK_HEADER, "", "{generated_code}")
 
 
 def _find_assets_impl(assets: AssetsDictT, path: Path) -> None:
@@ -75,7 +75,7 @@ def _for_all_assets(
 
 
 def _h_generator(key: str, paths: list[Path]) -> str:
-    return utils.lines(
+    return common.lines(
         f"// {key}",
         "\n".join(f'#include "{path.name}"' for path in paths),
         "",
@@ -96,18 +96,18 @@ def _c_generator(key: str, paths: list[Path]) -> str:
         name = _name_generator(key, path)
         _lines.append(f'    {function}("{name}", {name});')
 
-    return utils.lines(*_lines)
+    return common.lines(*_lines)
 
 
 def _mk_generator(key: str, paths: list[Path]) -> str:
-    return utils.lines(
+    return common.lines(
         f"# {key}",
         "\n".join(f"SRC += {path}".replace(".h", ".c") for path in paths),
         "",
     )
 
 
-class Script(utils.ScriptBase):
+class Script(common.ScriptBase):
     """Logic of this script."""
 
     @staticmethod
@@ -116,7 +116,7 @@ class Script(utils.ScriptBase):
         parser.add_argument(
             "directories",
             nargs="+",
-            type=utils.directory_arg,
+            type=common.directory_arg,
         )
 
     def run(self, args: Namespace) -> int:
@@ -130,7 +130,7 @@ class Script(utils.ScriptBase):
         # Gen files
         for_all_assets = partial(_for_all_assets, assets=assets)
 
-        gen_h = utils.lines(
+        gen_h = common.lines(
             for_all_assets(_h_generator),
             "",
             "void load_qp_resources(void);",

@@ -20,7 +20,7 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-import utils
+import common
 from qmk import keycodes  # depends on sys.path hacking
 
 if TYPE_CHECKING:
@@ -34,15 +34,15 @@ LAYOUT = re.compile(r"\[(.*)\]( *)=( *)LAYOUT(.*)\(")
 
 OUTPUT_NAME = "keycode_str"
 
-H_FILE = utils.lines(
-    utils.H_HEADER,
+H_FILE = common.lines(
+    common.H_HEADER,
     "",
     "const char *get_keycode_name(uint16_t keycode);",
     "",
 )
 
-C_FILE = utils.lines(
-    utils.C_HEADER,
+C_FILE = common.lines(
+    common.C_HEADER,
     "",
     "#include <quantum/quantum.h>",
     "",
@@ -141,7 +141,7 @@ def _keymap_data(layers: list[str]) -> str:
     return strings
 
 
-class Script(utils.ScriptBase):
+class Script(common.ScriptBase):
     """Logic of this script."""
 
     @staticmethod
@@ -150,7 +150,7 @@ class Script(utils.ScriptBase):
         parser.add_argument(
             "keymap",
             help="The keymap file to analyze",
-            type=utils.file_arg,
+            type=common.file_arg,
         )
 
     def run(self, args: Namespace) -> int:
