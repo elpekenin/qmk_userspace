@@ -44,8 +44,8 @@ def main() -> NoReturn:
     """Run a script's main logic, logging errors to file."""
     tweak_paths()
 
-    # NOTE: we have to hack here, doing some manual parsing
-    # at this point, we can't yet defer into argparse, because
+    # NOTE: we have to hack here, doing some manual parsing...
+    # at this point, we can't yet defer work into argparse, because
     # there are script-specific args we dont know ahead of time
     script_name = sys.argv.pop(1)
 
