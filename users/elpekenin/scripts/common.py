@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from argparse import ArgumentTypeError
 from functools import partial
 from pathlib import Path
@@ -39,18 +40,19 @@ def _repr(path: Path) -> str:
     return f"'{path.resolve()}'"
 
 
-def exists(path: Path) -> None:
-    """Check if the path exists, raise otherwise."""
-    if not path.exists():
-        msg = _repr(path) + " does not exist"
-        raise ArgumentTypeError(msg)
+def path_or_raise(raw: str) -> Path:
+    """Return the Path if it exists, raise otherwise."""
+    path = Path(raw)
+    if path.exists():
+        return path
+
+    msg = _repr(path) + " does not exist"
+    raise ArgumentTypeError(msg)
 
 
 def file_arg(raw: str) -> Path:
     """Conversion function for and argument expected to be a file."""
-    path = Path(raw)
-    exists(path)
-
+    path = path_or_raise(raw)
     if not path.is_file():
         msg = _repr(path) + " is not a file"
         raise ArgumentTypeError(msg)
@@ -60,9 +62,7 @@ def file_arg(raw: str) -> Path:
 
 def directory_arg(raw: str) -> Path:
     """Conversion function for and argument expected to be a directory."""
-    path = Path(raw)
-    exists(path)
-
+    path = path_or_raise(raw)
     if not path.is_dir():
         msg = _repr(path) + " is not a directory"
         raise ArgumentTypeError(msg)
@@ -70,16 +70,15 @@ def directory_arg(raw: str) -> Path:
     return path
 
 
-class ScriptBase:
+class ScriptBase(ABC):
     """Represent a script."""
 
     @staticmethod
     def add_args(parser: ArgumentParser) -> None:
         """For scripts to add their specific arguments."""
+        _ = parser  # by default: no-op
 
+    @abstractmethod
     def run(self, args: Namespace) -> int:
         """Logic of script, return exitcode."""
         raise NotImplementedError
-
-
-__all__ = ("lines",)

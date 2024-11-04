@@ -13,8 +13,6 @@ NOTE: Assumes layers written as: ``[<layer>] = LAYOUT(.*)(``. That is
   - Numbering and LAYOUT on the same line
 """
 
-# NOTE: Has to be run from QMK's base folder
-
 from __future__ import annotations
 
 import re
