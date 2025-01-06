@@ -1,7 +1,7 @@
 USER_SCRIPTS = $(USER_PATH)/scripts
 USER_GENERATED = $(USER_PATH)/generated
 
-PYTHON = python
+PYTHON = python3
 LOG_ARG = --log-folder $(LOG_FOLDER)
 
 # make sure folder exists

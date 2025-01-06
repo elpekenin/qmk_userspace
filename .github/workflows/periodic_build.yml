@@ -47,15 +47,13 @@ jobs:
       - name: Compile qmk_build
         run: |
           git clone https://github.com/elpekenin/qmk_build
-          source "$HOME/.cargo/env"
+          source $HOME/.profile
           cargo install --path qmk_build
 
       - name: Install zig
         run: |
           curl https://raw.githubusercontent.com/tristanisham/zvm/master/install.sh | bash
-          export PATH="$HOME/.zvm/bin:$PATH"
-          export ZVM_INSTALL="$HOME/.zvm/self"
-          export PATH="$ZVM_INSTALL:$PATH"
+          source $HOME/.profile
           zvm install master
           zvm use master
 
@@ -70,12 +68,13 @@ jobs:
 
       - name: Run qmk_build
         run: |
-          source "$HOME/.cargo/env"
+          # put qmk_build (.cargo) and zig (.zvm) in scope
+          source $HOME/.profile
           qmk_build
 
       - name: Upload logs
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: Log
-          path: $HOME/workspace/qmk/users/elpekenin/logs/
+          name: .*
+          path: ./users/elpekenin/logs/
