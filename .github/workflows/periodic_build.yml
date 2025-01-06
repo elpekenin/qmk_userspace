@@ -50,6 +50,15 @@ jobs:
           source "$HOME/.cargo/env"
           cargo install --path qmk_build
 
+      - name: Install zig
+        run: |
+          curl https://raw.githubusercontent.com/tristanisham/zvm/master/install.sh | bash
+          export PATH="$HOME/.zvm/bin:$PATH"
+          export ZVM_INSTALL="$HOME/.zvm/self"
+          export PATH="$ZVM_INSTALL:$PATH"
+          zvm install master
+          zvm use master
+
       - name: Show environment info
         run: |
           source "$HOME/.cargo/env"

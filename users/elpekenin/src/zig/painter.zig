@@ -34,12 +34,14 @@ fn Map(V: type, export_name: []const u8, allocator: std.mem.Allocator) type {
         }
 
         comptime {
-            @export(set, .{
+            const set_ptr = &set;
+            @export(set_ptr, .{
                 .name = "qp_set_" ++ export_name ++ "_by_name",
                 .linkage = .strong,
             });
 
-            @export(get, .{
+            const get_ptr = &get;
+            @export(get_ptr, .{
                 .name = "qp_get_" ++ export_name ++ "_by_name",
                 .linkage = .strong,
             });

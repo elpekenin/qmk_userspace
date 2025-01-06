@@ -111,11 +111,9 @@ pub fn build(b: *std.Build) !void {
     const assets = try getAssets(b);
     elpekenin_lib.root_module.addImport("assets", assets.createModule());
 
-    // generate the .a file
-    b.installArtifact(elpekenin_lib);
-
-    // FIXME: broken on zig 0.13 (?)
-    // ... and its equivalent .h
-    // const header = b.addInstallFile(elpekenin_lib.getEmittedH(), "include/elpekenin/zig.h");
-    // b.getInstallStep().dependOn(&header.step);
+    // generate the .a file and the respective .h
+    // NOTE: a bit too verbose because emit-h is kinda broken: https://github.com/ziglang/zig/issues/9698
+    const install = b.addInstallArtifact(elpekenin_lib, .{});
+    install.emitted_h = elpekenin_lib.getEmittedH();
+    b.getInstallStep().dependOn(&install.step);
 }

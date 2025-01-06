@@ -43,10 +43,11 @@
             "operation": "diff",
             "file": "generic_rotation.diff"
         },
-        {
-            "operation": "diff",
-            "file": "animation.diff"
-        },
+        // {
+        //     // was this for 2nd core anims?
+        //     "operation": "diff",
+        //     "file": "animation.diff"
+        // },
     ],
     "compile_command": "./keyboards/elpekenin/access/compile",
     "wsl": {
