@@ -40,8 +40,12 @@
 
 // *** Internal variables ***
 
-static deferred_executor_t    scrolling_text_executors[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS] = {0};
-static scrolling_text_state_t scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS]    = {0};
+#ifndef CONCURRENT_SCROLLING_TEXTS
+#    define CONCURRENT_SCROLLING_TEXTS 15
+#endif
+
+static deferred_executor_t    scrolling_text_executors[CONCURRENT_SCROLLING_TEXTS] = {0};
+static scrolling_text_state_t scrolling_text_states[CONCURRENT_SCROLLING_TEXTS]    = {0};
 
 TASK(logging)
 TASK(uptime)
@@ -175,7 +179,7 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
     _ = logging(SCROLL, LOG_DEBUG, "%s: entry", __func__);
 
     scrolling_text_state_t *scrolling_state = NULL;
-    for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS]; ++state) {
+    for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[CONCURRENT_SCROLLING_TEXTS]; ++state) {
         if (state->device == NULL) {
             scrolling_state = state;
             break;
@@ -220,7 +224,7 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
     }
 
     // Set up the timer
-    scrolling_state->defer_token = defer_exec_advanced(scrolling_text_executors, QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS, delay, scrolling_text_callback, scrolling_state);
+    scrolling_state->defer_token = defer_exec_advanced(scrolling_text_executors, CONCURRENT_SCROLLING_TEXTS, delay, scrolling_text_callback, scrolling_state);
     if (scrolling_state->defer_token == INVALID_DEFERRED_TOKEN) {
         _ = logging(SCROLL, LOG_ERROR, "%s: fail (setup executor)", __func__);
 
@@ -233,7 +237,7 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
 }
 
 void extend_scrolling_text(deferred_token scrolling_token, const char *str) {
-    for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS]; ++state) {
+    for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[CONCURRENT_SCROLLING_TEXTS]; ++state) {
         if (state->defer_token == scrolling_token) {
             uint8_t cur_len = strlen(state->str);
             uint8_t new_len = strlen(str);
@@ -258,7 +262,7 @@ void stop_scrolling_text(deferred_token scrolling_token) {
         return;
     }
 
-    for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS]; ++state) {
+    for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[CONCURRENT_SCROLLING_TEXTS]; ++state) {
         if (state->defer_token == scrolling_token) {
             // Clear screen and de-allocate
             qp_rect(state->device, state->x, state->y, state->x + state->width, state->y + state->font->line_height, HSV_BLACK, true);
@@ -269,7 +273,7 @@ void stop_scrolling_text(deferred_token scrolling_token) {
             state->device      = NULL;
             state->defer_token = INVALID_DEFERRED_TOKEN;
 
-            cancel_deferred_exec_advanced(scrolling_text_executors, QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS, scrolling_token);
+            cancel_deferred_exec_advanced(scrolling_text_executors, CONCURRENT_SCROLLING_TEXTS, scrolling_token);
 
             return;
         }
@@ -282,7 +286,7 @@ void stop_scrolling_text(deferred_token scrolling_token) {
 
 static uint32_t scrolling_text_tick_callback(uint32_t trigger_time, void *cb_arg) {
     static uint32_t last_scrolling_text_exec = 0;
-    deferred_exec_advanced_task(scrolling_text_executors, QUANTUM_PAINTER_CONCURRENT_SCROLLING_TEXTS, &last_scrolling_text_exec);
+    deferred_exec_advanced_task(scrolling_text_executors, CONCURRENT_SCROLLING_TEXTS, &last_scrolling_text_exec);
     return 100; // 100ms sounds fast enough for me, text moving at +10 frames/second does not sound too readable for me
 }
 
