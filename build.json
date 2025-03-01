@@ -15,6 +15,11 @@
             "destination": "users/elpekenin"
         },
         {
+            // if submodules are not present, download
+            "operation": "exec",
+            "command": "ls modules/elpekenin || git submodule update --init --recursive"
+        },
+        {
             "operation": "cp",
             "orig": "modules/*",
             "destination": "modules"
