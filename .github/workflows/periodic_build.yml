@@ -76,5 +76,4 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: .*
-          path: ./users/elpekenin/logs/
+          path: $(qmk env QMK_HOME)/users/elpekenin/logs/
