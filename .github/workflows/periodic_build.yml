@@ -37,6 +37,7 @@ jobs:
           pip install Jinja2 fnvhash
           pip install --upgrade milc
           qmk config compile.parallel=20
+          echo "QMK_HOME=~/workspace/qmk" >> $GITHUB_ENV
 
       - name: Install Rust
         run: |
@@ -76,4 +77,4 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          path: $(qmk env QMK_HOME)/users/elpekenin/logs/
+          path: ${{ env.QMK_HOME }}/users/elpekenin/logs/
