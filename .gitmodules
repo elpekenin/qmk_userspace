@@ -1,0 +1,3 @@
+[submodule "modules/elpekenin"]
+	path = modules/elpekenin
+	url = https://github.com/elpekenin/qmk_modules

@@ -3,7 +3,7 @@
 # Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-"""Small snippets re-used across scripts."""
+"""Small snippets reused across scripts."""
 
 from __future__ import annotations
 

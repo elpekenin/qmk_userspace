@@ -161,7 +161,7 @@ static void maybe_symbol(const char **str) {
             return;
     }
 
-    // we may get here with a combinatin with no replacement, eg shift+arrows
+    // we may get here with a combination with no replacement, eg shift+arrows
     // dont want to assign str to NULL
     if (target != NULL) {
         *str = target;

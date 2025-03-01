@@ -47,7 +47,7 @@
 
 #include "elpekenin/utils/compiler.h"
 
-#if !defined(SPI_DRIVERS)
+#ifndef SPI_DRIVERS
 #    if defined(SPI_DRIVER)
 #        define SPI_DRIVERS {&SPI_DRIVER}
 #    else

@@ -4,9 +4,9 @@
 #include <quantum/deferred_exec.h>
 #include <quantum/eeconfig.h>
 
-#include "elpekenin.h"
 #include "elpekenin/build_info.h"
 #include "elpekenin/logging.h"
+#include "elpekenin/signatures.h"
 #include "elpekenin/logging/backends/split.h"
 #include "elpekenin/split/transactions.h"
 #include "elpekenin/utils/compiler.h"
@@ -21,8 +21,6 @@ static inline void __split_size_err(void) {
 }
 
 // *** Callbacks ***
-
-WEAK void build_info_sync_keymap_callback(void) {}
 
 void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
     if (m2s_size != sizeof(build_info_t)) {

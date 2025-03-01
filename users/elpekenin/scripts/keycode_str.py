@@ -6,7 +6,7 @@
 """Create a u16 -> char * mapping.
 
 1. Get keycode information from qmk.keycodes
-2. Specialize it with the keycodes and/or alises within keymap.c file
+2. Specialize it with the keycodes and/or aliases within keymap.c file
 
 NOTE: Assumes layers written as: ``[<layer>] = LAYOUT(.*)(``. That is
   - Layers with explicit numbering/naming
@@ -18,8 +18,9 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-import common
 from qmk import keycodes  # depends on sys.path hacking
+
+import common
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -44,7 +45,8 @@ C_FILE = common.lines(
     "",
     "#include <quantum/quantum.h>",
     "",
-    '#include "elpekenin.h" // keycodes and layers',
+    '#include "elpekenin/keycodes.h"',
+    '#include "elpekenin/layers.h"',
     "",
     "static const char *keycode_names[] = {{",
     "{qmk_data}"  # intentional lack of comma

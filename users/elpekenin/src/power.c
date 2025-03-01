@@ -3,9 +3,8 @@
 
 #include <quantum/logging/debug.h>
 
-#include "elpekenin.h"
+#include "elpekenin/signatures.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/placeholders.h"
 
 static bool suspend_changed     = true;
 static bool suspend_debug_state = true;

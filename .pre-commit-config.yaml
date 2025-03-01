@@ -1,46 +1,46 @@
 exclude: .*3rd_party.*  # let external code unchanged
 
 ci:
+  autoupdate_schedule: monthly
   skip:
-    - zig_fmt
+    - zig_fmt  # too big
 
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
-    hooks:
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
   - repo: https://github.com/asottile/add-trailing-comma
     rev: v3.1.0
     hooks:
       - id: add-trailing-comma
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.4
-    hooks:
-      - id: codespell
-        args: [-w]  # work in place
-        exclude: .*autocorrect.*
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.17.0
+    rev: v3.19.1
     hooks:
       - id: pyupgrade
-        args: [--py39-plus]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.8
+    rev: v0.9.7
     hooks:
       - id: ruff
-        # allow commiting with TODO and FIXME comments
-        args: [ "--fix", "--extend-ignore", "TD", "--extend-ignore", "FIX"]
+        args: [--fix]
       - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+    rev: v1.15.0
     hooks:
       - id: mypy
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v19.1.1
+    rev: v19.1.7
     hooks:
       - id: clang-format
   - repo: https://github.com/elpekenin/mirrors-ziglang
     rev: v0.13.0
     hooks:
       - id: zig_fmt
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        args: [-w]  # work in place
+        exclude: .*autocorrect.*
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: trailing-whitespace

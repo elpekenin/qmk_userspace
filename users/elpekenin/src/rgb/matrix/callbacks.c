@@ -4,8 +4,7 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/layers.h"
-#include "elpekenin/placeholders.h"
-#include "elpekenin/rgb/matrix/functions.h"
+#include "elpekenin/signatures.h"
 #include "elpekenin/rgb/matrix/indicators.h"
 #include "elpekenin/utils/compiler.h"
 #include "elpekenin/utils/sections.h"
@@ -39,10 +38,6 @@ bool led_update_user(led_t led_state) {
     // clang-format on
 
     return false;
-}
-
-WEAK bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
-    return true;
 }
 
 void rgb_shutdown(bool jump_to_bootloader) {

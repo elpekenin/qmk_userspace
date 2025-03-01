@@ -7,8 +7,9 @@
 #include <platforms/progmem.h>
 #include "default_keyboard.h" // for LAYOUT
 
-#include "elpekenin.h" // layers names and custom keycodes
 #include "elpekenin/errno.h"
+#include "elpekenin/keycodes.h"
+#include "elpekenin/layers.h"
 #include "elpekenin/rgb/matrix/indicators.h"
 
 // *** Definitions ***

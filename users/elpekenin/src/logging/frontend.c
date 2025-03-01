@@ -9,7 +9,6 @@
 #include <quantum/logging/print.h>
 #include <platforms/timer.h>
 
-#include "elpekenin.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/utils/string.h"
 #include "elpekenin/utils/sections.h"

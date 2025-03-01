@@ -20,8 +20,8 @@ index 5097edfa07..25d25a1e2d 100644
 --- a/quantum/painter/qp_internal.c
 +++ b/quantum/painter/qp_internal.c
 @@ -20,6 +20,7 @@ enum {
-                      + (SSD1351_NUM_DEVICES) // SSD1351
                       + (SH1106_NUM_DEVICES)  // SH1106
+                      + (SH1107_NUM_DEVICES)  // SH1107
                       + (LD7032_NUM_DEVICES)  // LD7032
 +                     + (IL91874_NUM_DEVICES) // IL91874
  };
@@ -32,8 +32,8 @@ index b773dd091c..1c71fbb50f 100644
 --- a/quantum/painter/rules.mk
 +++ b/quantum/painter/rules.mk
 @@ -19,7 +19,9 @@ VALID_QUANTUM_PAINTER_DRIVERS := \
-     sh1106_i2c \
-     sh1106_spi \
+     sh1107_i2c \
+     sh1107_spi \
      ld7032_i2c \
 -    ld7032_spi
 +    ld7032_spi \

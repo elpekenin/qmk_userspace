@@ -12,9 +12,9 @@
 
 #include "generated/qp_resources.h"
 
-#if !defined(QUANTUM_PAINTER_NUM_DISPLAYS)
+#ifndef QUANTUM_PAINTER_NUM_DISPLAYS
 #    define QUANTUM_PAINTER_NUM_DISPLAYS 1
-#endif // QUANTUM_PAINTER_NUM_DISPLAYS
+#endif
 
 // *** Asset handling ***
 NON_NULL(2) READ_ONLY(1) void qp_set_device_by_name(const char *name, painter_device_t display);

@@ -215,7 +215,7 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
     if (render_scrolling_text_state(scrolling_state) != 0) {
         _ = logging(SCROLL, LOG_ERROR, "%s: fail (render 1st step)", __func__);
 
-        scrolling_state->device = NULL; // disregard the allocated scroling slot
+        scrolling_state->device = NULL; // disregard the allocated scrolling slot
         return INVALID_DEFERRED_TOKEN;
     }
 

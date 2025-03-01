@@ -7,6 +7,9 @@ VPATH += $(USER_INCLUDE)
 # do not error if an attribute is unknown
 CFLAGS += -Wno-attributes
 
+# include'd by compiler into every file, to workaround known issues
+CFLAGS += -include $(USER_INCLUDE)/elpekenin/issues.h
+
 SRC += $(USER_SRC)/build_info.c \
        $(USER_SRC)/crash.c \
        $(USER_SRC)/elpekenin.c \
@@ -16,8 +19,6 @@ SRC += $(USER_SRC)/build_info.c \
        $(USER_SRC)/process.c
 
 DEBUG_ENABLE = yes
-
-CLFAGS += -include $(USER_INCLUDE)/elpekenin/issues.h
 
 # Default configuration
 AUTOCORRECT_ENABLE ?= yes

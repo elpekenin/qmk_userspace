@@ -3,8 +3,12 @@
 
 #include QMK_KEYBOARD_H
 
-#include "elpekenin.h"
+#include "port/micropython_embed.h"
+
+#include "elpekenin/keycodes.h"
+#include "elpekenin/layers.h"
 #include "elpekenin/rng.h"
+#include "elpekenin/signatures.h"
 #include "elpekenin/xap.h"
 #include "elpekenin/qp/graphics.h"
 #include "elpekenin/utils/sections.h"
@@ -120,3 +124,20 @@ static void start_animation(void) {
 // regardless of starting the animation from one core or another
 PEKE_POST_INIT(start_animation, 9000);
 #endif
+
+// clang-format off
+static const char program[] =
+"import qmk\n"
+"\n"
+"color = (\n"
+"    qmk.rgb.RED if qmk.get_highest_active_layer() == 0\n"
+"    else qmk.rgb.GREEN\n"
+")\n"
+"qmk.rgb.set_color(0, color)\n"
+;
+// clang-format on
+
+bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
+    mp_embed_exec_str(program);
+    return true;
+}

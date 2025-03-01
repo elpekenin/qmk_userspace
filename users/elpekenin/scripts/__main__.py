@@ -55,7 +55,8 @@ def main() -> NoReturn:
 
     # common args
     parser.add_argument(
-        "output_directory",
+        "--output",
+        dest="output_directory",
         help="directory where to write generated files",
         type=common.directory_arg,
     )
