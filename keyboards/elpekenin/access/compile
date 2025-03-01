@@ -16,7 +16,6 @@ do
     qmk compile \
         -kb $KB \
         -km $KM \
-        --compiledb \
         -e MAKECMDGOALS=uf2-split-$SIDE \
         -e LOG_FOLDER=$LOG_FOLDER \
         -e TARGET=$SIDE \
