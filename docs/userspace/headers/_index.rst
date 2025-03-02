@@ -11,7 +11,6 @@ You might want/need to dig deep into their respective source code.
     crash
     errno
     keylog
-    logging
     rng
     sipo
     spi_custom

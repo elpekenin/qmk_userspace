@@ -64,16 +64,17 @@ autodoc_member_order = "bysource"
 
 CONF = Path(__file__)
 DOCS = CONF.parent
-ELPEKENIN = DOCS.parent
-USERSPACE = ELPEKENIN.parent
+USERSPACE = DOCS.parent / "users"
+ELPEKENIN = USERSPACE / "elpekenin"
 QMK = USERSPACE.parent
 LIB = QMK / "lib"
+MODULES = QMK / "modules"
 CHIBIOS = LIB / "chibios" / "os"
 ACCESS = QMK / "keyboards" / "elpekenin" / "access"
 
 TARGET = "right"
 
-hawkmoth_root = str(ELPEKENIN)
+hawkmoth_root = str(QMK)
 hawkmoth_source_uri = (  # link to the source code on GitHub
     "https://github.com/elpekenin/qmk_userspace/tree/main/users/elpekenin/{source}#L{line}"
 )
@@ -103,6 +104,8 @@ INCLUDE_DIRS = [
     QMK / "tmk_core" / "protocol",
     QMK / "tmk_core" / "protocol" / "chibios" / "lufa_utils",
     LIB / "printf" / "src" / "printf",
+    # TODO(elpekenin): more headers will be needed here
+    MODULES / "elpekenin" / "logging",
     CHIBIOS / "hal" / "include",
     CHIBIOS / "hal" / "osal" / "rt-nil",
     CHIBIOS / "license",
@@ -137,8 +140,8 @@ INCLUDE_DIRS = [
     QMK / "platforms" / "chibios" / "vendors" / "RP",  # _pin_defs.h
     # ugly, -e TARGET=value dependent
     QMK / ".build" / f"obj_{TARGET}" / "src",
-# NOTE: could not get ``fmt: skip`` to work on a specific line
-# applying it to every entry of the list sounds like a good idea anyway :)
+    # NOTE: could not get ``fmt: skip`` to work on a specific line
+    # applying it to every entry of the list sounds like a good idea anyway :)
 ]  # fmt: skip
 
 CONFIG_H = [

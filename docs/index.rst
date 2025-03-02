@@ -10,7 +10,9 @@ elpekenin's userspace
 
 The structure is similar to a usual QMK repository:
 
+* ``docs``: files used to generate this page.
 * ``keyboards/elpekenin/access`` contains source for my custom PCB, and my keymap inside it.
+* ``modules``: Submodule pointing to my `Community Modules <https://github.com/elpekenin/qmk_modules>`_.
 * ``users/elpekenin`` contains most of the logic, in case I want to reuse on other boards in the future. Structured as:
 
   * ``src``: actual source (mostly C, but a bit of zig too).
@@ -20,7 +22,6 @@ The structure is similar to a usual QMK repository:
   * ``painter``: `Quantum Painter <https://docs.qmk.fm/quantum_painter>`_ assets.
   * ``autocorrect``: database of corrections.
   * ``3rd_party``: a couple of external dependencies that are used.
-  * ``docs``: files used to generate this page.
 
 * Then, ``patches`` and ``build.json`` will put everything together into a clone of ``qmk_firmware`` to build.
 
@@ -42,6 +43,5 @@ doc-comments in the code, in hopes to reduce this friction. If you find anything
 .. toctree::
     :hidden:
 
-    src/_index
-    headers/_index
-    utils/_index
+    modules/_index
+    userspace/_index

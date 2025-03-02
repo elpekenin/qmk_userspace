@@ -79,7 +79,7 @@
  * Args:
  *     map: Where to operate.
  *     key: Name of the element being searched.
- *     ret: Whether operation was successful. See :doc:`/headers/errno` for details.
+ *     ret: Whether operation was successful. See :doc:`/userspace/headers/errno` for details.
  *
  * Return:
  *     The element identified by ``key``.
