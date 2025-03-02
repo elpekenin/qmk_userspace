@@ -59,7 +59,7 @@ void c1_main(void) {
     while (!ready) {
     }
 
-    _ = logging(UNKNOWN, LOG_DEBUG, "Hello from core 1");
+    logging(UNKNOWN, LOG_DEBUG, "Hello from core 1");
 
     // PEKE_CORE1_INIT
     FOREACH_SECTION(init_fn, core1_init, func) {

@@ -66,7 +66,7 @@ touch_report_t get_spi_touch_report(touch_device_t device, bool check_irq) {
     }
 
     if (!touch_spi_start(comms_config)) {
-        _ = logging(TOUCH, LOG_DEBUG, "Start comms");
+        logging(TOUCH, LOG_DEBUG, "Start comms");
         goto err;
     }
 

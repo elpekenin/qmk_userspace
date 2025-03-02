@@ -101,7 +101,7 @@
         }                                                           \
                                                                     \
         if (ret < 0) {                                              \
-            _ = logging(MAP, LOG_ERROR, "Key '%s' not found", key); \
+            logging(MAP, LOG_ERROR, "Key '%s' not found", key);     \
         }                                                           \
                                                                     \
         map.values[i];                                              \

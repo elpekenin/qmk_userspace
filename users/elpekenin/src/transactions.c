@@ -17,7 +17,7 @@
 bool is_keyboard_master_impl(void);
 
 static inline void __split_size_err(void) {
-    _ = logging(SPLIT, LOG_ERROR, "%s size", __func__);
+    logging(SPLIT, LOG_ERROR, "%s size", __func__);
 }
 
 // *** Callbacks ***

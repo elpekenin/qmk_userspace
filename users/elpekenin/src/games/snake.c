@@ -58,7 +58,7 @@ NON_NULL(1) static inline void draw_game(game_state_t *state) {
     if (!state->playing) {
         painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
         if (font == NULL) {
-            _ = logging(QP, LOG_ERROR, "Font was NULL");
+            logging(QP, LOG_ERROR, "Font was NULL");
         } else {
             const char text[]  = "Dead, git gut.";
             int16_t    text_w  = qp_textwidth(font, text);
@@ -113,7 +113,7 @@ void advance_snake_game(game_state_t *state) {
             break;
 
         case NO_MOVEMENT:
-            _ = logging(UNKNOWN, LOG_ERROR, "%s unreachable.", __func__);
+            logging(UNKNOWN, LOG_ERROR, "%s unreachable.", __func__);
             return;
     }
 
@@ -127,7 +127,7 @@ void advance_snake_game(game_state_t *state) {
             return;
         }
     } else {
-        _ = logging(UNKNOWN, LOG_ERROR, "%s not implemented", __func__);
+        logging(UNKNOWN, LOG_ERROR, "%s not implemented", __func__);
 
         state->playing = false;
         return;

@@ -38,7 +38,7 @@ bool is_initialised[] = {[0 ... SPI_COUNT - 1] = false};
 static MUTEX_DECL(spi_mutex);
 
 static inline spi_status_t __spi_error(uint8_t n) {
-    _ = logging(SPI, LOG_ERROR, "n==%d invalid", n);
+    logging(SPI, LOG_ERROR, "n==%d invalid", n);
     return SPI_STATUS_ERROR;
 }
 

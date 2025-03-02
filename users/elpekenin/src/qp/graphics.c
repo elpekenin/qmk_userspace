@@ -83,7 +83,7 @@ static glitch_text_state_t layer_extra      = {0};
 void draw_commit(painter_device_t device) {
     painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
     if (font == NULL) {
-        _ = logging(QP, LOG_ERROR, "Font was NULL");
+        logging(QP, LOG_ERROR, "Font was NULL");
         return;
     }
 
@@ -111,12 +111,12 @@ void draw_commit(painter_device_t device) {
 allocator_t *scrolling_allocator = &c_runtime_allocator;
 
 static int render_scrolling_text_state(scrolling_text_state_t *state) {
-    _ = logging(SCROLL, LOG_DEBUG, "%s: entry (char #%d)", __func__, (int)state->char_number);
+    logging(SCROLL, LOG_DEBUG, "%s: entry (char #%d)", __func__, (int)state->char_number);
 
     // prepare string slice
     char *slice = alloca(state->n_chars + 1); // +1 for null terminator
     if (slice == NULL) {
-        _ = logging(SCROLL, LOG_ERROR, "%s: could not allocate", __func__);
+        logging(SCROLL, LOG_ERROR, "%s: could not allocate", __func__);
         return -ENOMEM;
     }
     memset(slice, 0, state->n_chars + 1);
@@ -176,7 +176,7 @@ deferred_token draw_scrolling_text(painter_device_t device, uint16_t x, uint16_t
 }
 
 deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, uint16_t y, painter_font_handle_t font, const char *str, uint8_t n_chars, uint32_t delay, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg, uint8_t sat_bg, uint8_t val_bg) {
-    _ = logging(SCROLL, LOG_DEBUG, "%s: entry", __func__);
+    logging(SCROLL, LOG_DEBUG, "%s: entry", __func__);
 
     scrolling_text_state_t *scrolling_state = NULL;
     for (scrolling_text_state_t *state = scrolling_text_states; state < &scrolling_text_states[CONCURRENT_SCROLLING_TEXTS]; ++state) {
@@ -187,7 +187,7 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
     }
 
     if (scrolling_state == NULL) {
-        _ = logging(SCROLL, LOG_ERROR, "%s: fail (no free slot)", __func__);
+        logging(SCROLL, LOG_ERROR, "%s: fail (no free slot)", __func__);
         return INVALID_DEFERRED_TOKEN;
     }
 
@@ -196,7 +196,7 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
     uint8_t len          = strlen(str) + 1; // add one to also allocate/copy the terminator
     scrolling_state->str = malloc_with(scrolling_allocator, len);
     if (scrolling_state->str == NULL) {
-        _ = logging(SCROLL, LOG_ERROR, "%s: fail (allocation)", __func__);
+        logging(SCROLL, LOG_ERROR, "%s: fail (allocation)", __func__);
         return INVALID_DEFERRED_TOKEN;
     }
 
@@ -217,7 +217,7 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
 
     // Draw the first string
     if (render_scrolling_text_state(scrolling_state) != 0) {
-        _ = logging(SCROLL, LOG_ERROR, "%s: fail (render 1st step)", __func__);
+        logging(SCROLL, LOG_ERROR, "%s: fail (render 1st step)", __func__);
 
         scrolling_state->device = NULL; // disregard the allocated scrolling slot
         return INVALID_DEFERRED_TOKEN;
@@ -226,13 +226,13 @@ deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, 
     // Set up the timer
     scrolling_state->defer_token = defer_exec_advanced(scrolling_text_executors, CONCURRENT_SCROLLING_TEXTS, delay, scrolling_text_callback, scrolling_state);
     if (scrolling_state->defer_token == INVALID_DEFERRED_TOKEN) {
-        _ = logging(SCROLL, LOG_ERROR, "%s: fail (setup executor)", __func__);
+        logging(SCROLL, LOG_ERROR, "%s: fail (setup executor)", __func__);
 
         scrolling_state->device = NULL; // disregard the allocated scrolling slot
         return INVALID_DEFERRED_TOKEN;
     }
 
-    _ = logging(SCROLL, LOG_DEBUG, "%s: ok (deferred token = %d)", __func__, (int)scrolling_state->defer_token);
+    logging(SCROLL, LOG_DEBUG, "%s: ok (deferred token = %d)", __func__, (int)scrolling_state->defer_token);
     return scrolling_state->defer_token;
 }
 
@@ -245,7 +245,7 @@ void extend_scrolling_text(deferred_token scrolling_token, const char *str) {
             char   *new_pos = realloc_with(scrolling_allocator, state->str, len);
 
             if (new_pos == NULL) {
-                _ = logging(SCROLL, LOG_ERROR, "%s: fail (realloc)", __func__);
+                logging(SCROLL, LOG_ERROR, "%s: fail (realloc)", __func__);
                 return;
             }
             state->str = new_pos;
@@ -279,7 +279,7 @@ void stop_scrolling_text(deferred_token scrolling_token) {
         }
     }
 
-    _ = logging(QP, LOG_ERROR, "404 scrolling token");
+    logging(QP, LOG_ERROR, "404 scrolling token");
 }
 
 // *** Callbacks ***
@@ -545,7 +545,7 @@ static void elpekenin_qp_init(void) {
 
     painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
     if (font == NULL) {
-        _ = logging(QP, LOG_ERROR, "Font was NULL");
+        logging(QP, LOG_ERROR, "Font was NULL");
         return;
     }
 

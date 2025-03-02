@@ -71,8 +71,9 @@ pub fn build(b: *std.Build) !void {
     const elpekenin = ".";
     const users = elpekenin ++ "/..";
     const qmk = users ++ "/..";
-    const platforms = qmk ++ "/platforms";
     const lib = qmk ++ "/lib";
+    const modules = qmk ++ "/modules";
+    const platforms = qmk ++ "/platforms";
     const chibios = lib ++ "/chibios/os";
 
     const elpekenin_lib = b.addStaticLibrary(.{
@@ -90,6 +91,7 @@ pub fn build(b: *std.Build) !void {
     // ideally, we would only need these two paths
     elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = qmk });
     elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = elpekenin ++ "/include" });
+    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = modules ++ "/elpekenin/logging" });
 
     // ... but QMK's includes are a mess
     elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = chibios ++ "/common/portability/GCC" });

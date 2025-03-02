@@ -42,7 +42,7 @@ void suspend_wakeup_init_user(void) {
     // restore debug and log event after suspend
     debug_config.enable = suspend_debug_state;
 
-    _ = logging(UNKNOWN, LOG_DEBUG, "waking up...");
+    logging(UNKNOWN, LOG_DEBUG, "waking up...");
 
     suspend_wakeup_init_keymap();
 }

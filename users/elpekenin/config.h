@@ -19,4 +19,5 @@
 #define UNICODE_SELECTED_MODES UNICODE_MODE_WINCOMPOSE
 #define UCIS_MAX_CODE_POINTS 11
 
+// format used by modules/elpekenin/logging
 #define LOGGING_FORMAT "%M\n"

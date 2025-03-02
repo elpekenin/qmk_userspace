@@ -58,10 +58,10 @@ void print_crash_call_stack(void) {
     backtrace_t *call_stack = get_crash_call_stack(&depth);
 
     // first entry is the error handler, skip it
-    _ = logging(UNKNOWN, LOG_WARN, "Crash (%s)", copied_crash_info.msg);
+    logging(UNKNOWN, LOG_WARN, "Crash (%s)", copied_crash_info.msg);
     for (int8_t i = 1; i < depth; ++i) {
-        _ = logging(UNKNOWN, LOG_ERROR, "%s", call_stack[i].name);
-        _ = logging(UNKNOWN, LOG_ERROR, "%p", call_stack[i].address);
+        logging(UNKNOWN, LOG_ERROR, "%s", call_stack[i].name);
+        logging(UNKNOWN, LOG_ERROR, "%p", call_stack[i].address);
     }
 }
 

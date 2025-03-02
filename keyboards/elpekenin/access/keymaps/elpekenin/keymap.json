@@ -1,3 +1,6 @@
 {
-    "modules": ["elpekenin/micropython"]
+    "modules": [
+        "elpekenin/logging",
+        "elpekenin/micropython"
+    ]
 }

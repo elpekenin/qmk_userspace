@@ -162,7 +162,7 @@ static void *manual_realloc(allocator_t *allocator, void *ptr, size_t new_size) 
     // find current size
     alloc_info_t *info = find_info(ptr);
     if (UNLIKELY(info == NULL)) {
-        _ = logging(ALLOC, LOG_ERROR, "Could not find info for realloc");
+        logging(ALLOC, LOG_ERROR, "Could not find info for realloc");
         return NULL;
     }
 
@@ -177,7 +177,7 @@ static void *manual_realloc(allocator_t *allocator, void *ptr, size_t new_size) 
     if (UNLIKELY(new_ptr == NULL)) {
         // no space for new allocation
         // return NULL and **do not** free old memory
-        _ = logging(ALLOC, LOG_ERROR, "New size could not be allocated.");
+        logging(ALLOC, LOG_ERROR, "New size could not be allocated.");
         return NULL;
     }
 
@@ -198,7 +198,7 @@ static void *ch_pool_malloc(allocator_t *allocator, size_t size) {
 
     // ensure we get asked for a single item's size
     if (n_items != 1 || n_items * pool->object_size != size) {
-        _ = logging(ALLOC, LOG_ERROR, "size / pool_obj_size != 1");
+        logging(ALLOC, LOG_ERROR, "size / pool_obj_size != 1");
         return NULL;
     }
 
@@ -245,16 +245,16 @@ PURE allocator_t *get_default_allocator(void) {
 // v convenience wrappers
 
 static inline void __entry(const char *fn, allocator_t *allocator) {
-    _ = logging(ALLOC, LOG_DEBUG, "Using %s.%s", allocator->name, fn);
+    logging(ALLOC, LOG_DEBUG, "Using %s.%s", allocator->name, fn);
 }
 
 static inline void *__bad_allocator(const char *fn, allocator_t *allocator) {
-    _ = logging(ALLOC, LOG_ERROR, "There is no %s.%s", allocator->name, fn);
+    logging(ALLOC, LOG_ERROR, "There is no %s.%s", allocator->name, fn);
     return NULL;
 }
 
 static inline void __error(const char *fn) {
-    _ = logging(ALLOC, LOG_ERROR, "Calling %s failed", fn);
+    logging(ALLOC, LOG_ERROR, "Calling %s failed", fn);
 }
 
 NON_NULL(1) void *calloc_with(allocator_t *allocator, size_t nmemb, size_t size) {
