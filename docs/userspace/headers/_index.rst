@@ -9,7 +9,6 @@ You might want/need to dig deep into their respective source code.
 
     build_info
     crash
-    errno
     keylog
     rng
     sipo

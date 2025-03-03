@@ -13,7 +13,8 @@
 
 #pragma once
 
-#include "elpekenin/errno.h"
+#include <errno.h>
+
 #include "elpekenin/utils/allocator.h"
 #include "elpekenin/utils/compiler.h"
 
@@ -94,8 +95,10 @@ PURE READ_ONLY(1) static inline size_t array_len(void *array) {
 /**
  * Check if ``array`` is full (``capacity == length``). If so, make it bigger.
  *
- * Return:
- *     Whether operation was successful. See :doc:`/userspace/headers/errno` for details.
+ * Return: Error code.
+ *    * ``0``: Size was enough, or could expand it.
+ *    * ``-EINVAL``: ``array`` pointed to ``NULL``.
+ *    * ``-ENOMEM``: Could not allocate required memory.
  *
  * .. attention::
  *   So far, this grow duplicates capacity, beware your memory usage and initialize
@@ -106,8 +109,10 @@ WARN_UNUSED int expand_if_needed(void **array);
 /**
  * Put a new element into an array.
  *
- * Return:
- *     Whether operation was successful. See :doc:`/userspace/headers/errno` for details.
+ * Return: Error code.
+ *    * ``0``: Added it.
+ *    * ``-EINVAL``: ```array`` pointed to ``NULL``.
+ *    * ``-ENOMEM``: Could not allocate required memory.
  */
 #define array_append(array, value)                                                 \
     ({                                                                             \

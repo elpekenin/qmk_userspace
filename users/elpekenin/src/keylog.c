@@ -137,7 +137,7 @@ static void maybe_symbol(const char **str) {
     // disable hash logging momentarily, as a lot of strings won't be in the replacements map
     WITHOUT_LOGGING(MAP, replacements = map_get(replacements_map, *str, ret););
 
-    if (LIKELY(ret == -ENOTFOUND)) {
+    if (LIKELY(ret == -ENOKEY)) {
         return;
     }
 

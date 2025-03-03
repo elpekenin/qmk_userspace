@@ -62,7 +62,7 @@
         /* if key already used, do nothing */               \
         int ret;                                            \
         WITHOUT_LOGGING(MAP, map_get(map, key, ret););      \
-        if (ret == -ENOTFOUND) {                            \
+        if (ret == -ENOKEY) {                               \
             /* dont bother with value if key fails */       \
             if (array_append(map.keys, key) == 0) {         \
                 /* if pushing value fails, pop key */       \
@@ -79,7 +79,9 @@
  * Args:
  *     map: Where to operate.
  *     key: Name of the element being searched.
- *     ret: Whether operation was successful. See :doc:`/userspace/headers/errno` for details.
+ *     ret: Error code.
+ *       * ``0``: Element found.
+ *       * ``-ENOKEY``: ``key`` not found in ``map``.
  *
  * Return:
  *     The element identified by ``key``.
@@ -90,7 +92,7 @@
  */
 #define map_get(map, key, ret)                                      \
     ({                                                              \
-        ret = -ENOTFOUND;                                           \
+        ret = -ENOKEY;                                              \
         size_t i;                                                   \
         for (i = 0; i < array_len(map.keys); ++i) {                 \
             if (map.keys[i] && strcmp(map.keys[i], key) == 0) {     \

@@ -3,7 +3,6 @@
 
 #include <ch.h>
 
-#include "elpekenin/errno.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/utils/sections.h"
 

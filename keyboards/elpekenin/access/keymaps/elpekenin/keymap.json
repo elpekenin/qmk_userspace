@@ -1,5 +1,6 @@
 {
     "modules": [
+        "elpekenin/ledmap",
         "elpekenin/logging",
         "elpekenin/micropython"
     ]

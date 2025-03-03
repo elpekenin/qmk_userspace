@@ -26,7 +26,7 @@ void *_new_array(size_t item_size, size_t initial_size, allocator_t *allocator) 
 }
 
 int expand_if_needed(void **array) {
-    if (UNLIKELY(*array == NULL)) {
+    if (UNLIKELY(array == NULL) || UNLIKELY(*array == NULL)) {
         return -EINVAL;
     }
 

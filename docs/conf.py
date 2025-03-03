@@ -4,7 +4,12 @@
 
 from __future__ import annotations
 
+import builtins
+import os
 from pathlib import Path
+from typing import Literal, cast
+
+Repository = Literal["userspace", "module"]
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -21,6 +26,7 @@ release = ""
 extensions = [
     "hawkmoth",
     "hawkmoth.ext.napoleon",
+    "sphinx_tabs.tabs",
 ]
 
 templates_path = ["_templates"]
@@ -65,27 +71,92 @@ autodoc_member_order = "bysource"
 CONF = Path(__file__)
 DOCS = CONF.parent
 USERSPACE = DOCS.parent / "users"
-ELPEKENIN = USERSPACE / "elpekenin"
+ELPEKENIN_USERSPACE = USERSPACE / "elpekenin"
 QMK = USERSPACE.parent
 LIB = QMK / "lib"
 MODULES = QMK / "modules"
+ELPEKENIN_MODULE = MODULES / "elpekenin"
 CHIBIOS = LIB / "chibios" / "os"
 ACCESS = QMK / "keyboards" / "elpekenin" / "access"
 
 TARGET = "right"
 
 hawkmoth_root = str(QMK)
-hawkmoth_source_uri = (  # link to the source code on GitHub
-    "https://github.com/elpekenin/qmk_userspace/tree/main/users/elpekenin/{source}#L{line}"
-)
+
+
+class UriGenerator:
+    """Convenience class to generate permalinks to source code.
+
+    It also handles providing links to 2 different repositories.
+
+    Provide a `.format` function to match how hawkmoth uses it.
+    It is supposed to be a template string, but we are cooler :)
+
+    FIXME(elpekenin): Prone to breaking if hawkmoth's implementation changes.
+    """
+
+    def __init__(self) -> None:
+        self.userspace_template = "https://github.com/elpekenin/qmk_userspace/blob/{version}/users/elpekenin/{source}#L{line}"
+        self.modules_template = (
+            "https://github.com/elpekenin/qmk_modules/blob/{version}/{source}#L{line}"
+        )
+
+    def get_commit(self, repo: Repository) -> str:
+        # since the files copied into "real QMK" when building docs are not
+        # proper git repositories, we can't fetch the commits with commands
+        # like `git rev-parse HEAD` and instead rely on `make docs` setting
+        # this environment variables when doing the whole bootstrap process
+        if repo == "userspace":
+            return os.environ["USERSPACE_COMMIT"]
+
+        if repo == "module":
+            return os.environ["MODULE_COMMIT"]
+
+        msg = f"Unexpected value for repo: '{repo}'"
+        raise RuntimeError(msg)
+
+    def format(self, **kwargs: object) -> str:
+        """Create a link."""
+        # need to make it an absolute path in order to compare with `is_relative_to`
+        source = QMK / Path(cast(str, kwargs["source"]))
+
+        if "version" in kwargs:
+            print("WARNING: UriGenerator overwriting `kwargs['version']`")
+
+        if source.is_relative_to(ELPEKENIN_USERSPACE):
+            kwargs.update(
+                version=self.get_commit("userspace"),
+            )
+            return self.userspace_template.format(**kwargs)
+
+        if source.is_relative_to(ELPEKENIN_MODULE):
+            # need to remap source, it starts with "module/elpekenin"
+            # but the path in its dedicated repository drops that part
+            kwargs.update(
+                source=source.relative_to(ELPEKENIN_MODULE),
+                version=self.get_commit("module"),
+            )
+            return self.modules_template.format(**kwargs)
+
+        msg = f"Unknown source: '{source}'"
+        raise RuntimeError(msg)
+
+
+# NOTE: sphinx puts this class thru pickle. I dont understand how/where but it
+# ends up looking up for the class name into the builtins namespace...
+# tried to come up with a proper solution but this is where i ended at ^_^
+builtins.__dict__["UriGenerator"] = UriGenerator
+
+hawkmoth_source_uri = UriGenerator()
+
 hawkmoth_napoleon_transform = None  # apply napoleon transform to every docstring
 
 INCLUDE_DIRS = [
     ACCESS,
     ACCESS / "keymaps" / "elpekenin",
-    ELPEKENIN,  # for generated/
-    ELPEKENIN / "include",
-    ELPEKENIN / "3rd_party" / "backtrace" / "include",
+    ELPEKENIN_USERSPACE,  # for generated/
+    ELPEKENIN_USERSPACE / "include",
+    ELPEKENIN_USERSPACE / "3rd_party" / "backtrace" / "include",
     QMK,  # quantum/
     QMK / "platforms",
     QMK / "platforms" / "chibios",
@@ -105,7 +176,8 @@ INCLUDE_DIRS = [
     QMK / "tmk_core" / "protocol" / "chibios" / "lufa_utils",
     LIB / "printf" / "src" / "printf",
     # TODO(elpekenin): more headers will be needed here
-    MODULES / "elpekenin" / "logging",
+    ELPEKENIN_MODULE / "ledmap",
+    ELPEKENIN_MODULE / "logging",
     CHIBIOS / "hal" / "include",
     CHIBIOS / "hal" / "osal" / "rt-nil",
     CHIBIOS / "license",
@@ -147,7 +219,7 @@ INCLUDE_DIRS = [
 CONFIG_H = [
     ACCESS / "config.h",
     ACCESS / "keymaps" / "elpekenin" / "config.h",
-    ELPEKENIN / "config.h",
+    ELPEKENIN_USERSPACE / "config.h",
 ]
 
 hawkmoth_clang = (

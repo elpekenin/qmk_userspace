@@ -3,7 +3,13 @@
 
 #include QMK_KEYBOARD_H
 
-#include "port/micropython_embed.h"
+#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+#    include "elpekenin/ledmap.h"
+#endif
+
+#ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
+#    include "port/micropython_embed.h"
+#endif
 
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
@@ -41,6 +47,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______,     _______,                  _______,     _______, RM_SPDU, RM_VALD, RM_SPDD
     ),
 
+    // Currently unused, and not accessible
     // [_FN3] = LAYOUT(
     //     XXXXXXX, PIPE,    AT,      HASH,    TILD,    EURO,           NOT,     XXXXXXX, XXXXXXX, XXXXXXX, QUOT,    BSLS,
     //     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TD_GRV,  XXXXXXX,
@@ -125,6 +132,7 @@ static void start_animation(void) {
 PEKE_POST_INIT(start_animation, 9000);
 #endif
 
+#ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
 // clang-format off
 static const char program[] =
 "import qmk\n"
@@ -136,8 +144,51 @@ static const char program[] =
 "qmk.rgb.set_color(0, color)\n"
 ;
 // clang-format on
+#endif
+
+#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+// clang-format off
+const uint8_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
+    [_QWERTY] = LAYOUT(
+        RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
+        RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
+        RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
+        RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
+        RED,  RED,  RED,  RED,    BLACK,         WHITE,    RED,  TRNS, RED,  RED
+    ),
+    [_FN1] = LAYOUT(
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        CYAN, CYAN, CYAN, CYAN, CYAN, CYAN,    CYAN, CYAN, CYAN, CYAN, CYAN, CYAN,
+        BLUE, BLUE, BLUE, BLUE, BLUE, BLUE,    BLUE, BLUE, BLUE, BLUE, BLUE, BLUE,
+        ROSE, ROSE, ROSE, ROSE, ROSE, ROSE,    ROSE, ROSE, ROSE, ROSE, ROSE, ROSE,
+        WHITE,WHITE,BLACK,TRNS,    BLACK,         BLACK,   RED,  TRNS, WHITE,WHITE
+    ),
+    [_FN2] = LAYOUT(
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS,    TRNS,          TRNS,    TRNS, TRNS, TRNS, TRNS
+    ),
+    [_RST] = LAYOUT(
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS,    TRNS,          TRNS,    TRNS, TRNS, TRNS, TRNS
+    ),
+};
+// clang-format on
+#endif
 
 bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
+#ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
     mp_embed_exec_str(program);
+#endif
+
+#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+    draw_ledmap(led_min, led_max);
+#endif
+
     return true;
 }

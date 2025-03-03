@@ -1,6 +1,8 @@
 // Copyright 2024 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <errno.h>
+
 #include <quantum/color.h>
 
 #if defined(WPM_ENABLE)
@@ -9,7 +11,6 @@
 
 #include "elpekenin/build_info.h"
 #include "elpekenin/crash.h"
-#include "elpekenin/errno.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/rng.h"
 #include "elpekenin/logging/backends/qp.h"

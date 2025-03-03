@@ -102,30 +102,6 @@ typedef struct PACKED {
         RGB_MATRIX_MAXIMUM_BRIGHTNESS, RGB_MATRIX_MAXIMUM_BRIGHTNESS, RGB_MATRIX_MAXIMUM_BRIGHTNESS \
     }
 
-enum colors {
-    RED        = 0,
-    ORANGE     = 21,
-    YELLOW     = 43,
-    CHARTREUSE = 64,
-    GREEN      = 85,
-    SPRING     = 106,
-    CYAN       = 127,
-    AZURE      = 148,
-    BLUE       = 169,
-    VIOLET     = 180,
-    MAGENTA    = 201,
-    ROSE       = 222,
-
-    // special values
-    TRNS  = 253,
-    WHITE = 254,
-    BLACK = 255,
-
-    // has to be equal to the smallest special value
-    // ... or rework the `is_special_color` function
-    _MARKER_ = TRNS,
-};
-
 // *** API ***
 
 bool draw_indicators(uint8_t led_min, uint8_t led_max);

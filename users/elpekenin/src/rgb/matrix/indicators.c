@@ -7,9 +7,9 @@
 #include <platforms/progmem.h>
 #include "default_keyboard.h" // for LAYOUT
 
-#include "elpekenin/errno.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
+#include "elpekenin/ledmap.h"
 #include "elpekenin/rgb/matrix/indicators.h"
 
 // *** Definitions ***
@@ -26,28 +26,6 @@ static indicator_t indicators[] = {
 
     // custom keycodes
     CUSTOM_KEYCODE_IN_LAYER_INDICATOR(_RST, RGB_BLUE),
-};
-
-// NOTES:
-//   - Assumes (for now?) that all LEDs are mapped to a key (no underglow or w/e)
-//   - Available colors defined on the `.h` file
-//   - TRNS on layer 0 => nothing drawn (respects animation)
-//   - Undefined layers => same as above
-static const uint8_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
-    // [_QWERTY] = LAYOUT(
-    //     RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
-    //     RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
-    //     RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
-    //     RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
-    //     RED,  RED,  RED,  RED,    BLACK,         WHITE,    RED,  TRNS, RED,  RED
-    // ),
-    // [_FN1] = LAYOUT(
-    //     TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
-    //     CYAN, CYAN, CYAN, CYAN, CYAN, CYAN,    CYAN, CYAN, CYAN, CYAN, CYAN, CYAN,
-    //     BLUE, BLUE, BLUE, BLUE, BLUE, BLUE,    BLUE, BLUE, BLUE, BLUE, BLUE, BLUE,
-    //     ROSE, ROSE, ROSE, ROSE, ROSE, ROSE,    ROSE, ROSE, ROSE, ROSE, ROSE, ROSE,
-    //     WHITE,WHITE,BLACK,TRNS,    BLACK,         BLACK,   RED,  TRNS, WHITE,WHITE
-    // )
 };
 
 static void handle_indicator(const indicator_t *indicator, const indicator_fn_args_t *args) {
@@ -68,55 +46,6 @@ static void handle_indicator(const indicator_t *indicator, const indicator_fn_ar
     }
 
     rgb_matrix_set_color(args->led_index, indicator->color.r, indicator->color.g, indicator->color.b);
-}
-
-// *** Ledmap ***
-
-#define LEDMAP_LAYERS (sizeof(ledmap) / (MATRIX_ROWS * MATRIX_COLS))
-
-CONST static inline bool is_special_color(uint8_t hue) {
-    return hue >= _MARKER_;
-};
-
-NON_NULL(4) WRITE_ONLY(4) static inline int get_ledmap_color(uint8_t layer, uint8_t row, uint8_t col, rgb_t *rgb) {
-    if (layer >= LEDMAP_LAYERS) {
-        return -EINVAL;
-    }
-
-    uint8_t hue = pgm_read_byte(&(ledmap[layer][row][col]));
-    uint8_t sat = rgb_matrix_get_sat();
-    uint8_t val = rgb_matrix_get_val();
-    hsv_t   hsv = {hue, sat, val};
-
-    // not "regular" colors (hue), but ones with special handling
-    if (is_special_color(hue)) {
-        switch (hue) {
-            case TRNS:
-                if (layer == 0) {
-                    return -EINVAL;
-                }
-
-                // look up further down (only on active layers)
-                for (int8_t __layer = layer - 1; __layer > 0; --__layer) {
-                    if (layer_state & (1 << __layer)) {
-                        return get_ledmap_color(layer - 1, row, col, rgb);
-                    }
-                }
-
-                return -ENOTFOUND;
-
-            case WHITE:
-                hsv = (hsv_t){0, 0, val};
-                break;
-
-            case BLACK:
-                hsv = (hsv_t){0, 0, 0};
-                break;
-        }
-    }
-
-    *rgb = hsv_to_rgb(hsv);
-    return 0;
 }
 
 // *** Callback ***
