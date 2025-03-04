@@ -102,10 +102,11 @@ class UriGenerator:
         )
 
     def get_commit(self, repo: Repository) -> str:
-        # since the files copied into "real QMK" when building docs are not
-        # proper git repositories, we can't fetch the commits with commands
-        # like `git rev-parse HEAD` and instead rely on `make docs` setting
-        # this environment variables when doing the whole bootstrap process
+        # the files copied into $QMK when building docs are not proper git repositories
+        # as such, we can't fetch the commit with stuff like `subprocess.run("git rev-parse HEAD", cwd=...)`
+        #
+        # instead, the commands are invoked inside `make docs` (runs in $USERSPACE), and passed
+        # into `sphinx` (runs in $QMK, after copying files there) via these environment variables
         if repo == "userspace":
             return os.environ["USERSPACE_COMMIT"]
 
@@ -142,12 +143,13 @@ class UriGenerator:
         raise RuntimeError(msg)
 
 
-# NOTE: sphinx puts this class thru pickle. I dont understand how/where but it
-# ends up looking up for the class name into the builtins namespace...
-# tried to come up with a proper solution but this is where i ended at ^_^
-builtins.__dict__["UriGenerator"] = UriGenerator
-
 hawkmoth_source_uri = UriGenerator()
+
+# NOTE: sphinx (un)pickles this class. the operation failed due to `pickle`
+# not finding the class' name in the `builtins` namespace (i have no idea how or
+# why this happens)
+# tried to come up with a proper solution... this is the only thing i managed to run ^_^
+builtins.__dict__["UriGenerator"] = UriGenerator
 
 hawkmoth_napoleon_transform = None  # apply napoleon transform to every docstring
 

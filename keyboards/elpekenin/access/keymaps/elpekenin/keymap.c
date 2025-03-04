@@ -148,7 +148,7 @@ static const char program[] =
 
 #ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
 // clang-format off
-const uint8_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
+const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
     [_QWERTY] = LAYOUT(
         RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
         RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
