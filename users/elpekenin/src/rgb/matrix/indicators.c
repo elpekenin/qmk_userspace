@@ -69,12 +69,6 @@ bool draw_indicators(uint8_t led_min, uint8_t led_max) {
                 continue;
             }
 
-            // draw ledmap color
-            rgb_t rgb;
-            if (get_ledmap_color(layer, row, col, &rgb) == 0) {
-                rgb_matrix_set_color(index, rgb.r, rgb.g, rgb.b);
-            }
-
             args.led_index = index;
             args.keycode   = keymap_key_to_keycode(layer, (keypos_t){col, row});
 
