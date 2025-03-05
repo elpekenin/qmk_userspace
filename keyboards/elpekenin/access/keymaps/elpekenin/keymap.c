@@ -3,6 +3,10 @@
 
 #include QMK_KEYBOARD_H
 
+#ifdef COMMUNITY_MODULE_INDICATORS_ENABLE
+#    include "elpekenin/indicators.h"
+#endif
+
 #ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
 #    include "elpekenin/ledmap.h"
 #endif
@@ -181,6 +185,22 @@ const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 #endif
 
+#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+const indicator_t PROGMEM indicators[] = {
+    LAYER_INDICATOR(_RST, RGB_OFF),
+
+    // QMK keycodes
+    KEYCODE_IN_LAYER_INDICATOR(QK_BOOT, _RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(QK_RBT, _RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(EE_CLR, _RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(DB_TOGG, _RST, RGB_RED),
+    // KEYCODE_IN_LAYER_INDICATOR(AC_DICT, _RST, RGB_RED),
+
+    // custom keycodes
+    CUSTOM_KEYCODE_IN_LAYER_INDICATOR(_RST, RGB_BLUE),
+};
+#endif
+
 bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
 #ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
     mp_embed_exec_str(program);
@@ -188,6 +208,10 @@ bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
 
 #ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
     draw_ledmap(led_min, led_max);
+#endif
+
+#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+    draw_indicators(led_min, led_max);
 #endif
 
     return true;

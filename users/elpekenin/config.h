@@ -6,18 +6,38 @@
 
 #pragma once
 
-#include "elpekenin/logging/config.h"
-#include "elpekenin/qp/config.h"
-#include "elpekenin/rgb/matrix/config.h"
-#include "elpekenin/split/config.h"
-
+// misc
 #define MAX_DEFERRED_EXECUTORS 32
-
 #define LAYER_STATE_8BIT
 #define DYNAMIC_KEYMAP_LAYER_COUNT 5
 
+// logging
+#undef PRINTF_SUPPORT_DECIMAL_SPECIFIERS
+#define PRINTF_SUPPORT_DECIMAL_SPECIFIERS 1
+#define LOGGING_FORMAT "%M\n"
+
+// QP
+#define QUANTUM_PAINTER_DISPLAY_TIMEOUT 0
+
+// RGB
+#define RGB_MATRIX_KEYPRESSES
+#define ENABLE_RGB_MATRIX_SPLASH
+#define ENABLE_RGB_MATRIX_CYCLE_LEFT_RIGHT
+#define RGB_MATRIX_DEFAULT_VAL 30
+#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150
+#define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_CYCLE_LEFT_RIGHT
+
+// split
+#define SPLIT_TRANSACTION_IDS_USER RPC_ID_BUILD_INFO, RPC_ID_USER_SHUTDOWN, RPC_ID_USER_LOGGING, RPC_ID_USER_EE_CLR, RPC_ID_XAP
+#define SPLIT_WPM_ENABLE
+#define SPLIT_MODS_ENABLE
+#define SPLIT_ACTIVITY_ENABLE
+#define SPLIT_TRANSPORT_MIRROR
+#define SPLIT_LED_STATE_ENABLE
+#define SPLIT_LAYER_STATE_ENABLE
+#define RPC_M2S_BUFFER_SIZE 80
+#define RPC_S2M_BUFFER_SIZE 80
+
+// unicode
 #define UNICODE_SELECTED_MODES UNICODE_MODE_WINCOMPOSE
 #define UCIS_MAX_CODE_POINTS 11
-
-// format used by modules/elpekenin/logging
-#define LOGGING_FORMAT "%M\n"

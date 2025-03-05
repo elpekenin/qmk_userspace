@@ -3,19 +3,12 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/layers.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/rgb/matrix/indicators.h"
-#include "elpekenin/utils/compiler.h"
 #include "elpekenin/utils/sections.h"
 #include "elpekenin/utils/shortcuts.h"
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    if (!rgb_matrix_indicators_advanced_keymap(led_min, led_max)) {
-        return false;
-    }
-
-    return draw_indicators(led_min, led_max);
+    return rgb_matrix_indicators_advanced_keymap(led_min, led_max);
 }
 
 bool led_update_user(led_t led_state) {

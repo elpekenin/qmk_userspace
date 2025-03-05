@@ -8,6 +8,7 @@ Refer to `QMK's documentation <https://docs.qmk.fm/features/community_modules>`_
 
 .. toctree::
 
+    indicators
     ledmap
     logging
     micropython
