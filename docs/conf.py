@@ -96,7 +96,9 @@ class UriGenerator:
     """
 
     def __init__(self) -> None:
-        self.userspace_template = "https://github.com/elpekenin/qmk_userspace/blob/{version}/users/elpekenin/{source}#L{line}"
+        self.userspace_template = (
+            "https://github.com/elpekenin/qmk_userspace/blob/{version}/{source}#L{line}"
+        )
         self.modules_template = (
             "https://github.com/elpekenin/qmk_modules/blob/{version}/{source}#L{line}"
         )
