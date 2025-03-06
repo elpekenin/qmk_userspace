@@ -8,7 +8,9 @@ Refer to `QMK's documentation <https://docs.qmk.fm/features/community_modules>`_
 
 .. toctree::
 
+    dual_rp
     indicators
     ledmap
     logging
     micropython
+    sdk_wrappers

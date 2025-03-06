@@ -3,31 +3,9 @@
 
 #include <ch.h>
 
+#include "elpekenin/dual_rp.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/utils/sections.h"
-
-volatile static bool ready = false;
-
-static void start_signal(void) {
-    ready = true;
-}
-PEKE_POST_INIT(start_signal, INIT_DONE);
-
-static void stop_signal(bool unused) {
-    ready = false;
-}
-PEKE_DEINIT(stop_signal, DEINIT_CORE1);
-
-// will be a no-op if PICO_SDK_WRAPPERS is disabled on elpekenin/mk/mcu.mk
-// these are defined by PicoSDK
-extern init_fn __preinit_array_base__, __preinit_array_end__;
-
-static void pico_sdk_init(void) {
-    for (init_fn *func = &__preinit_array_base__; func < &__preinit_array_end__; func++) {
-        (*func)();
-    }
-}
-PEKE_PRE_INIT(pico_sdk_init, INIT_SDK);
 
 #if defined(SECOND_CORE_TASKS)
 // core0
@@ -45,34 +23,18 @@ PEKE_CORE1_LOOP(__real_deferred_exec_task);
 PEKE_CORE1_LOOP(__real_housekeeping_task);
 #endif
 
-// keep symbol defined, it is referenced by asm startup
-// however, no-op unless we wanna use the second core
-void c1_main(void) {
-    chSysWaitSystemState(ch_sys_running);
-    chInstanceObjectInit(&ch1, &ch_core1_cfg);
-
-    chSysUnlock();
-
-#if defined(USE_SECOND_CORE)
-    // wait for everything to be configured
-    while (!ready) {
-    }
-
+void c1_init_user(void) {
     logging(UNKNOWN, LOG_DEBUG, "Hello from core 1");
 
     // PEKE_CORE1_INIT
     FOREACH_SECTION(init_fn, core1_init, func) {
         (*func)();
     }
+}
 
-    while (true) {
-        // PEKE_CORE1_LOOP
-        FOREACH_SECTION(init_fn, core1_loop, func) {
-            (*func)();
-        }
+void c1_main_user(void) {
+    // PEKE_CORE1_LOOP
+    FOREACH_SECTION(init_fn, core1_loop, func) {
+        (*func)();
     }
-#else
-    while (true) {
-    }
-#endif
 }

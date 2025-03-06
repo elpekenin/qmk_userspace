@@ -1,8 +1,10 @@
 {
     "modules": [
+        "elpekenin/dual_rp",
         "elpekenin/indicators",
         "elpekenin/ledmap",
         "elpekenin/logging",
-        "elpekenin/micropython"
+        "elpekenin/micropython",
+        "elpekenin/sdk_wrappers"
     ]
 }
