@@ -10,7 +10,6 @@ You might want/need to dig deep into their respective source code.
     build_info
     crash
     keylog
-    rng
     sipo
     spi_custom
     touch

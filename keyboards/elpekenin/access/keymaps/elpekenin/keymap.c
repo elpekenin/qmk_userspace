@@ -15,6 +15,11 @@
 #    include "port/micropython_embed.h"
 #endif
 
+#ifdef COMMUNITY_MODULE_RNG_ENABLE
+#    include <platforms/chibios/drivers/analog.h>
+#    include "elpekenin/rng.h"
+#endif
+
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/rng.h"
@@ -116,7 +121,9 @@ void keyboard_post_init_keymap(void) {
 #    endif
 #endif
 
+#ifdef COMMUNITY_MODULE_RNG_ENABLE
     rng_set_seed(analogReadPin(GP28) * analogReadPin(GP28));
+#endif
 }
 
 void build_info_sync_keymap_callback(void) {

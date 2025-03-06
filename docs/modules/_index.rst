@@ -13,4 +13,5 @@ Refer to `QMK's documentation <https://docs.qmk.fm/features/community_modules>`_
     ledmap
     logging
     micropython
+    rng
     sdk_wrappers

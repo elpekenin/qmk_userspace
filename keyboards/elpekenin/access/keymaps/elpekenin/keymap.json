@@ -5,6 +5,7 @@
         "elpekenin/ledmap",
         "elpekenin/logging",
         "elpekenin/micropython",
+        "elpekenin/rng",
         "elpekenin/sdk_wrappers"
     ]
 }

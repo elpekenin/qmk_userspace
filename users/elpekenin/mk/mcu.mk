@@ -26,8 +26,10 @@ ifeq ($(MCU_SERIES), RP2040)
     SECOND_CORE_TASKS ?= $(USE_SECOND_CORE)
     ifeq ($(strip $(SECOND_CORE_TASKS)), yes)
         OPT_DEFS += -DSECOND_CORE_TASKS
-        MAIN_TASKS := qp_internal_task deferred_exec_task housekeeping_task
-        $(call WRAP, $(MAIN_TASKS))
+        EXTRALDFLAGS += \
+            -Wl,--wrap=qp_internal_task \
+            -Wl,--wrap=deferred_exec_task \
+            -Wl,--wrap=housekeeping_task
     endif
 
     SECOND_CORE_MATRIX ?= $(USE_SECOND_CORE)

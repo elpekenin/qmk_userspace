@@ -6,7 +6,6 @@ SERIAL_DRIVER = vendor
 # Custom features
 SIPO_PINS = yes
 
-
 # BOARD = GENERIC_PROMICRO_RP2040  # default
 # BOARD = GENERIC_RP_RP2040  # remove __late_init and some pinctrl settings
 

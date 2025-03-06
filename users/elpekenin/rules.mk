@@ -34,11 +34,9 @@ include $(MK_PATH)/games.mk
 include $(MK_PATH)/logging.mk
 include $(MK_PATH)/painter.mk
 include $(MK_PATH)/rgb_matrix.mk
-include $(MK_PATH)/rng.mk
 include $(MK_PATH)/split.mk
 include $(MK_PATH)/unicode.mk
 include $(MK_PATH)/utils.mk
-include $(MK_PATH)/wrappers.mk
 include $(MK_PATH)/xap.mk
 include $(MK_PATH)/3rd_party.mk
 include $(MK_PATH)/mcu.mk
