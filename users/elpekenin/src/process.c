@@ -5,7 +5,6 @@
 #include <quantum/process_keycode/process_rgb_matrix.h>
 #include <quantum/keymap_extras/sendstring_spanish.h>
 
-#include "elpekenin/crash.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/signatures.h"
@@ -198,17 +197,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 #endif
-
-        case PK_CRSH:
-            set_crash_info("test");
-            NVIC_SystemReset();
-            return false;
-
-        case PK_PCSH:
-            if (pressed) {
-                print_crash_call_stack();
-            }
-            return false;
 
         case PK_SIZE:
             if (pressed) {

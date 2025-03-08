@@ -11,7 +11,6 @@ CFLAGS += -Wno-attributes
 CFLAGS += -include $(USER_INCLUDE)/elpekenin/issues.h
 
 SRC += $(USER_SRC)/build_info.c \
-       $(USER_SRC)/crash.c \
        $(USER_SRC)/elpekenin.c \
        $(USER_SRC)/placeholders.c \
        $(USER_SRC)/layers.c \

@@ -19,6 +19,7 @@ do
         -e MAKECMDGOALS=uf2-split-$SIDE \
         -e LOG_FOLDER=$LOG_FOLDER \
         -e TARGET=$SIDE \
+        --compiledb \
         > $OUT 2> $ERR \
         || (cat $OUT && echo '' && cat $ERR && exit 1)
 done

@@ -54,9 +54,16 @@ void keyboard_pre_init_user(void) {
  * Finally, iterate the ``post_init`` linker section, executing all functions put into it (initializers).
  */
 void keyboard_post_init_user(void) {
-    if (program_crashed()) {
-        print_crash_call_stack();
-        clear_crash_info();
+    uint8_t      depth;
+    const char  *msg;
+    backtrace_t *call_stack = get_crash_call_stack(&depth, &msg);
+
+    if (depth != 0) {
+        logging(UNKNOWN, LOG_WARN, "Crash (%s)", msg);
+        for (int8_t i = 0; i < depth; ++i) {
+            logging(UNKNOWN, LOG_ERROR, "%s", call_stack[i].name);
+            logging(UNKNOWN, LOG_ERROR, "%p", call_stack[i].address);
+        }
     }
 
     keyboard_post_init_keymap();

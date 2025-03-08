@@ -122,10 +122,6 @@ enum userspace_keycodes {
     // Games
     PK_GAME, // start a new game
 
-    // Crash
-    PK_CRSH, // crash the firmware (testing)
-    PK_PCSH, // print crash call stack
-
     PK_SIZE, // print used flash
 
     // First value that can be used on a keymap, keep last

@@ -10,7 +10,6 @@
 #endif
 
 #include "elpekenin/build_info.h"
-#include "elpekenin/crash.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/rng.h"
 #include "elpekenin/logging/backends/qp.h"

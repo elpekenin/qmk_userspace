@@ -8,7 +8,6 @@ You might want/need to dig deep into their respective source code.
 .. toctree::
 
     build_info
-    crash
     keylog
     sipo
     spi_custom
