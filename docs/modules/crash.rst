@@ -1,4 +1,4 @@
 ``crash``
 =========
 
-.. c:autodoc:: modules/elpekenin/crash/include/elpekenin/crash.h
+.. c:autodoc:: modules/elpekenin/crash/elpekenin/crash.h

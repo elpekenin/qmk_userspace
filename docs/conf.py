@@ -179,9 +179,9 @@ INCLUDE_DIRS = [
     QMK / "tmk_core" / "protocol",
     QMK / "tmk_core" / "protocol" / "chibios" / "lufa_utils",
     LIB / "printf" / "src" / "printf",
-    # TODO(elpekenin): more headers will be needed here
-    ELPEKENIN_MODULE / "ledmap",
     ELPEKENIN_MODULE / "logging",
+    ELPEKENIN_MODULE / "crash",
+    ELPEKENIN_MODULE / "crash" / "backtrace" / "include",
     CHIBIOS / "hal" / "include",
     CHIBIOS / "hal" / "osal" / "rt-nil",
     CHIBIOS / "license",
