@@ -1,23 +1,16 @@
-#! /usr/bin/env python3
-
-# Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
-# SPDX-License-Identifier: GPL-2.0-or-later
-
-"""Define a new struct type which holds whether selected features are enabled or not.
-
-Also provides a function to draw the state on a QP screen.
-"""
+"""Subcommand to generate a type for checking if features are enabled."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from commands.base import BaseCommand
+from commands.codegen import C_HEADER, H_HEADER, lines
+
 if TYPE_CHECKING:
     from argparse import Namespace
     from collections.abc import Callable
     from pathlib import Path
-
-import common
 
 # == User configuration here ==
 TEXT_COLOR = "HSV_BLACK"
@@ -55,8 +48,8 @@ OUTPUT_NAME = "features"
 MAX_WIDTH = max(map(len, FEATURES))
 
 # *** Templates ***
-H_FILE = common.lines(
-    common.H_HEADER,
+H_FILE = lines(
+    H_HEADER,
     "",
     "#include <stdbool.h>",
     "#include <stdint.h>",
@@ -72,8 +65,8 @@ H_FILE = common.lines(
     "",
 )
 
-C_FILE = common.lines(
-    common.C_HEADER,
+C_FILE = lines(
+    C_HEADER,
     "",
     f'#include "{OUTPUT_NAME}.h"',
     "",
@@ -88,8 +81,8 @@ C_FILE = common.lines(
     "",
 )
 
-DRAW_FILE = common.lines(
-    common.C_HEADER,
+DRAW_FILE = lines(
+    C_HEADER,
     "",
     "#include <quantum/color.h>",
     "",
@@ -139,7 +132,7 @@ def _h_generator(feature: str) -> str:
 
 
 def _c_generator(feature: str) -> str:
-    return common.lines(
+    return lines(
         f"    #if defined({feature.upper()}_ENABLE)",
         f"        features.{feature.lower()} = true;",
         "    #endif",
@@ -152,7 +145,7 @@ def _draw_generator(feature: str) -> str:
     short_name = SHORT_NAMES.get(feature, feature)
     name = short_name.replace("_", " ").title()
 
-    return common.lines(
+    return lines(
         f'    qp_drawtext_recolor(device, x, y, font, features.{feature.lower()} ? "{name}: On " : "{name}: Off", {TEXT_COLOR}, {BACKGROUND_COLOR});',  # noqa: E501
         #                         intentional space so it overwrites previous "Off"         ^^^  # noqa: E501
         "    y += font_height;",
@@ -172,12 +165,12 @@ def _draw_generator(feature: str) -> str:
     )
 
 
-class Script(common.ScriptBase):
-    """Logic of this script."""
+class Features(BaseCommand):
+    """Define a type that holds whether some features are enabled."""
 
-    def run(self, args: Namespace) -> int:
+    def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
-        output_directory: Path = args.output_directory
+        output_directory: Path = arguments.output_directory
 
         # Gen files
         type_ = _get_type()  # Work out the union type needed

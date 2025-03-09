@@ -1,19 +1,13 @@
-#! /usr/bin/env python3
-
-# Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
-# SPDX-License-Identifier: GPL-2.0-or-later
-
-"""Automatically include on your compilation all QP assets on relevant paths.
-
-Also provides a function to load them into memory at once.
-"""
+"""Subcommand to do QP-related codegen."""
 
 from __future__ import annotations
 
 from functools import partial
 from typing import TYPE_CHECKING
 
-import common
+from commands import args
+from commands.base import BaseCommand
+from commands.codegen import C_HEADER, H_HEADER, MK_HEADER, lines
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -25,10 +19,10 @@ if TYPE_CHECKING:
 
 OUTPUT_NAME = "qp_resources"
 
-H_FILE = common.lines(common.H_HEADER, "", "{generated_code}")
+H_FILE = lines(H_HEADER, "", "{generated_code}")
 
-C_FILE = common.lines(
-    common.C_HEADER,
+C_FILE = lines(
+    C_HEADER,
     "",
     '#include "elpekenin/qp/graphics.h"',
     "",
@@ -37,7 +31,7 @@ C_FILE = common.lines(
     "}}",
 )
 
-MK_FILE = common.lines(common.MK_HEADER, "", "{generated_code}")
+MK_FILE = lines(MK_HEADER, "", "{generated_code}")
 
 
 def _find_assets_impl(assets: AssetsDictT, path: Path) -> None:
@@ -75,7 +69,7 @@ def _for_all_assets(
 
 
 def _h_generator(key: str, paths: list[Path]) -> str:
-    return common.lines(
+    return lines(
         f"// {key}",
         "\n".join(f'#include "{path.name}"' for path in paths),
         "",
@@ -96,33 +90,34 @@ def _c_generator(key: str, paths: list[Path]) -> str:
         name = _name_generator(key, path)
         _lines.append(f'    {function}("{name}", {name});')
 
-    return common.lines(*_lines)
+    return lines(*_lines)
 
 
 def _mk_generator(key: str, paths: list[Path]) -> str:
-    return common.lines(
+    return lines(
         f"# {key}",
         "\n".join(f"SRC += {path}".replace(".h", ".c") for path in paths),
         "",
     )
 
 
-class Script(common.ScriptBase):
-    """Logic of this script."""
+class QpResources(BaseCommand):
+    """Automatically handle all QP assets."""
 
     @staticmethod
     def add_args(parser: ArgumentParser) -> None:
         """Script-specific arguments."""
         parser.add_argument(
             "directories",
+            help="list of directories where to look for QP assets",
+            type=args.directory,
             nargs="+",
-            type=common.directory_arg,
         )
 
-    def run(self, args: Namespace) -> int:
+    def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
-        output_directory: Path = args.output_directory
-        directories: list[Path] = args.directories
+        output_directory: Path = arguments.output_directory
+        directories: list[Path] = arguments.directories
 
         # Find elements
         assets = _find_assets(directories)
@@ -130,7 +125,7 @@ class Script(common.ScriptBase):
         # Gen files
         for_all_assets = partial(_for_all_assets, assets=assets)
 
-        gen_h = common.lines(
+        gen_h = lines(
             for_all_assets(_h_generator),
             "",
             "void load_qp_resources(void);",

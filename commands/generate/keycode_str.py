@@ -1,26 +1,17 @@
-#! /usr/bin/env python3
+"""Subcommand to codegen a keycode->name mapping."""
 
-# Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
-# SPDX-License-Identifier: GPL-2.0-or-later
-
-"""Create a u16 -> char * mapping.
-
-1. Get keycode information from qmk.keycodes
-2. Specialize it with the keycodes and/or aliases within keymap.c file
-
-NOTE: Assumes layers written as: ``[<layer>] = LAYOUT(.*)(``. That is
-  - Layers with explicit numbering/naming
-  - Numbering and LAYOUT on the same line
-"""
+# NOTE: Assumes layers written as: ``[<layer>] = LAYOUT(.*)(``. That is
+#   - Layers with explicit numbering/naming
+#   - Numbering and LAYOUT on the same line
 
 from __future__ import annotations
 
 import re
 from typing import TYPE_CHECKING
 
-from qmk import keycodes  # depends on sys.path hacking
-
-import common
+from commands import args
+from commands.base import BaseCommand
+from commands.codegen import C_HEADER, H_HEADER, lines
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -33,15 +24,15 @@ LAYOUT = re.compile(r"\[(.*)\]( *)=( *)LAYOUT(.*)\(")
 
 OUTPUT_NAME = "keycode_str"
 
-H_FILE = common.lines(
-    common.H_HEADER,
+H_FILE = lines(
+    H_HEADER,
     "",
     "const char *get_keycode_name(uint16_t keycode);",
     "",
 )
 
-C_FILE = common.lines(
-    common.C_HEADER,
+C_FILE = lines(
+    C_HEADER,
     "",
     "#include <quantum/quantum.h>",
     "",
@@ -71,11 +62,6 @@ C_FILE = common.lines(
     "}}",
     "",
 )
-
-
-def _read_file(keymap_path: Path) -> str:
-    with keymap_path.open() as f:
-        return f.read()
 
 
 def _remove_comments(raw_file: str) -> str:
@@ -141,34 +127,39 @@ def _keymap_data(layers: list[str]) -> str:
     return strings
 
 
-class Script(common.ScriptBase):
-    """Logic of this script."""
+class KeycodeStr(BaseCommand):
+    """Create a map from keycode values(u16) to their names (char*)."""
 
     @staticmethod
     def add_args(parser: ArgumentParser) -> None:
         """Script-specific arguments."""
         parser.add_argument(
             "keymap",
-            help="The keymap file to analyze",
-            type=common.file_arg,
+            help="the keymap file to analyze",
+            type=args.file,
         )
 
-    def run(self, args: Namespace) -> int:
+    def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
-        output_directory: Path = args.output_directory
-        keymap_file: Path = args.keymap
+        output_directory: Path = arguments.output_directory
+        keymap_file: Path = arguments.keymap
 
         if keymap_file.name != "keymap.c":
             msg = "Keymap file should be a 'keymap.c'"
             raise ValueError(msg)
 
         # parse file
-        raw = _read_file(keymap_file)
+        raw = keymap_file.read_text()
         clean = _remove_comments(raw)
         layers = _extract_keycodes(clean)
 
+        # lazy import so that patching of `sys.path` can happen in
+        # manage.py:main, and not its global scope (between importing sys and
+        # importing this module)
+        import qmk.keycodes  # type: ignore[import-not-found]
+
         # generate file
-        spec = keycodes.load_spec("latest")
+        spec = qmk.keycodes.load_spec("latest")
         qmk_data = ""
         for entry in spec["keycodes"].values():
             keycode = entry["key"]

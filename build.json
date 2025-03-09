@@ -25,6 +25,16 @@
             "destination": "modules"
         },
         {
+            "operation": "cp",
+            "orig": "manage.py",
+            "destination": "."
+        },
+        {
+            "operation": "cp",
+            "orig": "commands/*",
+            "destination": "commands"
+        },
+        {
             // 3color eink
             "operation": "pr",
             "id": 20032
