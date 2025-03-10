@@ -57,7 +57,7 @@ html_theme_options = {
 autodoc_member_order = "bysource"
 
 # -- Hawkmoth config
-hawkmoth_root = os.environ["CONF_QMK"]
+hawkmoth_root = os.environ["CONF_ROOT"]
 hawkmoth_clang = os.environ["CONF_HAWKMOTH_CLANG"].split("||")
 
 ROOT = Path(__file__).parent.parent

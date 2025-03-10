@@ -31,26 +31,17 @@ if TYPE_CHECKING:
         file: str
 
 
+CWD = Path.cwd()
+
+
 def cleanup_args(args: list[str], directory: Path) -> list[str]:
     """From all args, filter the ones we want, and fix relative paths."""
-    out: list[str] = []
-    for i, arg in enumerate(args):
-        # make relative paths correct
-        if arg.startswith("-I"):
-            relative = Path(arg.removeprefix("-I"))
+    out = [
+        "-D_ATTR(...)=",
+        f"-I{directory}",
+    ]
 
-            fixed = f"-I{directory / relative}"
-            if fixed not in out:  # some were duplicated many times
-                out.append(fixed)
-
-        # make relative paths correct
-        if arg in {"-isystem", "-include"}:
-            relative = Path(args[i + 1])
-            out.extend([arg, str(directory / relative)])
-
-        # ignore some weird flags
-        if arg.startswith("-D"):
-            out.append(arg)
+    out.extend([arg for arg in args if arg.startswith("-D")])
 
     return out
 
@@ -66,20 +57,6 @@ def get_args_from_file(file: Path) -> list[str]:
         args,
         directory=Path(command["directory"]),
     )
-
-
-def resolve_qmk(maybe_qmk: Path | None) -> Path | None:
-    """Return input if not None, read environment variable otherwise."""
-    if maybe_qmk is not None:
-        qmk = maybe_qmk
-    else:
-        env = os.getenv("QMK_HOME")
-        if env is None:
-            return None
-
-        qmk = args.directory(env)
-
-    return qmk.resolve()
 
 
 def get_commit(directory: Path) -> str:
@@ -105,17 +82,19 @@ def get_commit(directory: Path) -> str:
     )
 
 
-def add_conf_environment(qmk: Path) -> None:
+def add_conf_environment() -> None:
     """Pass arguments into `conf.py` via environment variables."""
-    os.environ["CONF_QMK"] = str(qmk.resolve())
+    # want docs to be generated from current code (local path)
+    # not the (potentially outdated) copies on $QMK
+    os.environ["CONF_ROOT"] = str(CWD)
 
-    clang_args = get_args_from_file(qmk / "compile_commands.json")
+    clang_args = get_args_from_file(Path("compile_commands.json"))
     os.environ["CONF_HAWKMOTH_CLANG"] = "||".join(clang_args)
 
     # for permalink into commits
     os.environ["CONF_USERSPACE_COMMIT"] = get_commit(Path().parent)
     os.environ["CONF_MODULES_COMMIT"] = get_commit(
-        Path.cwd() / "modules" / "elpekenin",
+        CWD / "modules" / "elpekenin",
     )
 
 
@@ -135,14 +114,6 @@ class Docs(BaseCommand):
     @classmethod
     def add_args(cls, parser: ArgumentParser) -> None:
         """Command-specific arguments."""
-        parser.add_argument(
-            "--qmk",
-            help="path to your local copy of qmk_firmware",
-            metavar="DIR",
-            type=args.directory,
-            required=False,
-        )
-
         parser.add_argument(
             "--output",
             help="where to write the docs (default: temporary directory)",
@@ -216,15 +187,7 @@ class Docs(BaseCommand):
 
     def do_build(self, build: str, arguments: Namespace) -> int:
         """Build documentation."""
-        maybe_qmk: Path | None = arguments.qmk
-        qmk = resolve_qmk(maybe_qmk)
-        if qmk is None:
-            sys.stderr.write(
-                "Must provide --qmk or set $QMK_HOME\n",
-            )
-            return 1
-
-        add_conf_environment(qmk)
+        add_conf_environment()
 
         sphinx_args = [
             "-M",
