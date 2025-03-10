@@ -6,31 +6,49 @@ from argparse import ArgumentTypeError
 from pathlib import Path
 
 
-def path_or_raise(raw: str) -> Path:
-    """Return the Path if it exists, raise otherwise."""
-    path = Path(raw).resolve()
-    if path.exists():
+class File:
+    """Represent a file argument."""
+
+    def __init__(self, *, require_existence: bool) -> None:
+        """Initialize an instance."""
+        self.require_existence = require_existence
+
+    def __call__(self, raw: str) -> Path:
+        """Conversion function for and argument expected to be a file."""
+        path = Path(raw)
+        if not path.exists():
+            if self.require_existence:
+                msg = f"{path} does not exist"
+                raise ArgumentTypeError(msg)
+
+            return path
+
+        if not path.is_file():
+            msg = f"{path} is not a file"
+            raise ArgumentTypeError(msg)
+
         return path
 
-    msg = f"{path} does not exist"
-    raise ArgumentTypeError(msg)
 
+class Directory:
+    """Represent a directory argument."""
 
-def file(raw: str) -> Path:
-    """Conversion function for and argument expected to be a file."""
-    path = path_or_raise(raw)
-    if not path.is_file():
-        msg = f"{path} is not a file"
-        raise ArgumentTypeError(msg)
+    def __init__(self, *, require_existence: bool) -> None:
+        """Initialize an instance."""
+        self.require_existence = require_existence
 
-    return path
+    def __call__(self, raw: str) -> Path:
+        """Conversion function for and argument expected to be a file."""
+        path = Path(raw)
+        if not path.exists():
+            if self.require_existence:
+                msg = f"{path} does not exist"
+                raise ArgumentTypeError(msg)
 
+            return path
 
-def directory(raw: str) -> Path:
-    """Conversion function for and argument expected to be a directory."""
-    path = path_or_raise(raw)
-    if not path.is_dir():
-        msg = f"{path} is not a directory"
-        raise ArgumentTypeError(msg)
+        if not path.is_dir():
+            msg = f"{path} is not a directory"
+            raise ArgumentTypeError(msg)
 
-    return path
+        return path

@@ -22,7 +22,7 @@ class CodegenCommand(BaseCommand):
             dest="output_directory",
             help="directory where to write generated files",
             metavar="DIR",
-            type=args.directory,
+            type=args.Directory(require_existence=True),
             required=True,
         )
         return super().add_args(parser)

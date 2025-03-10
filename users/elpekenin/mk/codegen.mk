@@ -1,14 +1,15 @@
 USER_GENERATED = $(USER_PATH)/generated
 
 PYTHON = python3
-COMMON_ARGS = --output $(USER_GENERATED) --log $(LOG_FOLDER)/python.txt
+COMMON_ARGS = --log $(LOG_FOLDER)/python.txt
+CODEGEN_ARGS = --output $(USER_GENERATED)
 
 # make sure folder exists
 $(shell mkdir -p $(USER_GENERATED))
 
 # enabled_features_t
 $(USER_GENERATED)/features.c: FORCE
-	$(shell $(PYTHON) manage.py $(COMMON_ARGS) features)
+	$(shell $(PYTHON) manage.py $(COMMON_ARGS) features $(CODEGEN_ARGS))
 SRC += $(USER_GENERATED)/features.c
 
 # create a char *keycode_names[] based on qmk.keycodes.load_spec and keymap.c
@@ -16,7 +17,7 @@ SRC += $(USER_GENERATED)/features.c
 # NOTE: when both json and c keyamps exist, they are KEYMAP_C and OTHER_KEYMAP_C respectively, apparently
 # TODO: support C-only build
 $(USER_GENERATED)/keycode_str.c: FORCE
-	$(shell $(PYTHON) manage.py $(COMMON_ARGS) keycode_str $(OTHER_KEYMAP_C))
+	$(shell $(PYTHON) manage.py $(COMMON_ARGS) keycode_str $(CODEGEN_ARGS) $(OTHER_KEYMAP_C))
 SRC += $(USER_GENERATED)/keycode_str.c
 
 # QP assets
@@ -33,7 +34,7 @@ ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
     QP_DIRS := $(KEYBOARD_PATHS) $(KEYMAP_PATH) $(USER_PATH)
 
     $(USER_GENERATED)/qp_resources.c $(USER_GENERATED)/features_draw.c: FORCE
-    	$(shell $(PYTHON) manage.py $(COMMON_ARGS) qp_resources $(QP_DIRS))
+    	$(shell $(PYTHON) manage.py $(COMMON_ARGS) qp_resources $(CODEGEN_ARGS) $(QP_DIRS))
     SRC += $(USER_GENERATED)/qp_resources.c $(USER_GENERATED)/features_draw.c
 
     include $(USER_GENERATED)/qp_resources.mk

@@ -138,7 +138,7 @@ class KeycodeStr(CodegenCommand):
             "keymap",
             help="the keymap file to analyze",
             metavar="FILE",
-            type=args.file,
+            type=args.File(require_existence=True),
         )
         return super().add_args(parser)
 

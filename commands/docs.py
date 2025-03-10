@@ -118,7 +118,7 @@ class Docs(BaseCommand):
             "--output",
             help="where to write the docs (default: temporary directory)",
             metavar="DIR",
-            type=args.directory,
+            type=args.Directory(require_existence=True),
         )
 
         parser.add_argument(

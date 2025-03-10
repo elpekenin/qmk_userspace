@@ -112,7 +112,7 @@ class QpResources(CodegenCommand):
             "directories",
             help="list of directories where to look for QP assets",
             metavar="DIR",
-            type=args.directory,
+            type=args.Directory(require_existence=True),
             nargs="+",
         )
         return super().add_args(parser)

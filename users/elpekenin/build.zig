@@ -104,18 +104,18 @@ pub fn build(b: *std.Build) !void {
     elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = platforms ++ "/chibios" });
     elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = qmk ++ "/quantum" });
 
-    // ... and my 3rd_party libs are as well :P
-    elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = elpekenin ++ "/3rd_party/backtrace/include" });
-
     // hack newlib (c-stdlib) include path too...
     elpekenin_lib.addSystemIncludePath(.{ .cwd_relative = "/usr/include/newlib/" });
 
     const assets = try getAssets(b);
     elpekenin_lib.root_module.addImport("assets", assets.createModule());
 
+    // generate .a library
+    b.installArtifact(elpekenin_lib);
+
     // generate the .a file and the respective .h
     // NOTE: a bit too verbose because emit-h is kinda broken: https://github.com/ziglang/zig/issues/9698
-    const install = b.addInstallArtifact(elpekenin_lib, .{});
-    install.emitted_h = elpekenin_lib.getEmittedH();
-    b.getInstallStep().dependOn(&install.step);
+    // const install = b.addInstallArtifact(elpekenin_lib, .{});
+    // install.emitted_h = elpekenin_lib.getEmittedH();
+    // b.getInstallStep().dependOn(&install.step);
 }
