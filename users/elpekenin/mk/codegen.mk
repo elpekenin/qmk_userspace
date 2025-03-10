@@ -1,7 +1,7 @@
 USER_GENERATED = $(USER_PATH)/generated
 
 PYTHON = python3
-COMMON_ARGS = --output $(USER_GENERATED) --log-folder $(LOG_FOLDER)
+COMMON_ARGS = --output $(USER_GENERATED) --log $(LOG_FOLDER)/python.txt
 
 # make sure folder exists
 $(shell mkdir -p $(USER_GENERATED))

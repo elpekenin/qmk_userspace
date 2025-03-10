@@ -4,13 +4,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from commands.base import BaseCommand
 from commands.codegen import C_HEADER, H_HEADER, lines
+
+from . import CodegenCommand
 
 if TYPE_CHECKING:
     from argparse import Namespace
     from collections.abc import Callable
     from pathlib import Path
+
 
 # == User configuration here ==
 TEXT_COLOR = "HSV_BLACK"
@@ -165,25 +167,25 @@ def _draw_generator(feature: str) -> str:
     )
 
 
-class Features(BaseCommand):
+class Features(CodegenCommand):
     """Define a type that holds whether some features are enabled."""
 
     def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
         output_directory: Path = arguments.output_directory
 
-        # Gen files
         type_ = _get_type()  # Work out the union type needed
+
+        h_file = output_directory / f"{OUTPUT_NAME}.h"
         gen_h = _for_all_features(_h_generator)
-        with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
-            f.write(H_FILE.format(type=type_, generated_code=gen_h))
+        h_file.write_text(H_FILE.format(type=type_, generated_code=gen_h))
 
+        c_file = output_directory / f"{OUTPUT_NAME}.c"
         gen_c = _for_all_features(_c_generator)
-        with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
-            f.write(C_FILE.format(generated_code=gen_c))
+        c_file.write_text(C_FILE.format(generated_code=gen_c))
 
+        draw_file = output_directory / f"{OUTPUT_NAME}_draw.c"
         gen_draw = _for_all_features(_draw_generator)
-        with (output_directory / f"{OUTPUT_NAME}_draw.c").open("w") as f:
-            f.write(DRAW_FILE.format(generated_code=gen_draw))
+        draw_file.write_text(DRAW_FILE.format(generated_code=gen_draw))
 
         return 0

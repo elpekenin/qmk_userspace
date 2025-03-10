@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import argparse
 import logging
-import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from commands import args
+from commands.docs import Docs
 from commands.generate.features import Features
 from commands.generate.keycode_str import KeycodeStr
 from commands.generate.qp_resources import QpResources
@@ -21,8 +21,8 @@ THIS = Path(__file__)
 QMK = THIS.parent
 LOG_FILE = "python.txt"
 
-# TODO(elpekenin): docs, compile
 SUBCOMMANDS: dict[str, type[BaseCommand]] = {
+    "docs": Docs,
     "features": Features,
     "keycode_str": KeycodeStr,
     "qp_resources": QpResources,
@@ -31,8 +31,6 @@ SUBCOMMANDS: dict[str, type[BaseCommand]] = {
 
 def main() -> int:
     """Run a script's main logic, logging errors to file."""
-    sys.path.append(str(QMK / "lib" / "python"))  # make `import qmk` work
-
     parser = argparse.ArgumentParser(
         prog=THIS.stem,
         description=__doc__,
@@ -40,22 +38,16 @@ def main() -> int:
 
     # common args
     parser.add_argument(
-        "--output",
-        dest="output_directory",
-        help="directory where to write generated files",
-        type=args.directory,
-        required=True,
-    )
-    parser.add_argument(
-        "--log-folder",
-        help="directory where to write logs",
-        type=args.directory,
-        required=True,
+        "--log",
+        help="file where to write logs",
+        metavar="FILE",
+        type=args.file,
+        required=False,
+        default=None,
     )
 
     # script-specific args
-    subparsers = parser.add_subparsers(dest="subcommand", required=True)
-
+    subparsers = parser.add_subparsers(dest="subcommand")
     for name, class_ in SUBCOMMANDS.items():
         subparser = subparsers.add_parser(name, help=class_.help())
         class_.add_args(subparser)
@@ -63,9 +55,15 @@ def main() -> int:
     # run logic
     arguments = parser.parse_args()
 
-    logging.basicConfig(filename=arguments.log_folder / LOG_FILE)
+    log: Path | None = arguments.log
+    logging.basicConfig(filename=log)
 
-    subcommand = SUBCOMMANDS[arguments.subcommand]
+    subcommand_name: str | None = arguments.subcommand
+    if subcommand_name is None:
+        parser.print_help()
+        return 1
+
+    subcommand = SUBCOMMANDS[subcommand_name]
     return subcommand().run(arguments)
 
 

@@ -6,7 +6,7 @@ from argparse import ArgumentTypeError
 from pathlib import Path
 
 
-def _path_or_raise(raw: str) -> Path:
+def path_or_raise(raw: str) -> Path:
     """Return the Path if it exists, raise otherwise."""
     path = Path(raw).resolve()
     if path.exists():
@@ -18,7 +18,7 @@ def _path_or_raise(raw: str) -> Path:
 
 def file(raw: str) -> Path:
     """Conversion function for and argument expected to be a file."""
-    path = _path_or_raise(raw)
+    path = path_or_raise(raw)
     if not path.is_file():
         msg = f"{path} is not a file"
         raise ArgumentTypeError(msg)
@@ -28,7 +28,7 @@ def file(raw: str) -> Path:
 
 def directory(raw: str) -> Path:
     """Conversion function for and argument expected to be a directory."""
-    path = _path_or_raise(raw)
+    path = path_or_raise(raw)
     if not path.is_dir():
         msg = f"{path} is not a directory"
         raise ArgumentTypeError(msg)

@@ -13,4 +13,9 @@ extend-ignore = [
 ]
 
 [tool.mypy]
+python_version = "3.9"
 strict = true
+exclude = [
+    "modules/*",
+    "docs/conf.py",  # maybe later
+]

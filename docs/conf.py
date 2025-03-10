@@ -1,28 +1,22 @@
+"""Generate the documentation hosted on <qmk.elpekenin.dev>_."""
+
 # noqa: INP001
 
-"""Generate the documentation hosted on <qmk.elpekenin.dev>_."""
+# NOTE: Environment variables named CONF_* are provided by `py manage.py docs`
 
 from __future__ import annotations
 
 import builtins
 import os
 from pathlib import Path
-from typing import Literal, cast
 
-Repository = Literal["userspace", "module"]
-
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
+# -- Project information
 project = "QMK userspace"
 copyright = "2024, elpekenin"  # noqa: A001
 author = "elpekenin"
 release = ""
 
-
-# -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
-
+# -- General configuration
 extensions = [
     "hawkmoth",
     "hawkmoth.ext.napoleon",
@@ -32,10 +26,7 @@ extensions = [
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-
-# -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-
+# -- Options for HTML output
 html_theme = "furo"
 html_show_sourcelink = False  # disable "view source" button, showing raw rst
 html_static_path: list[str] = []
@@ -65,23 +56,13 @@ html_theme_options = {
 
 autodoc_member_order = "bysource"
 
-
 # -- Hawkmoth config
+hawkmoth_root = os.environ["CONF_QMK"]
+hawkmoth_clang = os.environ["CONF_HAWKMOTH_CLANG"].split("||")
 
-CONF = Path(__file__)
-DOCS = CONF.parent
-USERSPACE = DOCS.parent / "users"
-ELPEKENIN_USERSPACE = USERSPACE / "elpekenin"
-QMK = USERSPACE.parent
-LIB = QMK / "lib"
-MODULES = QMK / "modules"
-ELPEKENIN_MODULE = MODULES / "elpekenin"
-CHIBIOS = LIB / "chibios" / "os"
-ACCESS = QMK / "keyboards" / "elpekenin" / "access"
-
-TARGET = "right"
-
-hawkmoth_root = str(QMK)
+ROOT = Path(__file__).parent.parent
+USERSPACE = ROOT / "users" / "elpekenin"
+MODULES = ROOT / "modules" / "elpekenin"
 
 
 class UriGenerator:
@@ -103,41 +84,26 @@ class UriGenerator:
             "https://github.com/elpekenin/qmk_modules/blob/{version}/{source}#L{line}"
         )
 
-    def get_commit(self, repo: Repository) -> str:
-        # the files copied into $QMK when building docs are not proper git repositories
-        # as such, we can't fetch the commit with stuff like `subprocess.run("git rev-parse HEAD", cwd=...)`
-        #
-        # instead, the commands are invoked inside `make docs` (runs in $USERSPACE), and passed
-        # into `sphinx` (runs in $QMK, after copying files there) via these environment variables
-        if repo == "userspace":
-            return os.environ["USERSPACE_COMMIT"]
-
-        if repo == "module":
-            return os.environ["MODULE_COMMIT"]
-
-        msg = f"Unexpected value for repo: '{repo}'"
-        raise RuntimeError(msg)
-
-    def format(self, **kwargs: object) -> str:
+    def format(self, **kwargs: str) -> str:
         """Create a link."""
-        # need to make it an absolute path in order to compare with `is_relative_to`
-        source = QMK / Path(cast(str, kwargs["source"]))
+        source = Path(kwargs["source"]).resolve()
 
         if "version" in kwargs:
             print("WARNING: UriGenerator overwriting `kwargs['version']`")
 
-        if source.is_relative_to(ELPEKENIN_USERSPACE):
+        if source.is_relative_to(USERSPACE):
             kwargs.update(
-                version=self.get_commit("userspace"),
+                version=os.environ["CONF_USERSPACE_COMMIT"],
             )
             return self.userspace_template.format(**kwargs)
 
-        if source.is_relative_to(ELPEKENIN_MODULE):
+        if source.is_relative_to(MODULES):
             # need to remap source, it starts with "module/elpekenin"
             # but the path in its dedicated repository drops that part
+            relative = source.relative_to(MODULES)
             kwargs.update(
-                source=source.relative_to(ELPEKENIN_MODULE),
-                version=self.get_commit("module"),
+                source=str(relative),
+                version=os.environ["CONF_MODULES_COMMIT"],
             )
             return self.modules_template.format(**kwargs)
 
@@ -154,104 +120,3 @@ hawkmoth_source_uri = UriGenerator()
 builtins.__dict__["UriGenerator"] = UriGenerator
 
 hawkmoth_napoleon_transform = None  # apply napoleon transform to every docstring
-
-INCLUDE_DIRS = [
-    ACCESS,
-    ACCESS / "keymaps" / "elpekenin",
-    ELPEKENIN_USERSPACE,  # for generated/
-    ELPEKENIN_USERSPACE / "include",
-    ELPEKENIN_USERSPACE / "3rd_party" / "backtrace" / "include",
-    QMK,  # quantum/
-    QMK / "platforms",
-    QMK / "platforms" / "chibios",
-    QMK / "platforms" / "chibios" / "boards" / "common" / "configs",
-    QMK / "quantum",
-    QMK / "quantum" / "keymap_extras",
-    QMK / "quantum" / "logging",
-    QMK / "quantum" / "painter",
-    QMK / "quantum" / "process_keycode",
-    QMK / "quantum" / "rgb_matrix",
-    QMK / "quantum" / "rgb_matrix" / "animations",
-    QMK / "quantum" / "send_string",
-    QMK / "quantum" / "sequencer",
-    QMK / "quantum" / "unicode",
-    QMK / "quantum" / "xap",
-    QMK / "tmk_core" / "protocol",
-    QMK / "tmk_core" / "protocol" / "chibios" / "lufa_utils",
-    LIB / "printf" / "src" / "printf",
-    ELPEKENIN_MODULE / "logging",
-    ELPEKENIN_MODULE / "crash",
-    ELPEKENIN_MODULE / "crash" / "backtrace" / "include",
-    CHIBIOS / "hal" / "include",
-    CHIBIOS / "hal" / "osal" / "rt-nil",
-    CHIBIOS / "license",
-    CHIBIOS / "oslib" / "include",
-    CHIBIOS / "rt" / "include",
-    CHIBIOS / "rt" / "license",
-    # FIXME(elpekenin): these are(or may be) based on target
-    # might break when (if) we get to use another MCU
-    CHIBIOS / "common" / "portability" / "GCC",
-    CHIBIOS / "common" / "ext" / "RP" / "RP2040",
-    CHIBIOS / "common" / "ports" / "ARM-common",
-    CHIBIOS / "common" / "ports" / "ARMv6-M-RP2",
-    CHIBIOS / "common" / "startup" / "ARMCMx" / "devices" / "RP2040",
-    CHIBIOS / "hal" / "boards" / "RP_PICO_RP2040",
-    CHIBIOS / "hal" / "ports" / "common" / "ARMCMx",
-    CHIBIOS / "hal" / "ports" / "RP" / "RP2040",
-    CHIBIOS / "hal" / "ports" / "RP" / "LLD" / "DMAv1",
-    CHIBIOS / "hal" / "ports" / "RP" / "LLD" / "GPIOv1",
-    CHIBIOS / "hal" / "ports" / "RP" / "LLD" / "TIMERv1",
-    CHIBIOS / "hal" / "ports" / "RP" / "LLD" / "SPIv1",
-    CHIBIOS / "various" / "pico_bindings" / "dumb" / "include",
-    LIB / "chibios-contrib" / "os" / "hal" / "ports" / "RP" / "LLD" / "USBDv1",
-    LIB / "pico-sdk" / "src" / "boards" / "include",
-    LIB / "pico-sdk" / "src" / "common" / "pico_base" / "include",
-    LIB / "pico-sdk" / "src" / "rp2_common" / "cmsis" / "stub" / "CMSIS" / "Core" / "Include",  # noqa: E501
-    LIB / "pico-sdk" / "src" / "rp2_common" / "hardware_base" / "include",
-    LIB / "pico-sdk" / "src" / "rp2_common" / "hardware_clocks" / "include",
-    LIB / "pico-sdk" / "src" / "rp2_common" / "pico_platform" / "include",
-    LIB / "pico-sdk" / "src" / "rp2040" / "hardware_regs" / "include",
-    LIB / "pico-sdk" / "src" / "rp2040" / "hardware_structs" / "include",
-    QMK / "platforms" / "chibios" / "boards" / "GENERIC_RP_RP2040" / "configs",
-    QMK / "platforms" / "chibios" / "vendors" / "RP",  # _pin_defs.h
-    # ugly, -e TARGET=value dependent
-    QMK / ".build" / f"obj_{TARGET}" / "src",
-    # NOTE: could not get ``fmt: skip`` to work on a specific line
-    # applying it to every entry of the list sounds like a good idea anyway :)
-]  # fmt: skip
-
-CONFIG_H = [
-    ACCESS / "config.h",
-    ACCESS / "keymaps" / "elpekenin" / "config.h",
-    ELPEKENIN_USERSPACE / "config.h",
-]
-
-hawkmoth_clang = (
-    [f"-I{path}" for path in INCLUDE_DIRS]
-    + [f"-include{file}" for file in CONFIG_H]
-    + [
-        # attributes are a no-op for clang not to mess up
-        "-D_ATTR(...)=",
-        # silence warning emitted by pico-SDK all over the place
-        "-Wno-duplicate-decl-specifier",
-        # provided by build system
-        "-DMCU_RP",
-        "-DPROTOCOL_CHIBIOS",
-        "-DINIT_EE_HANDS_RIGHT",
-        "-DRGB_MATRIX_LED_COUNT=58",
-        "-DAUTOCORRECT_ENABLE",
-        "-DEEPROM_WEAR_LEVELING",
-        "-DKEYLOG_ENABLE",
-        "-DKEY_OVERRIDE_ENABLE",
-        "-DQUANTUM_PAINTER_ENABLE",
-        "-DRGB_MATRIX_ENABLE",
-        "-DSPLIT_ENABLE",
-        "-DTAP_DANCE_ENABLE",
-        "-DTOUCH_SCREEN_ENABLE",
-        "-DTRI_LAYER_ENABLE",
-        "-DUCIS_ENABLE",
-        "-DUNICODE_COMMON_ENABLE",
-        "-DWPM_ENABLE",
-        "-DXAP_ENABLE",
-    ]
-)

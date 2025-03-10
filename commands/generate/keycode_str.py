@@ -10,8 +10,9 @@ import re
 from typing import TYPE_CHECKING
 
 from commands import args
-from commands.base import BaseCommand
 from commands.codegen import C_HEADER, H_HEADER, lines
+
+from . import CodegenCommand
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -127,17 +128,19 @@ def _keymap_data(layers: list[str]) -> str:
     return strings
 
 
-class KeycodeStr(BaseCommand):
+class KeycodeStr(CodegenCommand):
     """Create a map from keycode values(u16) to their names (char*)."""
 
-    @staticmethod
-    def add_args(parser: ArgumentParser) -> None:
-        """Script-specific arguments."""
+    @classmethod
+    def add_args(cls, parser: ArgumentParser) -> None:
+        """Command-specific arguments."""
         parser.add_argument(
             "keymap",
             help="the keymap file to analyze",
+            metavar="FILE",
             type=args.file,
         )
+        return super().add_args(parser)
 
     def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
@@ -167,15 +170,15 @@ class KeycodeStr(BaseCommand):
 
         keymap_data = _keymap_data(layers)
 
-        with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
-            f.write(
-                C_FILE.format(
-                    qmk_data=qmk_data,
-                    keymap_data=keymap_data,
-                ),
-            )
+        c_file = output_directory / f"{OUTPUT_NAME}.c"
+        c_file.write_text(
+            C_FILE.format(
+                qmk_data=qmk_data,
+                keymap_data=keymap_data,
+            ),
+        )
 
-        with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
-            f.write(H_FILE)
+        h_file = output_directory / f"{OUTPUT_NAME}.h"
+        h_file.write_text(H_FILE)
 
         return 0

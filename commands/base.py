@@ -22,8 +22,8 @@ class BaseCommand(ABC):
 
         return doc.lower().rstrip(".")
 
-    @staticmethod
-    def add_args(parser: ArgumentParser) -> None:
+    @classmethod
+    def add_args(cls, parser: ArgumentParser) -> None:
         """For commands to add their specific arguments."""
         _ = parser  # by default: no-op
 

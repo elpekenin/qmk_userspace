@@ -10,8 +10,6 @@
 *.bin
 *.uf2
 
-# nothing to be seen
-lint
 
 # notes to self
 TODO.md

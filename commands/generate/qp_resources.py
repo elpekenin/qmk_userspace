@@ -6,8 +6,9 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from commands import args
-from commands.base import BaseCommand
 from commands.codegen import C_HEADER, H_HEADER, MK_HEADER, lines
+
+from . import CodegenCommand
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -101,18 +102,20 @@ def _mk_generator(key: str, paths: list[Path]) -> str:
     )
 
 
-class QpResources(BaseCommand):
+class QpResources(CodegenCommand):
     """Automatically handle all QP assets."""
 
-    @staticmethod
-    def add_args(parser: ArgumentParser) -> None:
-        """Script-specific arguments."""
+    @classmethod
+    def add_args(cls, parser: ArgumentParser) -> None:
+        """Command-specific arguments."""
         parser.add_argument(
             "directories",
             help="list of directories where to look for QP assets",
+            metavar="DIR",
             type=args.directory,
             nargs="+",
         )
+        return super().add_args(parser)
 
     def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
@@ -130,15 +133,15 @@ class QpResources(BaseCommand):
             "",
             "void load_qp_resources(void);",
         )
-        with (output_directory / f"{OUTPUT_NAME}.h").open("w") as f:
-            f.write(H_FILE.format(generated_code=gen_h))
+        h_file = output_directory / f"{OUTPUT_NAME}.h"
+        h_file.write_text(H_FILE.format(generated_code=gen_h))
 
         gen_c = for_all_assets(_c_generator)
-        with (output_directory / f"{OUTPUT_NAME}.c").open("w") as f:
-            f.write(C_FILE.format(generated_code=gen_c))
+        c_file = output_directory / f"{OUTPUT_NAME}.c"
+        c_file.write_text(C_FILE.format(generated_code=gen_c))
 
         gen_mk = for_all_assets(_mk_generator)
-        with (output_directory / f"{OUTPUT_NAME}.mk").open("w") as f:
-            f.write(MK_FILE.format(generated_code=gen_mk))
+        mk_file = output_directory / f"{OUTPUT_NAME}.mk"
+        mk_file.write_text(MK_FILE.format(generated_code=gen_mk))
 
         return 0
