@@ -34,16 +34,64 @@ if TYPE_CHECKING:
 CWD = Path.cwd()
 
 
-def cleanup_args(args: list[str], directory: Path) -> list[str]:
+def fixed_path(raw: str, source_directory: Path) -> str:
+    """Given a path, make it absolute by prepending source when needed.
+
+    This is needed because hawkmoth is configured to look at userspace, not
+    QMK directory, thus relative paths will break (except users/ and modules/)
+    """
+    path = Path(raw)
+
+    # make sure paths to these folders point to this repository
+    for directory in ("modules", "users"):
+        if directory in path.parts:
+            index = path.parts.index(directory)
+
+            ret = CWD
+            for part in path.parts[index:]:
+                ret /= part
+
+            return str(ret)
+
+    if raw.startswith("/"):
+        return raw
+
+    return str(source_directory / path)
+
+
+def include_flags(args: list[str], source_directory: Path) -> list[str]:
+    """From all args, filter the ones adding include paths or files."""
+    ret: list[str] = []
+    for i, arg in enumerate(args):
+        if arg.startswith("-I"):
+            ret.append(
+                "-I"
+                + fixed_path(
+                    arg.removeprefix("-I"),
+                    source_directory,
+                ),
+            )
+
+        if arg in {"-isystem", "-include"}:
+            ret.append(arg)
+            ret.append(fixed_path(args[i + 1], source_directory))
+
+    return ret
+
+
+def define_flags(args: list[str]) -> list[str]:
+    """From all args, filter the ones defining pre-processor macros."""
+    return [arg for arg in args if arg.startswith("-D")]
+
+
+def cleanup_args(args: list[str], source_directory: Path) -> list[str]:
     """From all args, filter the ones we want, and fix relative paths."""
-    out = [
-        "-D_ATTR(...)=",
-        f"-I{directory}",
+    return [
+        "-D_ATTR(...)=",  # clang trips on some __attribute__'s
+        f"-I{source_directory}",
+        *define_flags(args),
+        *include_flags(args, source_directory),
     ]
-
-    out.extend([arg for arg in args if arg.startswith("-D")])
-
-    return out
 
 
 def get_args_from_file(file: Path) -> list[str]:
@@ -53,10 +101,7 @@ def get_args_from_file(file: Path) -> list[str]:
 
     args = shlex.split(command["command"])
 
-    return cleanup_args(
-        args,
-        directory=Path(command["directory"]),
-    )
+    return cleanup_args(args, source_directory=Path(command["directory"]))
 
 
 def get_commit(directory: Path) -> str:
@@ -89,7 +134,9 @@ def add_conf_environment() -> None:
     os.environ["CONF_ROOT"] = str(CWD)
 
     clang_args = get_args_from_file(Path("compile_commands.json"))
-    os.environ["CONF_HAWKMOTH_CLANG"] = "||".join(clang_args)
+    sep = "||"
+    os.environ["CONF_HAWKMOTH_CLANG"] = sep.join(clang_args)
+    os.environ["CONF_HAWKMOTH_CLANG_SEP"] = sep
 
     # for permalink into commits
     os.environ["CONF_USERSPACE_COMMIT"] = get_commit(Path().parent)

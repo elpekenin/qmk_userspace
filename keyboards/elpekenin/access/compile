@@ -10,6 +10,7 @@ do
     qmk compile \
         -kb $KB \
         -km $KM \
+        --compiledb \
         -e MAKECMDGOALS=uf2-split-$SIDE \
         -e TARGET=$SIDE
 done

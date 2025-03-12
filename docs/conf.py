@@ -1,6 +1,6 @@
 """Generate the documentation hosted on <qmk.elpekenin.dev>_."""
 
-# noqa: INP001
+# ruff: noqa: INP001  # part of implicit namespace
 
 # NOTE: Environment variables named CONF_* are provided by `py manage.py docs`
 
@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import builtins
 import os
+import sys
 from pathlib import Path
 
 # -- Project information
@@ -58,7 +59,9 @@ autodoc_member_order = "bysource"
 
 # -- Hawkmoth config
 hawkmoth_root = os.environ["CONF_ROOT"]
-hawkmoth_clang = os.environ["CONF_HAWKMOTH_CLANG"].split("||")
+hawkmoth_clang = os.environ["CONF_HAWKMOTH_CLANG"].split(
+    os.environ["CONF_HAWKMOTH_CLANG_SEP"],
+)
 
 ROOT = Path(__file__).parent.parent
 USERSPACE = ROOT / "users" / "elpekenin"
@@ -77,6 +80,7 @@ class UriGenerator:
     """
 
     def __init__(self) -> None:
+        """Initialize template attributes."""
         self.userspace_template = (
             "https://github.com/elpekenin/qmk_userspace/blob/{version}/{source}#L{line}"
         )
@@ -89,7 +93,9 @@ class UriGenerator:
         source = Path(kwargs["source"]).resolve()
 
         if "version" in kwargs:
-            print("WARNING: UriGenerator overwriting `kwargs['version']`")
+            sys.stderr.write(
+                "WARNING: UriGenerator overwriting `kwargs['version']`\n",
+            )
 
         if source.is_relative_to(USERSPACE):
             kwargs.update(
