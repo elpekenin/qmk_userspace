@@ -4,8 +4,7 @@
 // TODO
 // - Maybe the XAP answer should be success/failure based on the output from QP functions, returning success for now as in "your request has been handled"
 
-#include <quantum/painter/qp.h>
-#include <quantum/xap/xap.h>
+#include <quantum/quantum.h>
 
 #include "elpekenin/qp/graphics.h"
 #include "elpekenin/utils/shortcuts.h"
@@ -63,7 +62,7 @@ bool xap_execute_qp_ellipse(xap_token_t token, xap_route_user_quantum_painter_dr
 bool xap_execute_qp_drawimage(xap_token_t token, xap_route_user_quantum_painter_drawimage_arg_t* arg) {
     xap_respond_success(token);
 
-    qp_drawimage(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_img_by_index(arg->image_id));
+    qp_drawimage(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_image_by_index(arg->image_id));
 
     return true;
 }
@@ -71,7 +70,7 @@ bool xap_execute_qp_drawimage(xap_token_t token, xap_route_user_quantum_painter_
 bool xap_execute_qp_drawimage_recolor(xap_token_t token, xap_route_user_quantum_painter_drawimage_recolor_arg_t* arg) {
     xap_respond_success(token);
 
-    qp_drawimage_recolor(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_img_by_index(arg->image_id), arg->hue_fg, arg->sat_fg, arg->val_fg, arg->hue_bg, arg->sat_bg, arg->val_bg);
+    qp_drawimage_recolor(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_image_by_index(arg->image_id), arg->hue_fg, arg->sat_fg, arg->val_fg, arg->hue_bg, arg->sat_bg, arg->val_bg);
 
     return true;
 }
@@ -79,7 +78,7 @@ bool xap_execute_qp_drawimage_recolor(xap_token_t token, xap_route_user_quantum_
 bool xap_execute_qp_animate(xap_token_t token, xap_route_user_quantum_painter_animate_arg_t* arg) {
     xap_respond_success(token);
 
-    qp_animate(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_img_by_index(arg->image_id));
+    qp_animate(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_image_by_index(arg->image_id));
 
     return true;
 }
@@ -87,7 +86,7 @@ bool xap_execute_qp_animate(xap_token_t token, xap_route_user_quantum_painter_an
 bool xap_execute_qp_animate_recolor(xap_token_t token, xap_route_user_quantum_painter_animate_recolor_arg_t* arg) {
     xap_respond_success(token);
 
-    qp_animate_recolor(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_img_by_index(arg->image_id), arg->hue_fg, arg->sat_fg, arg->val_fg, arg->hue_bg, arg->sat_bg, arg->val_bg);
+    qp_animate_recolor(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_image_by_index(arg->image_id), arg->hue_fg, arg->sat_fg, arg->val_fg, arg->hue_bg, arg->sat_bg, arg->val_bg);
 
     return true;
 }

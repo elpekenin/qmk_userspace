@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <quantum/xap/xap.h>
+#include <quantum/quantum.h>
 #include <quantum/split_common/transactions.h>
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
 

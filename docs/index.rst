@@ -15,7 +15,7 @@ The structure is similar to a usual QMK repository:
 * ``modules``: Submodule pointing to my `Community Modules <https://github.com/elpekenin/qmk_modules>`_.
 * ``users/elpekenin`` contains most of the logic, in case I want to reuse on other boards in the future. Structured as:
 
-  * ``src``: actual source (mostly C, but a bit of zig too).
+  * ``src``: source code
   * ``include``: header files.
   * ``mk``: Makefile logic, broken into "small" sections.
   * ``scripts``: Python that generates code at compile time.

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <quantum/painter/qp.h>
+#include <quantum/quantum.h>
 
 #include "elpekenin/utils/compiler.h"
 

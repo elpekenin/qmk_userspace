@@ -1,0 +1,5 @@
+clang==14  # to match apt-provided libclang14.so on my system
+furo
+hawkmoth
+sphinx
+sphinx-tabs

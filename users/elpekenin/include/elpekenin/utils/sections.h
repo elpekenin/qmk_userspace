@@ -15,7 +15,7 @@
 
 #include <stdbool.h>
 
-#include <quantum/util.h>
+#include <quantum/quantum.h>
 
 #include "elpekenin/utils/compiler.h"
 #include "elpekenin/utils/ld.h"
@@ -25,12 +25,6 @@
  * 1000 instead of 100 or 10 provides plenty of room to tweak order in the future.
  */
 
-/*
- * Run RP's SDK initialization procedures as soon as possible.
- * Otherwise we will likely crash due to broken stdlib functions.
- */
-#define INIT_SDK 1000
-
 /* Set up allocation tracker, this *attempts* to detect memory leaks. */
 #define INIT_ALLOC 1010
 
@@ -38,14 +32,12 @@
 #define INIT_QP_LOG 1020
 /* Set up custom :c:func:`sendchar` function, which :c:func:`printf` calls. */
 #define INIT_SENDCHAR 1021 /* after QP logging has been init */
-/* Set up zig-level code. */
-#define INIT_ZIG 1022 /* early on, but with logging available */
 
-/* Make a copy of crash data, so we dont lose the information. */
-#define INIT_CRASH 1030
 /* Set up the struct that holds which features are/not enabled. */
 #define INIT_BUILD 1030 /* before split, so that we send the right thing over wire */
 
+/* Set up maps to store name->asset */
+#define INIT_QP_MAPS 1035
 /* Set up structs that configure screens' drawing. */
 #define INIT_QP_TASKS_ARGS 1040
 /* Set up custom keylog feature. */
@@ -61,17 +53,10 @@
 /* Set up games. */
 #define INIT_GAME 1060
 
-/* Flag that everything is set up on core 0. */
-#define INIT_DONE 9990
-
-/* Stopping second core is first on the list. */
-#define DEINIT_CORE1 1000
 /* Warn computer we shutting down/restarting. */
 #define DEINIT_XAP 1010
 /* Clean up screens. */
 #define DEINIT_QP 1020
-/* Run zig-level cleanup code. */
-#define DEINIT_ZIG 1020
 /* Stop lights as a marker that we aren't running. */
 #define DEINIT_RGB 1020
 

@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <quantum/action.h> // keyrecord_t
+#include <quantum/quantum.h>
 
 #include "elpekenin/utils/compiler.h"
 

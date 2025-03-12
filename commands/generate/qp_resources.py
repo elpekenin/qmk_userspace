@@ -25,7 +25,9 @@ H_FILE = lines(H_HEADER, "", "{generated_code}")
 C_FILE = lines(
     C_HEADER,
     "",
-    '#include "elpekenin/qp/graphics.h"',
+    '#include "elpekenin/qp/assets.h"',  # set_{font,image}_by_name
+    "",
+    '#include "generated/qp_resources.h"',
     "",
     "void load_qp_resources(void) {{",
     "{generated_code}"  # no comma here intentionally
@@ -120,10 +122,9 @@ class QpResources(CodegenCommand):
     def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
         output_directory: Path = arguments.output_directory
-        directories: list[Path] = arguments.directories
 
         # Find elements
-        assets = _find_assets(directories)
+        assets = _find_assets(arguments.directories)
 
         # Gen files
         for_all_assets = partial(_for_all_assets, assets=assets)

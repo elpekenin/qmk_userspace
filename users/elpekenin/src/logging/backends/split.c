@@ -3,8 +3,7 @@
 
 #include <string.h>
 
-#include <quantum/keyboard.h>
-#include <quantum/logging/print.h>
+#include <quantum/quantum.h>
 
 #include "elpekenin/logging.h"
 #include "elpekenin/split/transactions.h"

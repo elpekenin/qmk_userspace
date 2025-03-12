@@ -3,7 +3,8 @@
 
 #include <string.h>
 
-#include <quantum/keyboard.h>
+#include <quantum/quantum.h>
+
 #include "version.h"
 
 #include "elpekenin/build_info.h"

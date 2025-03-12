@@ -10,12 +10,13 @@ CFLAGS += -Wno-attributes
 # include'd by compiler into every file, to workaround known issues
 CFLAGS += -include $(USER_INCLUDE)/elpekenin/issues.h
 
-SRC += $(USER_SRC)/build_info.c \
-       $(USER_SRC)/elpekenin.c \
-       $(USER_SRC)/placeholders.c \
-       $(USER_SRC)/layers.c \
-       $(USER_SRC)/power.c \
-       $(USER_SRC)/process.c
+SRC += \
+    $(USER_SRC)/build_info.c \
+    $(USER_SRC)/elpekenin.c \
+    $(USER_SRC)/placeholders.c \
+    $(USER_SRC)/layers.c \
+    $(USER_SRC)/power.c \
+    $(USER_SRC)/process.c
 
 DEBUG_ENABLE = yes
 
@@ -39,7 +40,6 @@ include $(MK_PATH)/utils.mk
 include $(MK_PATH)/xap.mk
 include $(MK_PATH)/3rd_party.mk
 include $(MK_PATH)/mcu.mk
-include $(MK_PATH)/zig.mk
 
 # downloaded (sometimes) using qmk_build
 -include $(MK_PATH)/rtc.mk

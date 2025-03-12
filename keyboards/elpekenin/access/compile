@@ -5,21 +5,11 @@
 KB=elpekenin/access
 KM=elpekenin
 
-LOG_FOLDER=$(realpath ./users/elpekenin/logs)
-mkdir -p $LOG_FOLDER
-
-OUT=$LOG_FOLDER/compile.out
-ERR=$LOG_FOLDER/compile.err
-
 for SIDE in left right
 do
     qmk compile \
         -kb $KB \
         -km $KM \
         -e MAKECMDGOALS=uf2-split-$SIDE \
-        -e LOG_FOLDER=$LOG_FOLDER \
-        -e TARGET=$SIDE \
-        --compiledb \
-        > $OUT 2> $ERR \
-        || (cat $OUT && echo '' && cat $ERR && exit 1)
+        -e TARGET=$SIDE
 done

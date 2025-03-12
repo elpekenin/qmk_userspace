@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <errno.h>
+
 #include "elpekenin/logging.h"
 #include "elpekenin/utils/dyn_array.h"
 #include "elpekenin/utils/shortcuts.h"
@@ -62,7 +64,7 @@
         /* if key already used, do nothing */               \
         int ret;                                            \
         WITHOUT_LOGGING(MAP, map_get(map, key, ret););      \
-        if (ret == -ENOKEY) {                               \
+        if (ret == -ENODEV) {                               \
             /* dont bother with value if key fails */       \
             if (array_append(map.keys, key) == 0) {         \
                 /* if pushing value fails, pop key */       \
@@ -81,7 +83,7 @@
  *     key: Name of the element being searched.
  *     ret: Error code.
  *       * ``0``: Element found.
- *       * ``-ENOKEY``: ``key`` not found in ``map``.
+ *       * ``-ENODEV``: ``key`` not found in ``map``.
  *
  * Return:
  *     The element identified by ``key``.
@@ -92,12 +94,12 @@
  */
 #define map_get(map, key, ret)                                      \
     ({                                                              \
-        ret = -ENOKEY;                                              \
+        ret = -ENODEV;                                              \
         size_t i;                                                   \
         for (i = 0; i < array_len(map.keys); ++i) {                 \
             if (map.keys[i] && strcmp(map.keys[i], key) == 0) {     \
                 ret = 0;                                            \
-                _   = logging(MAP, LOG_DEBUG, "Read '%s'", key);    \
+                logging(MAP, LOG_DEBUG, "Read '%s'", key);          \
                 break; /* without this, we get one off (next ++) */ \
             }                                                       \
         }                                                           \

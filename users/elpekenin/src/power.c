@@ -1,7 +1,7 @@
 // Copyright 2023 Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <quantum/logging/debug.h>
+#include <quantum/quantum.h>
 
 #include "elpekenin/signatures.h"
 #include "elpekenin/logging.h"

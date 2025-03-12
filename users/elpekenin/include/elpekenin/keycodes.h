@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <quantum/quantum_keycodes.h>
-
+#include <quantum/quantum.h>
 #include <quantum/keymap_extras/keymap_spanish.h>
 
 // aliases

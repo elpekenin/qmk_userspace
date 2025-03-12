@@ -6,7 +6,7 @@
 
 #include <stdlib.h>
 
-#include <quantum/logging/debug.h>
+#include <quantum/quantum.h>
 
 #include "elpekenin/logging.h"
 #include "elpekenin/utils/allocator.h"

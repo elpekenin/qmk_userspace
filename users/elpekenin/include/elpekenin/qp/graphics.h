@@ -3,27 +3,7 @@
 
 #pragma once
 
-#include <quantum/painter/qp.h>
-#include <quantum/painter/qp_internal.h>
-
-#include "elpekenin/logging.h"
-#include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/map.h"
-
-#include "generated/qp_resources.h"
-
-#ifndef QUANTUM_PAINTER_NUM_DISPLAYS
-#    define QUANTUM_PAINTER_NUM_DISPLAYS 1
-#endif
-
-// *** Asset handling ***
-NON_NULL(2) READ_ONLY(1) void qp_set_device_by_name(const char *name, painter_device_t display);
-NON_NULL(2) READ_ONLY(1) void qp_set_font_by_name(const char *name, const uint8_t *font);
-NON_NULL(2) READ_ONLY(1) void qp_set_image_by_name(const char *name, const uint8_t *img);
-
-NON_NULL(1) READ_ONLY(1) painter_device_t qp_get_device_by_name(const char *name);
-NON_NULL(1) READ_ONLY(1) painter_font_handle_t qp_get_font_by_name(const char *name);
-NON_NULL(1) READ_ONLY(1) painter_image_handle_t qp_get_image_by_name(const char *name);
+#include <quantum/quantum.h>
 
 // *** Show build info ***
 
@@ -48,10 +28,13 @@ typedef struct PACKED {
     deferred_token        defer_token;
 } scrolling_text_state_t;
 
-NON_NULL(5) READ_ONLY(5) deferred_token draw_scrolling_text(painter_device_t device, uint16_t x, uint16_t y, painter_font_handle_t font, const char *str, uint8_t n_chars, uint32_t delay);
-NON_NULL(5) READ_ONLY(5) deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, uint16_t y, painter_font_handle_t font, const char *str, uint8_t n_chars, uint32_t delay, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg, uint8_t sat_bg, uint8_t val_bg);
+deferred_token draw_scrolling_text(painter_device_t device, uint16_t x, uint16_t y, painter_font_handle_t font, const char *str, uint8_t n_chars, uint32_t delay);
+
+deferred_token draw_scrolling_text_recolor(painter_device_t device, uint16_t x, uint16_t y, painter_font_handle_t font, const char *str, uint8_t n_chars, uint32_t delay, uint8_t hue_fg, uint8_t sat_fg, uint8_t val_fg, uint8_t hue_bg, uint8_t sat_bg, uint8_t val_bg);
+
 void stop_scrolling_text(deferred_token scrolling_token);
-NON_NULL(2) READ_ONLY(2) void extend_scrolling_text(deferred_token scrolling_token, const char *str);
+
+void extend_scrolling_text(deferred_token scrolling_token, const char *str);
 
 // *** Callbacks ***
 

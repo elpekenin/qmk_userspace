@@ -3,9 +3,7 @@
 
 #include <string.h>
 
-#include <quantum/action_layer.h>   // get_highest_layer
-#include <quantum/action_util.h>    // get_mods
-#include <quantum/logging/debug.h>  // debug_config
+#include <quantum/quantum.h>
 #include <tmk_core/protocol/host.h> // keyboard_led_state
 
 #include "elpekenin/utils/allocator.h" // memory_heap_t
@@ -137,7 +135,7 @@ static void maybe_symbol(const char **str) {
     // disable hash logging momentarily, as a lot of strings won't be in the replacements map
     WITHOUT_LOGGING(MAP, replacements = map_get(replacements_map, *str, ret););
 
-    if (LIKELY(ret == -ENOKEY)) {
+    if (LIKELY(ret == -ENODEV)) {
         return;
     }
 

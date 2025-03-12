@@ -156,9 +156,7 @@ class KeycodeStr(CodegenCommand):
         clean = _remove_comments(raw)
         layers = _extract_keycodes(clean)
 
-        # lazy import so that patching of `sys.path` can happen in
-        # manage.py:main, and not its global scope (between importing sys and
-        # importing this module)
+        # lazy import for sys.path patching
         import qmk.keycodes  # type: ignore[import-not-found]
 
         # generate file

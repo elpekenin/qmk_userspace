@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 import json
 import os
 import shlex
@@ -10,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from contextlib import contextmanager
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
@@ -98,8 +98,8 @@ def add_conf_environment() -> None:
     )
 
 
-@contextlib.contextmanager
-def or_temp_dir(maybe_dir: Path | None) -> Generator[str]:
+@contextmanager
+def build_dir(maybe_dir: Path | None) -> Generator[str]:
     """Return input if not None, a temporary dir otherwise."""
     if maybe_dir is not None:
         yield str(maybe_dir)
@@ -178,11 +178,9 @@ class Docs(BaseCommand):
             "preview": self.do_preview,
             "deploy": self.do_deploy,
         }
-        action_name: str = arguments.action
-        action = actions[action_name]
+        action = actions[arguments.action]
 
-        output: Path | None = arguments.output
-        with or_temp_dir(output) as build:
+        with build_dir(arguments.output) as build:
             return action(build, arguments)
 
     def do_build(self, build: str, arguments: Namespace) -> int:
@@ -209,8 +207,21 @@ class Docs(BaseCommand):
             return ret
 
         listen: str = arguments.listen
-        address, port_str = listen.split(":", maxsplit=1)
-        port = int(port_str)
+        try:
+            address, port_str = listen.split(":", maxsplit=1)
+        except ValueError:
+            sys.stderr.write(
+                "Invalid interface specified. Use ADDRESS:PORT syntax\n",
+            )
+            return 1
+
+        try:
+            port = int(port_str)
+        except ValueError:
+            sys.stderr.write(
+                "Invalid interface specified. Port has to be a number\n",
+            )
+            return 1
 
         httpd = HTTPServer(
             (address, port),
@@ -221,9 +232,9 @@ class Docs(BaseCommand):
         os.chdir(str(docs))
 
         sys.stdout.write(f"Serving on http://{address}:{port}\n")
-        with contextlib.suppress(KeyboardInterrupt):
-            httpd.serve_forever()
+        httpd.serve_forever()
 
+        # unreachable (?), does server exit?
         return 0
 
     def remove_docs(self, host: str, path: str) -> None:
@@ -271,13 +282,10 @@ class Docs(BaseCommand):
             return ret
         sys.stdout.write("Documentation built\n")
 
-        host: str = arguments.host
-        path: str = arguments.path
-
-        self.remove_docs(host, path)
+        self.remove_docs(arguments.host, arguments.path)
         sys.stdout.write("Removed previous documentation\n")
 
-        self.deploy_docs(build, host, path)
+        self.deploy_docs(build, arguments.host, arguments.path)
         sys.stdout.write("Deployed new documentation\n")
 
         return 0

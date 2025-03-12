@@ -13,6 +13,7 @@ ifeq ($(strip $(GAME_ENABLE)), yes)
     endif
 
     OPT_DEFS += -DGAME_ENABLE -DGAME_$(shell echo $(SELECTED_GAME) | tr '[:lower:]' '[:upper:]')
-    SRC += $(USER_SRC)/games/game.c \
-           $(USER_SRC)/games/$(SELECTED_GAME).c
+    SRC += \
+        $(USER_SRC)/games/game.c \
+        $(USER_SRC)/games/$(SELECTED_GAME).c
 endif

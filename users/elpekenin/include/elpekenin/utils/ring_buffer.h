@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include <quantum/util.h> // ARRAY_SIZE
+#include <quantum/quantum.h>
 
 /**
  * Create a new ring buffer.

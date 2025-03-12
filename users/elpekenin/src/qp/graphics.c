@@ -3,21 +3,18 @@
 
 #include <errno.h>
 
-#include <quantum/color.h>
-
-#if defined(WPM_ENABLE)
-#    include <quantum/wpm.h>
-#endif
+#include <quantum/quantum.h>
 
 #include "elpekenin/build_info.h"
 #include "elpekenin/layers.h"
+#include "elpekenin/logging.h"
 #include "elpekenin/rng.h"
 #include "elpekenin/logging/backends/qp.h"
+#include "elpekenin/qp/assets.h"
 #include "elpekenin/qp/graphics.h"
 #include "elpekenin/utils/allocator.h"
 #include "elpekenin/utils/compiler.h"
 #include "elpekenin/utils/sections.h"
-#include "elpekenin/utils/map.h"
 #include "elpekenin/utils/memory.h"
 #include "elpekenin/utils/string.h"
 #include "elpekenin/utils/time.h"
@@ -541,8 +538,6 @@ static uint32_t layer_task_callback(uint32_t trigger_time, void *cb_arg) {
 }
 
 static void elpekenin_qp_init(void) {
-    load_qp_resources();
-
     painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
     if (font == NULL) {
         logging(QP, LOG_ERROR, "Font was NULL");

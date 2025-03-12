@@ -25,6 +25,7 @@
 #include "elpekenin/rng.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/xap.h"
+#include "elpekenin/qp/assets.h"
 #include "elpekenin/qp/graphics.h"
 #include "elpekenin/utils/sections.h"
 

@@ -10,12 +10,6 @@
 
 #include "generated/features.h"
 
-extern void elpekenin_zig_init(void);
-PEKE_PRE_INIT(elpekenin_zig_init, INIT_ZIG);
-
-extern void elpekenin_zig_deinit(bool);
-PEKE_DEINIT(elpekenin_zig_deinit, DEINIT_ZIG);
-
 #if defined(XAP_ENABLE)
 #    include "elpekenin/xap.h"
 

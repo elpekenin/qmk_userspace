@@ -1,5 +1,0 @@
-clang==14  # and libclang14.so on system
-furo
-hawkmoth
-sphinx
-sphinx-tabs

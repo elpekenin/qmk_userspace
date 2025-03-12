@@ -86,10 +86,10 @@ C_FILE = lines(
 DRAW_FILE = lines(
     C_HEADER,
     "",
-    "#include <quantum/color.h>",
+    "#include <quantum/quantum.h>",
     "",
     f'#include "{OUTPUT_NAME}.h"',
-    '#include "elpekenin/qp/graphics.h"',
+    '#include "elpekenin/qp/assets.h"',
     '#include "elpekenin/build_info.h"',
     '#include "elpekenin/logging.h"',
     "",
