@@ -5,8 +5,8 @@
 
 #include <quantum/quantum.h>
 
+#include "elpekenin/compiler.h"
 #include "elpekenin/qp/graphics.h"
-#include "elpekenin/utils/compiler.h"
 
 void qp_log_clear(void);
 NON_NULL(1) READ_ONLY(1) void qp_logging_backend_render(qp_callback_args_t *args);

@@ -5,10 +5,10 @@
 
 #include <quantum/quantum.h>
 
+#include "elpekenin/dyn_array.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/utils/dyn_array.h"
-#include "elpekenin/utils/map.h"
-#include "elpekenin/utils/sections.h"
+#include "elpekenin/map.h"
+#include "elpekenin/sections.h"
 #include "generated/qp_resources.h"
 
 static new_map(painter_device_t, device_map);

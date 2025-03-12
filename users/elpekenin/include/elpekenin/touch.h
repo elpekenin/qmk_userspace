@@ -8,10 +8,6 @@
  *   Only ``XPT2046`` has been implemented/tested.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
@@ -23,7 +19,7 @@
 #include <platforms/chibios/gpio.h>
 #include <platforms/gpio.h>
 
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/compiler.h"
 
 /**
  * Current status of a screen.

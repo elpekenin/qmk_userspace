@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "elpekenin/utils/shortcuts.h"
+#include "elpekenin/shortcuts.h"
 
 bool is_utf8(char c) {
     return GET_BIT(c, 7); // 1xxx xxxx

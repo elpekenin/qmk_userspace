@@ -7,10 +7,6 @@
  * Tiny wrapper on top of an array.
  */
 
-/**
- * ----
- */
-
 // -- barrrier --
 
 #pragma once

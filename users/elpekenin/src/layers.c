@@ -6,8 +6,8 @@
 #endif
 
 #include "elpekenin/layers.h"
+#include "elpekenin/sections.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/utils/sections.h"
 
 #if defined(XAP_ENABLE)
 #    include "elpekenin/xap.h"

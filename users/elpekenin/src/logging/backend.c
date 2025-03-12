@@ -3,7 +3,7 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/utils/sections.h"
+#include "elpekenin/sections.h"
 
 // default logging provided by QMK
 //    - USB via console endpoint, if CONSOLE_ENABLE

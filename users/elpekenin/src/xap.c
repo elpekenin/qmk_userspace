@@ -5,8 +5,8 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/sections.h"
+#include "elpekenin/compiler.h"
+#include "elpekenin/sections.h"
 #include "generated/keycode_str.h"
 
 #if defined(TOUCH_SCREEN_ENABLE)

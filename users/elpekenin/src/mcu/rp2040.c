@@ -5,7 +5,7 @@
 
 #include "elpekenin/dual_rp.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/utils/sections.h"
+#include "elpekenin/sections.h"
 
 #if defined(SECOND_CORE_TASKS)
 // core0

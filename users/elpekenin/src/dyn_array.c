@@ -1,10 +1,10 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "elpekenin/utils/dyn_array.h"
+#include "elpekenin/dyn_array.h"
 
+#include "elpekenin/allocator.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/utils/allocator.h"
 
 void *_new_array(size_t item_size, size_t initial_size, allocator_t *allocator) {
     if (UNLIKELY(allocator == NULL)) {

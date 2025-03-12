@@ -3,8 +3,8 @@
 
 #include QMK_KEYBOARD_H
 
+#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/utils/compiler.h"
 
 #if defined(QUANTUM_PAINTER_ENABLE)
 #    include "elpekenin/sipo.h"

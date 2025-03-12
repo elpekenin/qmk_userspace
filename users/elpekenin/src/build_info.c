@@ -5,7 +5,7 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/utils/sections.h"
+#include "elpekenin/sections.h"
 #include "version.h"
 
 static build_info_t build_info = {

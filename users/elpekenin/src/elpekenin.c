@@ -1,12 +1,12 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "elpekenin/allocator.h"
 #include "elpekenin/crash.h"
 #include "elpekenin/logging.h"
+#include "elpekenin/sections.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/utils/allocator.h"
-#include "elpekenin/utils/sections.h"
-#include "elpekenin/utils/string.h"
+#include "elpekenin/string.h"
 #include "generated/features.h"
 
 #if defined(XAP_ENABLE)
@@ -18,12 +18,6 @@ PEKE_DEINIT(xap_shutdown, DEINIT_XAP);
 void housekeeping_task_user(void) {
     housekeeping_task_keymap();
 }
-
-/**
- * This file uses a bit of magic to invoke initializer and finalizer functions on QMK.
- *
- * They are stored in special linker sections. See :doc:`/userspace/utils/sections` for details.
- */
 
 /**
  * Iterate the ``pre_init`` linker section, executing all functions put into it (initializers).

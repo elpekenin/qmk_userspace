@@ -3,12 +3,12 @@
 
 #include <quantum/quantum.h>
 
+#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
+#include "elpekenin/ring_buffer.h"
+#include "elpekenin/sections.h"
 #include "elpekenin/split/transactions.h"
-#include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/ring_buffer.h"
-#include "elpekenin/utils/sections.h"
-#include "elpekenin/utils/string.h"
+#include "elpekenin/string.h"
 
 // *** Split data ***
 

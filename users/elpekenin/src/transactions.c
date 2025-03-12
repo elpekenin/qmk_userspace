@@ -6,11 +6,11 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/build_info.h"
+#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backends/split.h"
+#include "elpekenin/sections.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/sections.h"
 
 // race condition, QMK fills the left/master fields **after** post_init funcs
 // lets manually invoke it to make sure we get the right thing

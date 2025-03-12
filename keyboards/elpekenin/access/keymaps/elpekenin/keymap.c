@@ -26,8 +26,8 @@
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/qp/graphics.h"
 #include "elpekenin/rng.h"
+#include "elpekenin/sections.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/utils/sections.h"
 #include "elpekenin/xap.h"
 
 // clang-format off

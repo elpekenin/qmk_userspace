@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 # -- Project information
-project = "QMK userspace"
+project = "elpekenin QMK"
 copyright = "2024, elpekenin"  # noqa: A001
 author = "elpekenin"
 release = ""

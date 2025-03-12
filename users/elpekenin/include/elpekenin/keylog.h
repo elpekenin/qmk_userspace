@@ -7,17 +7,13 @@
  * This could later be shown on a screen, for example.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/compiler.h"
 
 /**
  * Hook into :c:func:`process_record_user` that performs the tracking.

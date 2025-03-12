@@ -1,8 +1,8 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "elpekenin/compiler.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/utils/compiler.h"
 
 WEAK void housekeeping_task_keymap(void) {}
 WEAK void keyboard_pre_init_keymap(void) {}

@@ -5,10 +5,6 @@
  * Tiny memory-usage and address "identification" functions.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
@@ -16,7 +12,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/compiler.h"
 
 /**
  * Check if the input pointer belongs to the heap.

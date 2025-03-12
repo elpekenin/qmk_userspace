@@ -5,10 +5,6 @@
  * Handy aliases for repetitive and un-interesting code.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "elpekenin/utils/ld.h"
+#include "elpekenin/ld.h"
 
 /*
  * NOTE: clang thinks this is a header, due to .h extension

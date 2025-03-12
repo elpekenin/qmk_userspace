@@ -7,13 +7,13 @@
 #include <string.h>
 #include <tmk_core/protocol/host.h> // keyboard_led_state
 
+#include "elpekenin/allocator.h" // memory_heap_t
+#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/utils/allocator.h" // memory_heap_t
-#include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/map.h"
-#include "elpekenin/utils/sections.h"
-#include "elpekenin/utils/shortcuts.h"
-#include "elpekenin/utils/string.h"
+#include "elpekenin/map.h"
+#include "elpekenin/sections.h"
+#include "elpekenin/shortcuts.h"
+#include "elpekenin/string.h"
 #include "generated/keycode_str.h"
 
 // *** Internal variables ***

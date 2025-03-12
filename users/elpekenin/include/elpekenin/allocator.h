@@ -7,17 +7,13 @@
  * This is: :c:func:`malloc`, :c:func:`free`, :c:func:`calloc` and :c:func:`realloc`.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
 
 #include <stddef.h>
 
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/compiler.h"
 
 typedef struct allocator_t allocator_t;
 
@@ -40,10 +36,6 @@ typedef void *(*calloc_fn)(allocator_t *allocator, size_t nmemb, size_t size);
  * Signature of a :c:func:`realloc` function.
  */
 typedef void *(*realloc_fn)(allocator_t *allocator, void *ptr, size_t size);
-
-/**
- * ----
- */
 
 /**
  * Information about a custom allocator.
@@ -113,10 +105,6 @@ void *calloc_with(allocator_t *allocator, size_t nmemb, size_t size);
 void *realloc_with(allocator_t *allocator, void *ptr, size_t size);
 
 /**
- * ----
- */
-
-/**
  * Total heap used between all allocators.
  */
 size_t get_used_heap(void);
@@ -135,10 +123,6 @@ const allocator_t **get_known_allocators(int8_t *n);
  *   For now, that's :c:var:`c_runtime_allocator`
  */
 allocator_t *get_default_allocator(void);
-
-/**
- * ----
- */
 
 /**
  * C's stdlib allocator.

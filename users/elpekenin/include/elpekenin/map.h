@@ -5,11 +5,7 @@
  * Map strings (names) to values.
  *
  * .. note::
- *   Convenience wrapper on top of two dynamic arrays (:doc:`dyn_array`).
- */
-
-/**
- * ----
+ *   Convenience wrapper on top of two dynamic arrays
  */
 
 // -- barrier --
@@ -18,9 +14,9 @@
 
 #include <errno.h>
 
+#include "elpekenin/dyn_array.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/utils/dyn_array.h"
-#include "elpekenin/utils/shortcuts.h"
+#include "elpekenin/shortcuts.h"
 
 /**
  * Create a new map variable.

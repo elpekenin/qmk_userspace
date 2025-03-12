@@ -5,18 +5,14 @@
  * Utilities to add elements into specific linker sections, and then iterate over those sections.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
 
 #include <stdbool.h>
 
-#include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/ld.h"
+#include "elpekenin/compiler.h"
+#include "elpekenin/ld.h"
 
 /* Start at 1000 because alphabetical order.
  * Does not take extra resources, is the name of a linker section, not a value.
@@ -73,10 +69,6 @@ typedef void (*deinit_fn)(bool jump_to_bootloader);
  */
 typedef int8_t (*sendchar_func_t)(uint8_t character);
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #define FULL_SECTION_NAME(name, func, prio) SECTION(STR(LD_NAME(name)) "." #prio "." #func)
@@ -131,10 +123,6 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  *     func: The function to be added.
  */
 #define PEKE_SENDCHAR(func) FULL_SECTION_NAME(sendchar, func, 0) USED static sendchar_func_t __##func = func
-
-/**
- * ----
- */
 
 /**
  * Macro to iterate all elements on a linker section.

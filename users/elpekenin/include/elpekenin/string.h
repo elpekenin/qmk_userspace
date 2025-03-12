@@ -5,15 +5,11 @@
  * Small string-related functions.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
 
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/compiler.h"
 
 /**
  * Write the value of ``n`` (# of bytes) in an human-friendly format, into ``buffer``

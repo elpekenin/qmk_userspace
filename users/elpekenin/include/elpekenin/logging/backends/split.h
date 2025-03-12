@@ -5,7 +5,7 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/compiler.h"
 
 void user_logging_master_poll(void);
 

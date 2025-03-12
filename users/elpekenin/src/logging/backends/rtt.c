@@ -3,7 +3,7 @@
 
 #include <lib/RTT/SEGGER_RTT.h>
 
-#include "elpekenin/utils/sections.h"
+#include "elpekenin/sections.h"
 
 static int8_t sendchar_rtt_hook(uint8_t c) {
 #if ENABLE_RTT == 1

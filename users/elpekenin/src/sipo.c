@@ -4,8 +4,8 @@
 #include "elpekenin/sipo.h"
 
 #include "elpekenin/logging.h"
+#include "elpekenin/shortcuts.h"
 #include "elpekenin/spi_custom.h"
-#include "elpekenin/utils/shortcuts.h"
 
 #define SIPO_BYTES ((N_SIPO_PINS + 7) / 8)
 

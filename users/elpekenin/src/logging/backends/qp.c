@@ -7,7 +7,7 @@
 
 #include "elpekenin/logging.h"
 #include "elpekenin/qp/graphics.h"
-#include "elpekenin/utils/sections.h"
+#include "elpekenin/sections.h"
 
 #ifndef LOG_N_LINES
 #    define LOG_N_LINES 9

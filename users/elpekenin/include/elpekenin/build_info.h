@@ -5,15 +5,11 @@
  * Get some identification about the version of the code running on your board.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
 
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/compiler.h"
 #include "generated/features.h"
 
 /**

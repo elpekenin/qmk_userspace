@@ -5,10 +5,6 @@
  * Driver to use Serial In - Parallel Out shift registers.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once

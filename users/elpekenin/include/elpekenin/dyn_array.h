@@ -5,18 +5,14 @@
  * Dynamic (grows as needed) array of elements.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
 
 #include <errno.h>
 
-#include "elpekenin/utils/allocator.h"
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/allocator.h"
+#include "elpekenin/compiler.h"
 
 /**
  * Metadata stored for a dynamic array.
@@ -42,10 +38,6 @@ typedef struct PACKED {
      */
     size_t item_size;
 } header_t;
-
-/**
- * ----
- */
 
 /**
  * Create a new dynamic array.

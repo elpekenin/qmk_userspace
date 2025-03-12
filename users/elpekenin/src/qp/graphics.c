@@ -6,18 +6,18 @@
 #include <errno.h>
 #include <quantum/quantum.h>
 
+#include "elpekenin/allocator.h"
 #include "elpekenin/build_info.h"
+#include "elpekenin/compiler.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backends/qp.h"
+#include "elpekenin/memory.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/rng.h"
-#include "elpekenin/utils/allocator.h"
-#include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/memory.h"
-#include "elpekenin/utils/sections.h"
-#include "elpekenin/utils/string.h"
-#include "elpekenin/utils/time.h"
+#include "elpekenin/sections.h"
+#include "elpekenin/string.h"
+#include "elpekenin/time.h"
 
 #if defined(KEYLOG_ENABLE)
 #    include "elpekenin/keylog.h"

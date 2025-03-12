@@ -28,10 +28,6 @@
  *   They will be automatically configured with their single-driver counterparts, if available.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
@@ -42,7 +38,7 @@
 #include <platforms/chibios/gpio.h>
 #include <platforms/gpio.h>
 
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/compiler.h"
 
 #ifndef SPI_DRIVERS
 #    if defined(SPI_DRIVER)

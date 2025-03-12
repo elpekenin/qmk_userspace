@@ -1,5 +1,5 @@
 SRC += \
-    $(USER_SRC)/utils/allocator.c \
-    $(USER_SRC)/utils/dyn_array.c \
-    $(USER_SRC)/utils/memory.c \
-    $(USER_SRC)/utils/string.c
+    $(USER_SRC)/allocator.c \
+    $(USER_SRC)/dyn_array.c \
+    $(USER_SRC)/memory.c \
+    $(USER_SRC)/string.c

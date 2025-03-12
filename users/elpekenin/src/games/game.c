@@ -6,7 +6,7 @@
 #include "elpekenin/game.h"
 
 #include "elpekenin/games/snake.h"
-#include "elpekenin/utils/sections.h"
+#include "elpekenin/sections.h"
 
 static game_state_t   game       = {0};
 static deferred_token game_token = INVALID_DEFERRED_TOKEN;

@@ -13,10 +13,6 @@
  *   `Pull Request <https://github.com/qmk/qmk_firmware/pull/13733>`_ for the feature.
  */
 
-/**
- * ----
- */
-
 // -- barrier --
 
 #pragma once
@@ -24,7 +20,7 @@
 #include <quantum/quantum.h>
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
 
-#include "elpekenin/utils/compiler.h"
+#include "elpekenin/compiler.h"
 
 #if defined(TOUCH_SCREEN_ENABLE)
 #    include "elpekenin/touch.h"
@@ -48,10 +44,6 @@ typedef enum {
  * Identifier for each type of message.
  */
 typedef uint8_t xap_msg_id_t;
-
-/**
- * ----
- */
 
 // *** Messages ***
 
@@ -87,10 +79,6 @@ typedef struct PACKED {
 void xap_screen_pressed(uint8_t screen_id, touch_report_t report);
 
 /**
- * ----
- */
-
-/**
  * Information about a screen release event.
  */
 typedef struct PACKED {
@@ -109,10 +97,6 @@ typedef struct PACKED {
  * Send a message to PC's client about a screen release event.
  */
 void xap_screen_released(uint8_t screen_id);
-
-/**
- * ----
- */
 #endif
 
 /**
@@ -135,10 +119,6 @@ _Static_assert(sizeof(layer_state_t) == 1, "Client code expects layer to be u8")
  * Send a message to PC's client about a layer change event.
  */
 void xap_layer(layer_state_t state);
-
-/**
- * ----
- */
 
 /**
  * Information about a key event.
@@ -202,10 +182,6 @@ _Static_assert(sizeof(keyevent_msg_t) == MAX_PAYLOAD, "wrong size for keyevent_m
  * Send a message to PC's client about a key event.
  */
 NON_NULL(2) READ_ONLY(2) void xap_keyevent(uint16_t keycode, keyrecord_t *record);
-
-/**
- * ----
- */
 
 /**
  * Information about shutdown event.

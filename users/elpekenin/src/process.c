@@ -7,11 +7,11 @@
 
 #include "elpekenin/keycodes.h"
 #include "elpekenin/logging.h"
+#include "elpekenin/memory.h"
+#include "elpekenin/sections.h"
+#include "elpekenin/shortcuts.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/utils/memory.h"
-#include "elpekenin/utils/sections.h"
-#include "elpekenin/utils/shortcuts.h"
-#include "elpekenin/utils/string.h"
+#include "elpekenin/string.h"
 #include "generated/keycode_str.h"
 
 #if defined(GAME_ENABLE)

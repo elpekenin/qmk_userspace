@@ -3,9 +3,9 @@
 
 #include <quantum/quantum.h>
 
+#include "elpekenin/sections.h"
+#include "elpekenin/shortcuts.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/utils/sections.h"
-#include "elpekenin/utils/shortcuts.h"
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     return rgb_matrix_indicators_advanced_keymap(led_min, led_max);

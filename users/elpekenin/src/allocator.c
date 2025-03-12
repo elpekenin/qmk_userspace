@@ -4,15 +4,15 @@
 // TODO: Find issue causing spam of log_success error msgs
 //       Maybe a bug here, maybe a bug on scrolling_text API
 
-#include "elpekenin/utils/allocator.h"
+#include "elpekenin/allocator.h"
 
 #include <quantum/quantum.h>
 #include <stdlib.h>
 
+#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/sections.h"
-#include "elpekenin/utils/shortcuts.h"
+#include "elpekenin/sections.h"
+#include "elpekenin/shortcuts.h"
 
 // *** Track heap usage ***
 
