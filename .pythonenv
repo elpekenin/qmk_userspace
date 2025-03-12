@@ -1,0 +1,3 @@
+# get Python to autocomplete `qmk.<tab>`
+# NOTE: adjust according to your config
+PYTHONPATH=/home/elpekenin/workspace/qmk/lib/python
