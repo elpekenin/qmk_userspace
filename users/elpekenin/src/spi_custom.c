@@ -17,8 +17,9 @@
 
 // TODO: Support for NO_PIN
 
-#include "elpekenin/logging.h"
 #include "elpekenin/spi_custom.h"
+
+#include "elpekenin/logging.h"
 
 static pin_t slave_pins[] = {[0 ... SPI_COUNT - 1] = NO_PIN};
 

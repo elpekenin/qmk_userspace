@@ -17,17 +17,18 @@
 
 #ifdef COMMUNITY_MODULE_RNG_ENABLE
 #    include <platforms/chibios/drivers/analog.h>
+
 #    include "elpekenin/rng.h"
 #endif
 
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
-#include "elpekenin/rng.h"
-#include "elpekenin/signatures.h"
-#include "elpekenin/xap.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/qp/graphics.h"
+#include "elpekenin/rng.h"
+#include "elpekenin/signatures.h"
 #include "elpekenin/utils/sections.h"
+#include "elpekenin/xap.h"
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {

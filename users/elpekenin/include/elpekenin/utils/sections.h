@@ -15,8 +15,6 @@
 
 #include <stdbool.h>
 
-#include <quantum/quantum.h>
-
 #include "elpekenin/utils/compiler.h"
 #include "elpekenin/utils/ld.h"
 

@@ -20,8 +20,8 @@
 #include <stdint.h>
 
 // for pin_t
-#include <platforms/gpio.h>
 #include <platforms/chibios/gpio.h>
+#include <platforms/gpio.h>
 
 #include "elpekenin/utils/compiler.h"
 

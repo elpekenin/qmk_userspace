@@ -1,20 +1,19 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <string.h>
+#include "elpekenin/keylog.h"
 
 #include <quantum/quantum.h>
+#include <string.h>
 #include <tmk_core/protocol/host.h> // keyboard_led_state
 
-#include "elpekenin/utils/allocator.h" // memory_heap_t
-#include "elpekenin/keylog.h"
 #include "elpekenin/logging.h"
+#include "elpekenin/utils/allocator.h" // memory_heap_t
 #include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/sections.h"
 #include "elpekenin/utils/map.h"
+#include "elpekenin/utils/sections.h"
 #include "elpekenin/utils/shortcuts.h"
 #include "elpekenin/utils/string.h"
-
 #include "generated/keycode_str.h"
 
 // *** Internal variables ***

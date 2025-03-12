@@ -4,8 +4,8 @@
 #include <quantum/quantum.h>
 #include <tmk_core/protocol/usb_descriptor.h>
 
-#include "elpekenin/utils/sections.h"
 #include "elpekenin/utils/ring_buffer.h"
+#include "elpekenin/utils/sections.h"
 
 #define MAX_PAYLOAD_SIZE (XAP_EPSIZE - sizeof(xap_broadcast_header_t)) // -1 for terminator
 

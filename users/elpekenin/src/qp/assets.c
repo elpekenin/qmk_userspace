@@ -1,14 +1,14 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "elpekenin/qp/assets.h"
+
 #include <quantum/quantum.h>
 
 #include "elpekenin/logging.h"
 #include "elpekenin/utils/dyn_array.h"
 #include "elpekenin/utils/map.h"
 #include "elpekenin/utils/sections.h"
-#include "elpekenin/qp/assets.h"
-
 #include "generated/qp_resources.h"
 
 static new_map(painter_device_t, device_map);

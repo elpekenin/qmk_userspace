@@ -14,7 +14,6 @@
 #pragma once
 
 #include "elpekenin/utils/compiler.h"
-
 #include "generated/features.h"
 
 /**

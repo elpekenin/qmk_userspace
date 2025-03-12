@@ -1,13 +1,14 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "elpekenin/split/transactions.h"
+
 #include <quantum/quantum.h>
 
 #include "elpekenin/build_info.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/signatures.h"
 #include "elpekenin/logging/backends/split.h"
-#include "elpekenin/split/transactions.h"
+#include "elpekenin/signatures.h"
 #include "elpekenin/utils/compiler.h"
 #include "elpekenin/utils/sections.h"
 

@@ -36,14 +36,11 @@
 
 #pragma once
 
-#include <stdbool.h>
-
 #include <ch.h>
 #include <hal.h>
-
-#include <platforms/gpio.h>
-#include <platforms/chibios/gpio.h>
 #include <platforms/chibios/chibios_config.h>
+#include <platforms/chibios/gpio.h>
+#include <platforms/gpio.h>
 
 #include "elpekenin/utils/compiler.h"
 

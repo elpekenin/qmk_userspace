@@ -1,15 +1,13 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <string.h>
-
 #include <quantum/quantum.h>
 
 #include "elpekenin/logging.h"
 #include "elpekenin/split/transactions.h"
 #include "elpekenin/utils/compiler.h"
-#include "elpekenin/utils/sections.h"
 #include "elpekenin/utils/ring_buffer.h"
+#include "elpekenin/utils/sections.h"
 #include "elpekenin/utils/string.h"
 
 // *** Split data ***

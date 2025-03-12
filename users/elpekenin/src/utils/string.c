@@ -1,8 +1,8 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "elpekenin/utils/shortcuts.h"
 

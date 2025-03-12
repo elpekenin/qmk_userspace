@@ -1,8 +1,8 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <platforms/wait.h>
 #include <platforms/chibios/drivers/spi_master.h>
+#include <platforms/wait.h>
 
 #include "elpekenin/logging.h"
 #include "elpekenin/touch.h"

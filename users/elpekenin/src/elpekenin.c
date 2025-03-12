@@ -7,7 +7,6 @@
 #include "elpekenin/utils/allocator.h"
 #include "elpekenin/utils/sections.h"
 #include "elpekenin/utils/string.h"
-
 #include "generated/features.h"
 
 #if defined(XAP_ENABLE)
