@@ -4,7 +4,7 @@ index 4e6067394b..0f8f651859 100644
 +++ b/drivers/painter/comms/qp_comms_spi.c
 @@ -1,4 +1,5 @@
  // Copyright 2021 Nick Brassel (@tzarc)
-+// Copyright 2023 Pablo Martinez (@elpekenin)
++// Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
  // SPDX-License-Identifier: GPL-2.0-or-later
 
  #ifdef QUANTUM_PAINTER_SPI_ENABLE
@@ -167,7 +167,7 @@ index c39ea95f72..156cb6fd70 100644
 +++ b/drivers/painter/comms/qp_comms_spi.h
 @@ -1,5 +1,7 @@
  // Copyright 2021 Nick Brassel (@tzarc)
-+// Copyright 2023 Pablo Martinez (@elpekenin)
++// Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
  // SPDX-License-Identifier: GPL-2.0-or-later
 +
  #pragma once

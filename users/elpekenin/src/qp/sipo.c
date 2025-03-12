@@ -1,5 +1,5 @@
 // Copyright 2021 Nick Brassel (@tzarc)
-// Copyright 2023 Pablo Martinez (@elpekenin)
+// Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #ifdef QUANTUM_PAINTER_SPI_ENABLE
