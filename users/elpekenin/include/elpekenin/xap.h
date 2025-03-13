@@ -20,8 +20,6 @@
 #include <quantum/quantum.h>
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
 
-#include "elpekenin/compiler.h"
-
 #if defined(TOUCH_SCREEN_ENABLE)
 #    include "elpekenin/touch.h"
 #endif
@@ -181,7 +179,7 @@ _Static_assert(sizeof(keyevent_msg_t) == MAX_PAYLOAD, "wrong size for keyevent_m
 /**
  * Send a message to PC's client about a key event.
  */
-NON_NULL(2) READ_ONLY(2) void xap_keyevent(uint16_t keycode, keyrecord_t *record);
+void xap_keyevent(uint16_t keycode, keyrecord_t *record);
 
 /**
  * Information about shutdown event.

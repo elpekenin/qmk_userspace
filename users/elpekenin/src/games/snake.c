@@ -14,7 +14,7 @@ static inline position_t random_position(void) {
     };
 }
 
-CONST static inline bool check_collision(position_t pos1, position_t pos2) {
+static inline bool check_collision(position_t pos1, position_t pos2) {
     return pos1.x == pos2.x && pos1.y == pos2.y;
 }
 
@@ -38,7 +38,7 @@ static inline void generate_food(game_state_t *state) {
 
 static const position_t board_start = {.x = 10, .y = 100};
 
-CONST static inline position_t to_pixels(position_t tile_pos) {
+static inline position_t to_pixels(position_t tile_pos) {
     return (position_t){
         .x = board_start.x + tile_pos.x * TILE_SIZE,
         .y = board_start.y + tile_pos.y * TILE_SIZE,

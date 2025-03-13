@@ -9,14 +9,14 @@
 #include <quantum/quantum.h>
 #include <stdlib.h>
 
-#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/sections.h"
 #include "elpekenin/shortcuts.h"
 
 // *** Track heap usage ***
 
-static size_t             n_known = 0;
+static size_t n_known = 0;
+
 static const allocator_t *known_allocators[100];
 
 // TODO: per-allocator stats
@@ -66,7 +66,7 @@ static inline alloc_info_t *find_info(void *ptr) {
 }
 
 static void memory_allocated(allocator_t *allocator, void *ptr, size_t size) {
-    if (UNLIKELY(ptr == NULL)) {
+    if (ptr == NULL) {
         return;
     }
 
@@ -81,10 +81,10 @@ static void memory_allocated(allocator_t *allocator, void *ptr, size_t size) {
         known_allocators[n_known++] = allocator;
     }
 
-    alloc_info_t *info   = chPoolAlloc(&alloc_info_pool);
-    bool          pushed = info != NULL;
+    alloc_info_t *info = chPoolAlloc(&alloc_info_pool);
 
-    if (LIKELY(pushed)) {
+    bool pushed = info != NULL;
+    if (pushed) {
         allocator->used += size;
 
         *info = (alloc_info_t){
@@ -98,14 +98,14 @@ static void memory_allocated(allocator_t *allocator, void *ptr, size_t size) {
 }
 
 static void memory_freed(void *ptr) {
-    if (UNLIKELY(ptr == NULL)) {
+    if (ptr == NULL) {
         return;
     }
 
-    alloc_info_t *info   = find_info(ptr);
-    bool          popped = info != NULL;
+    alloc_info_t *info = find_info(ptr);
 
-    if (LIKELY(popped)) {
+    bool popped = info != NULL;
+    if (popped) {
         info->allocator->used -= info->size;
         chPoolFree(&alloc_info_pool, ptr);
     }
@@ -161,7 +161,7 @@ static void *manual_realloc(allocator_t *allocator, void *ptr, size_t new_size) 
 
     // find current size
     alloc_info_t *info = find_info(ptr);
-    if (UNLIKELY(info == NULL)) {
+    if (info == NULL) {
         logging(ALLOC, LOG_ERROR, "Could not find info for realloc");
         return NULL;
     }
@@ -174,7 +174,7 @@ static void *manual_realloc(allocator_t *allocator, void *ptr, size_t new_size) 
 
     // actual realloc
     void *new_ptr = malloc_with(allocator, new_size);
-    if (UNLIKELY(new_ptr == NULL)) {
+    if (new_ptr == NULL) {
         // no space for new allocation
         // return NULL and **do not** free old memory
         logging(ALLOC, LOG_ERROR, "New size could not be allocated.");
@@ -236,7 +236,7 @@ allocator_t new_ch_heap_allocator(memory_heap_t *heap, const char *name) {
 #    endif
 #endif
 
-PURE allocator_t *get_default_allocator(void) {
+allocator_t *get_default_allocator(void) {
     return &c_runtime_allocator;
 }
 
@@ -257,7 +257,7 @@ static inline void __error(const char *fn) {
     logging(ALLOC, LOG_ERROR, "Calling %s failed", fn);
 }
 
-NON_NULL(1) void *calloc_with(allocator_t *allocator, size_t nmemb, size_t size) {
+void *calloc_with(allocator_t *allocator, size_t nmemb, size_t size) {
     const char fn[] = "calloc";
 
     __entry(fn, allocator);
@@ -267,7 +267,7 @@ NON_NULL(1) void *calloc_with(allocator_t *allocator, size_t nmemb, size_t size)
     }
 
     void *ptr = allocator->calloc(allocator, nmemb, size);
-    if (UNLIKELY(ptr == NULL)) {
+    if (ptr == NULL) {
         __error(fn);
     } else {
         memory_allocated(allocator, ptr, nmemb * size);
@@ -276,7 +276,7 @@ NON_NULL(1) void *calloc_with(allocator_t *allocator, size_t nmemb, size_t size)
     return ptr;
 }
 
-NON_NULL(1) void free_with(allocator_t *allocator, void *ptr) {
+void free_with(allocator_t *allocator, void *ptr) {
     const char fn[] = "free";
 
     __entry(fn, allocator);
@@ -290,7 +290,7 @@ NON_NULL(1) void free_with(allocator_t *allocator, void *ptr) {
     memory_freed(ptr);
 }
 
-NON_NULL(1) void *malloc_with(allocator_t *allocator, size_t size) {
+void *malloc_with(allocator_t *allocator, size_t size) {
     const char fn[] = "malloc";
 
     __entry(fn, allocator);
@@ -300,7 +300,7 @@ NON_NULL(1) void *malloc_with(allocator_t *allocator, size_t size) {
     }
 
     void *ptr = allocator->malloc(allocator, size);
-    if (UNLIKELY(ptr == NULL)) {
+    if (ptr == NULL) {
         __error(fn);
     } else {
         memory_allocated(allocator, ptr, size);
@@ -309,7 +309,7 @@ NON_NULL(1) void *malloc_with(allocator_t *allocator, size_t size) {
     return ptr;
 }
 
-NON_NULL(1) void *realloc_with(allocator_t *allocator, void *ptr, size_t size) {
+void *realloc_with(allocator_t *allocator, void *ptr, size_t size) {
     const char fn[] = "realloc";
 
     __entry(fn, allocator);
@@ -319,7 +319,7 @@ NON_NULL(1) void *realloc_with(allocator_t *allocator, void *ptr, size_t size) {
     }
 
     void *new_ptr = allocator->realloc(allocator, ptr, size);
-    if (UNLIKELY(new_ptr == NULL)) {
+    if (new_ptr == NULL) {
         __error(fn);
     } else {
         // maybe it already went thru free and got cleaned?

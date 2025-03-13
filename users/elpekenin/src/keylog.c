@@ -8,7 +8,6 @@
 #include <tmk_core/protocol/host.h> // keyboard_led_state
 
 #include "elpekenin/allocator.h" // memory_heap_t
-#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/map.h"
 #include "elpekenin/sections.h"
@@ -134,7 +133,7 @@ static void maybe_symbol(const char **str) {
     // disable hash logging momentarily, as a lot of strings won't be in the replacements map
     WITHOUT_LOGGING(MAP, replacements = map_get(replacements_map, *str, ret););
 
-    if (LIKELY(ret == -ENODEV)) {
+    if (ret == -ENODEV) {
         return;
     }
 
@@ -299,7 +298,7 @@ void keylog_process(uint16_t keycode, keyrecord_t *record) {
     }
 
     // unknown keycode, quit
-    if (UNLIKELY(str == NULL)) {
+    if (str == NULL) {
         return;
     }
 

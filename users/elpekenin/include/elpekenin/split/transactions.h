@@ -7,8 +7,6 @@
 #include <quantum/split_common/transactions.h>
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
 
-#include "elpekenin/compiler.h"
-
 void reset_ee_slave(void);
 void build_info_sync_keymap_callback(void);
 void xap_execute_slave(const void *data);

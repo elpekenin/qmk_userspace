@@ -11,7 +11,6 @@
 
 #include <stdbool.h>
 
-#include "elpekenin/compiler.h"
 #include "elpekenin/ld.h"
 
 /* Start at 1000 because alphabetical order.
@@ -70,6 +69,9 @@ typedef void (*deinit_fn)(bool jump_to_bootloader);
 typedef int8_t (*sendchar_func_t)(uint8_t character);
 
 // -- barrier --
+
+#define SECTION(x) __attribute__((section(x)))
+#define USED __attribute__((used))
 
 #define FULL_SECTION_NAME(name, func, prio) SECTION(STR(LD_NAME(name)) "." #prio "." #func)
 

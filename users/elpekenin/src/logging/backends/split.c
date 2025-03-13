@@ -3,7 +3,6 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/ring_buffer.h"
 #include "elpekenin/sections.h"

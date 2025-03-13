@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "elpekenin/compiler.h"
 #include "elpekenin/game.h"
 
 #define TILE_SIZE 10

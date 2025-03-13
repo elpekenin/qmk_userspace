@@ -7,7 +7,7 @@
 #include "elpekenin/logging.h"
 
 void *_new_array(size_t item_size, size_t initial_size, allocator_t *allocator) {
-    if (UNLIKELY(allocator == NULL)) {
+    if (allocator == NULL) {
         allocator = get_default_allocator();
     }
 
@@ -27,19 +27,19 @@ void *_new_array(size_t item_size, size_t initial_size, allocator_t *allocator) 
 }
 
 int expand_if_needed(void **array) {
-    if (UNLIKELY(array == NULL) || UNLIKELY(*array == NULL)) {
+    if (array == NULL || *array == NULL) {
         return -EINVAL;
     }
 
     header_t *header = get_header(*array);
 
     // allocate more space if needed
-    if (UNLIKELY(header->length == header->capacity)) {
+    if (header->length == header->capacity) {
         size_t current_size = header->item_size * header->capacity;
         size_t total_size   = sizeof(header_t) + current_size * 2;
 
         header_t *new_header = realloc_with(header->allocator, header, total_size);
-        if (UNLIKELY(new_header == NULL)) {
+        if (new_header == NULL) {
             logging(ALLOC, LOG_ERROR, "%s failed", __func__);
             return -ENOMEM;
         }

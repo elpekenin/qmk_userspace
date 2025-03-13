@@ -5,8 +5,6 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/compiler.h"
-
 typedef enum {
     NO_MOVEMENT, // only on start
     TOP,

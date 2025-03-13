@@ -8,7 +8,6 @@
 
 #include "elpekenin/allocator.h"
 #include "elpekenin/build_info.h"
-#include "elpekenin/compiler.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backends/qp.h"

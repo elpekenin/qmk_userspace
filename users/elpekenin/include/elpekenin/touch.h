@@ -19,8 +19,6 @@
 #include <platforms/chibios/gpio.h>
 #include <platforms/gpio.h>
 
-#include "elpekenin/compiler.h"
-
 /**
  * Current status of a screen.
  */

@@ -10,9 +10,9 @@
 #pragma once
 
 #include <errno.h>
+#include <quantum/util.h>
 
 #include "elpekenin/allocator.h"
-#include "elpekenin/compiler.h"
 
 /**
  * Metadata stored for a dynamic array.
@@ -58,13 +58,13 @@ typedef struct PACKED {
  * .. hint::
  *   You really shouldn't use this, but the macro that provides some convenience.
  */
-READ_ONLY(3) void *_new_array(size_t item_size, size_t initial_size, allocator_t *allocator);
+void *_new_array(size_t item_size, size_t initial_size, allocator_t *allocator);
 
 /**
  * Given a dynamic array, access its metadata.
  */
-PURE READ_ONLY(1) static inline header_t *get_header(void *array) {
-    if (UNLIKELY(array == NULL)) {
+static inline header_t *get_header(void *array) {
+    if (array == NULL) {
         return NULL;
     }
 
@@ -74,10 +74,9 @@ PURE READ_ONLY(1) static inline header_t *get_header(void *array) {
 /**
  * Convenience to get the length of a dynamic array.
  */
-PURE READ_ONLY(1) static inline size_t array_len(void *array) {
+static inline size_t array_len(void *array) {
     header_t *header = get_header(array);
-
-    if (UNLIKELY(header == NULL)) {
+    if (header == NULL) {
         return 0;
     }
 
@@ -96,7 +95,7 @@ PURE READ_ONLY(1) static inline size_t array_len(void *array) {
  *   So far, this grow duplicates capacity, beware your memory usage and initialize
  *   the array with a better size if needed.
  */
-WARN_UNUSED int expand_if_needed(void **array);
+int expand_if_needed(void **array);
 
 /**
  * Put a new element into an array.

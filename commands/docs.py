@@ -87,7 +87,6 @@ def define_flags(args: list[str]) -> list[str]:
 def cleanup_args(args: list[str], source_directory: Path) -> list[str]:
     """From all args, filter the ones we want, and fix relative paths."""
     return [
-        "-D_ATTR(...)=",  # clang trips on some __attribute__'s
         f"-I{source_directory}",
         *define_flags(args),
         *include_flags(args, source_directory),

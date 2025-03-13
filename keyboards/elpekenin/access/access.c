@@ -3,7 +3,6 @@
 
 #include QMK_KEYBOARD_H
 
-#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
 
 #if defined(QUANTUM_PAINTER_ENABLE)
@@ -52,7 +51,7 @@ touch_device_t ili9341_touch = &ili9341_touch_driver;
 void keyboard_post_init_kb(void) {
     debug_config.enable = true;
 
-    UNUSED bool ret = true;
+    __attribute__((used)) bool ret = true;
 
 #if defined(QUANTUM_PAINTER_ENABLE)
     // *** SIPO ***

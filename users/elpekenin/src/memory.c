@@ -3,7 +3,6 @@
 
 #include <malloc.h>
 
-#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
 
 // *** Analyze memory locations ***

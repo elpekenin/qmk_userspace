@@ -6,7 +6,6 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/build_info.h"
-#include "elpekenin/compiler.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backends/split.h"
 #include "elpekenin/sections.h"

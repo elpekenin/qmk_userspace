@@ -38,8 +38,6 @@
 #include <platforms/chibios/gpio.h>
 #include <platforms/gpio.h>
 
-#include "elpekenin/compiler.h"
-
 #ifndef SPI_DRIVERS
 #    if defined(SPI_DRIVER)
 #        define SPI_DRIVERS {&SPI_DRIVER}

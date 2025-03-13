@@ -61,10 +61,6 @@ elpekenin/build_info.h
 ######################
 .. c:autodoc:: users/elpekenin/include/elpekenin/build_info.h
 
-elpekenin/compiler.h
-####################
-.. c:autodoc:: users/elpekenin/include/elpekenin/compiler.h
-
 elpekenin/dyn_array.h
 #####################
 .. c:autodoc:: users/elpekenin/include/elpekenin/dyn_array.h

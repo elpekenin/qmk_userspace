@@ -5,7 +5,6 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/compiler.h"
 #include "elpekenin/sections.h"
 #include "generated/keycode_str.h"
 

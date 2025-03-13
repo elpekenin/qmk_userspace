@@ -13,8 +13,6 @@
 
 #include <stddef.h>
 
-#include "elpekenin/compiler.h"
-
 typedef struct allocator_t allocator_t;
 
 /**
