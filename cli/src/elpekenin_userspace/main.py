@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PYTHON_ARGCOMPLETE_OK
 
 """Utilities to interact with my userspace."""
 
@@ -7,6 +8,12 @@ from __future__ import annotations
 import argparse
 import sys
 from typing import TYPE_CHECKING
+
+try:
+    argcomplete: ModuleType | None
+    import argcomplete
+except ImportError:
+    argcomplete = None
 
 import qmk_cli.helpers  # type: ignore[import-untyped]
 
@@ -18,6 +25,7 @@ from .commands.generate.qp_resources import QpResources
 
 if TYPE_CHECKING:
     from pathlib import Path
+    from types import ModuleType
 
     from .commands.base import BaseCommand
 
@@ -66,6 +74,8 @@ def get_parser() -> argparse.ArgumentParser:
 def main() -> int:
     """Run a script's main logic, logging errors to file."""
     parser = get_parser()
+    if argcomplete is not None:
+        argcomplete.autocomplete(parser)
     arguments = parser.parse_args()
 
     # actual logic
