@@ -11,6 +11,10 @@ import os
 import sys
 from pathlib import Path
 
+ROOT = Path(os.environ["CONF_ROOT"])
+USERSPACE = ROOT / "users" / "elpekenin"
+MODULES = ROOT / "modules" / "elpekenin"
+
 # -- Project information
 project = "elpekenin QMK"
 copyright = "2024, elpekenin"  # noqa: A001
@@ -58,14 +62,10 @@ html_theme_options = {
 autodoc_member_order = "bysource"
 
 # -- Hawkmoth config
-hawkmoth_root = os.environ["CONF_ROOT"]
+hawkmoth_root = str(ROOT)
 hawkmoth_clang = os.environ["CONF_HAWKMOTH_CLANG"].split(
     os.environ["CONF_HAWKMOTH_CLANG_SEP"],
 )
-
-ROOT = Path(__file__).parent.parent
-USERSPACE = ROOT / "users" / "elpekenin"
-MODULES = ROOT / "modules" / "elpekenin"
 
 
 class UriGenerator:
@@ -90,30 +90,33 @@ class UriGenerator:
 
     def format(self, **kwargs: str) -> str:
         """Create a link."""
-        source = Path(kwargs["source"]).resolve()
+        absolute_path = ROOT / kwargs["source"]
+        if not absolute_path.exists():
+            msg = f"File '{absolute_path}' doesn't exist"
+            raise RuntimeError(msg)
 
         if "version" in kwargs:
             sys.stderr.write(
                 "WARNING: UriGenerator overwriting `kwargs['version']`\n",
             )
 
-        if source.is_relative_to(USERSPACE):
+        if absolute_path.is_relative_to(USERSPACE):
             kwargs.update(
                 version=os.environ["CONF_USERSPACE_COMMIT"],
             )
             return self.userspace_template.format(**kwargs)
 
-        if source.is_relative_to(MODULES):
+        if absolute_path.is_relative_to(MODULES):
             # need to remap source, it starts with "module/elpekenin"
             # but the path in its dedicated repository drops that part
-            relative = source.relative_to(MODULES)
+            relative = absolute_path.relative_to(MODULES)
             kwargs.update(
                 source=str(relative),
                 version=os.environ["CONF_MODULES_COMMIT"],
             )
             return self.modules_template.format(**kwargs)
 
-        msg = f"Unknown source: '{source}'"
+        msg = f"Unknown file: '{absolute_path}'"
         raise RuntimeError(msg)
 
 

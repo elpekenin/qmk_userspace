@@ -18,3 +18,5 @@ compile_commands.json
 
 # python leftovers
 __pycache__
+build/
+*egg-info

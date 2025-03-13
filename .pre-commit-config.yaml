@@ -1,4 +1,8 @@
-exclude: .*3rd_party.*  # let external code unchanged
+exclude: |
+  (?x)^(
+    .*3rd_party.*
+    |modules.*
+  )$
 
 ci:
   autoupdate_schedule: monthly

@@ -25,14 +25,8 @@
             "destination": "modules"
         },
         {
-            "operation": "cp",
-            "orig": "manage.py",
-            "destination": "."
-        },
-        {
-            "operation": "cp",
-            "orig": "commands/*",
-            "destination": "commands"
+            "operation": "exec",
+            "command": "pip install ./cli"
         },
         {
             // 3color eink

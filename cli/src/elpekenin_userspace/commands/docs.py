@@ -16,14 +16,14 @@ from typing import TYPE_CHECKING, TypedDict
 
 from sphinx.cmd.build import main as sphinx_build
 
-from commands import args
-from commands.base import BaseCommand
+from . import args
+from .base import BaseCommand
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
     from collections.abc import Generator
 
-    class Command(TypedDict):
+    class CompilationDatabaseEntry(TypedDict):
         """Typing stub for data in `compile_commands.json`."""
 
         command: str
@@ -31,10 +31,25 @@ if TYPE_CHECKING:
         file: str
 
 
-CWD = Path.cwd()
+COMPILEDB = "compile_commands.json"
 
 
-def fixed_path(raw: str, source_directory: Path) -> str:
+def is_userspace(path: Path) -> bool:
+    """Validate if the folder argument is actually an userspace.
+
+    So far the this checks for the existence of
+      * compile_commands.json
+      * docs
+    Those should be the minimum to get docs building.
+
+    No further constraints in case anyone ever wants to use this tool
+    """
+    compiledb = path / COMPILEDB
+    docs = path / "docs"
+    return compiledb.is_file() and docs.is_dir()
+
+
+def fixed_path(raw: str, *, userspace: Path, qmk: Path) -> str:
     """Given a path, make it absolute by prepending source when needed.
 
     This is needed because hawkmoth is configured to look at userspace, not
@@ -47,7 +62,7 @@ def fixed_path(raw: str, source_directory: Path) -> str:
         if directory in path.parts:
             index = path.parts.index(directory)
 
-            ret = CWD
+            ret = userspace
             for part in path.parts[index:]:
                 ret /= part
 
@@ -56,10 +71,10 @@ def fixed_path(raw: str, source_directory: Path) -> str:
     if raw.startswith("/"):
         return raw
 
-    return str(source_directory / path)
+    return str(qmk / path)
 
 
-def include_flags(args: list[str], source_directory: Path) -> list[str]:
+def include_flags(args: list[str], *, userspace: Path, qmk: Path) -> list[str]:
     """From all args, filter the ones adding include paths or files."""
     ret: list[str] = []
     for i, arg in enumerate(args):
@@ -68,13 +83,20 @@ def include_flags(args: list[str], source_directory: Path) -> list[str]:
                 "-I"
                 + fixed_path(
                     arg.removeprefix("-I"),
-                    source_directory,
+                    userspace=userspace,
+                    qmk=qmk,
                 ),
             )
 
         if arg in {"-isystem", "-include"}:
             ret.append(arg)
-            ret.append(fixed_path(args[i + 1], source_directory))
+            ret.append(
+                fixed_path(
+                    args[i + 1],
+                    userspace=userspace,
+                    qmk=qmk,
+                ),
+            )
 
     return ret
 
@@ -84,23 +106,20 @@ def define_flags(args: list[str]) -> list[str]:
     return [arg for arg in args if arg.startswith("-D")]
 
 
-def cleanup_args(args: list[str], source_directory: Path) -> list[str]:
+def cleanup_args(args: list[str], *, userspace: Path, qmk: Path) -> list[str]:
     """From all args, filter the ones we want, and fix relative paths."""
     return [
-        f"-I{source_directory}",
+        f"-I{qmk}",
         *define_flags(args),
-        *include_flags(args, source_directory),
+        *include_flags(args, userspace=userspace, qmk=qmk),
     ]
 
 
-def get_args_from_file(file: Path) -> list[str]:
+def get_args_and_dir_from_file(file: Path) -> tuple[list[str], Path]:
     """Extract arguments from a compilation database file."""
-    database: list[Command] = json.loads(file.read_text())
-    command = database[0]
-
-    args = shlex.split(command["command"])
-
-    return cleanup_args(args, source_directory=Path(command["directory"]))
+    database: list[CompilationDatabaseEntry] = json.loads(file.read_text())
+    entry = database[0]
+    return shlex.split(entry["command"]), Path(entry["directory"])
 
 
 def get_commit(directory: Path) -> str:
@@ -126,21 +145,23 @@ def get_commit(directory: Path) -> str:
     )
 
 
-def add_conf_environment() -> None:
+def add_conf_environment(userspace: Path) -> None:
     """Pass arguments into `conf.py` via environment variables."""
     # want docs to be generated from current code (local path)
     # not the (potentially outdated) copies on $QMK
-    os.environ["CONF_ROOT"] = str(CWD)
+    os.environ["CONF_ROOT"] = str(userspace)
 
-    clang_args = get_args_from_file(Path("compile_commands.json"))
+    raw_args, qmk = get_args_and_dir_from_file(userspace / COMPILEDB)
+    args = cleanup_args(raw_args, userspace=userspace, qmk=qmk)
+
     sep = "||"
-    os.environ["CONF_HAWKMOTH_CLANG"] = sep.join(clang_args)
+    os.environ["CONF_HAWKMOTH_CLANG"] = sep.join(args)
     os.environ["CONF_HAWKMOTH_CLANG_SEP"] = sep
 
     # for permalink into commits
-    os.environ["CONF_USERSPACE_COMMIT"] = get_commit(Path().parent)
+    os.environ["CONF_USERSPACE_COMMIT"] = get_commit(userspace)
     os.environ["CONF_MODULES_COMMIT"] = get_commit(
-        CWD / "modules" / "elpekenin",
+        userspace / "modules" / "elpekenin",
     )
 
 
@@ -160,19 +181,27 @@ class Docs(BaseCommand):
     @classmethod
     def add_args(cls, parser: ArgumentParser) -> None:
         """Command-specific arguments."""
+        # common args
         parser.add_argument(
             "--output",
             help="where to write the docs (default: temporary directory)",
             metavar="DIR",
             type=args.Directory(require_existence=True),
         )
-
+        parser.add_argument(
+            "--userspace",
+            help="where to find your userspace (default: cwd)",
+            metavar="DIR",
+            type=args.Directory(require_existence=True),
+            default=Path.cwd(),
+        )
         parser.add_argument(
             "--verbose",
             help="do not silence sphinx's output",
             action="store_true",
         )
 
+        # subcommands and their specific args
         subparsers = parser.add_subparsers(
             title="action",
             dest="action",
@@ -219,6 +248,10 @@ class Docs(BaseCommand):
 
     def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
+        if not is_userspace(arguments.userspace):
+            sys.stderr.write("Unexpected folder structure\n")
+            return 1
+
         actions = {
             "build": self.do_build,
             "preview": self.do_preview,
@@ -231,12 +264,14 @@ class Docs(BaseCommand):
 
     def do_build(self, build: str, arguments: Namespace) -> int:
         """Build documentation."""
-        add_conf_environment()
+        add_conf_environment(arguments.userspace)
+
+        docs = str(arguments.userspace / "docs")
 
         sphinx_args = [
             "-M",
             "html",
-            "docs",  # sourcedir
+            docs,  # sourcedir
             build,  # builddir
         ]
 

@@ -21,13 +21,13 @@ class File:
                 msg = f"{path} does not exist"
                 raise ArgumentTypeError(msg)
 
-            return path
+            return path.resolve()
 
         if not path.is_file():
             msg = f"{path} is not a file"
             raise ArgumentTypeError(msg)
 
-        return path
+        return path.resolve()
 
 
 class Directory:
@@ -45,10 +45,10 @@ class Directory:
                 msg = f"{path} does not exist"
                 raise ArgumentTypeError(msg)
 
-            return path
+            return path.resolve()
 
         if not path.is_dir():
             msg = f"{path} is not a directory"
             raise ArgumentTypeError(msg)
 
-        return path
+        return path.resolve()

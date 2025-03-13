@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from commands import args
-from commands.base import BaseCommand
+from elpekenin_userspace.commands import args
+from elpekenin_userspace.commands.base import BaseCommand
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser

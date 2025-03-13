@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# PYTHON_ARGCOMPLETE_OK
 
 """Utilities to interact with my userspace."""
 
@@ -7,24 +6,21 @@ from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
 from typing import TYPE_CHECKING
 
-import argcomplete
 import qmk_cli.helpers  # type: ignore[import-untyped]
 
-from commands import args
-from commands.docs import Docs
-from commands.generate.features import Features
-from commands.generate.keycode_str import KeycodeStr
-from commands.generate.qp_resources import QpResources
+from .commands import args
+from .commands.docs import Docs
+from .commands.generate.features import Features
+from .commands.generate.keycode_str import KeycodeStr
+from .commands.generate.qp_resources import QpResources
 
 if TYPE_CHECKING:
-    from commands.base import BaseCommand
+    from pathlib import Path
 
+    from .commands.base import BaseCommand
 
-THIS = Path(__file__)
-QMK = THIS.parent
 
 SUBCOMMANDS: dict[str, type[BaseCommand]] = {
     "docs": Docs,
@@ -43,10 +39,9 @@ def find_qmk(arg: Path | None) -> Path | None:
     return ret
 
 
-def main() -> int:
-    """Run a script's main logic, logging errors to file."""
+def get_parser() -> argparse.ArgumentParser:
+    """Create the parser."""
     parser = argparse.ArgumentParser(
-        prog=THIS.stem,
         description=__doc__,
     )
 
@@ -65,10 +60,15 @@ def main() -> int:
         subparser = subparsers.add_parser(name, help=class_.help())
         class_.add_args(subparser)
 
-    # run logic
-    argcomplete.autocomplete(parser)
+    return parser
+
+
+def main() -> int:
+    """Run a script's main logic, logging errors to file."""
+    parser = get_parser()
     arguments = parser.parse_args()
 
+    # actual logic
     subcommand_name: str | None = arguments.subcommand
     if subcommand_name is None:
         parser.print_help()

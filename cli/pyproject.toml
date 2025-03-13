@@ -1,0 +1,10 @@
+[project]
+name = "elpekenin_userspace"
+version = "0.0.0a"
+
+[project.scripts]
+manage = "elpekenin_userspace.main:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

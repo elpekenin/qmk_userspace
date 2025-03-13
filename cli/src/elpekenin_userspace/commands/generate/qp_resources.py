@@ -5,8 +5,8 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING
 
-from commands import args
-from commands.codegen import C_HEADER, H_HEADER, MK_HEADER, lines
+from elpekenin_userspace.commands import args
+from elpekenin_userspace.commands.codegen import C_HEADER, H_HEADER, MK_HEADER, lines
 
 from . import CodegenCommand
 

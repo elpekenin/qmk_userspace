@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from commands.codegen import C_HEADER, H_HEADER, lines
+from elpekenin_userspace.commands.codegen import C_HEADER, H_HEADER, lines
 
 from . import CodegenCommand
 
