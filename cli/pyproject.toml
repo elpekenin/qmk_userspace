@@ -8,3 +8,15 @@ manage = "elpekenin_userspace.main:main"
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+completion = [
+    "argcomplete",
+]
+docs = [
+    "clang==14",  # must match your libclangX.so
+    "furo",
+    "hawkmoth",
+    "sphinx",
+    "sphinx-tabs",
+]

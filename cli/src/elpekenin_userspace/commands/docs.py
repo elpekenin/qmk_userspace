@@ -14,14 +14,19 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
-from sphinx.cmd.build import main as sphinx_build
+try:
+    # NOTE: function signature copied from sphinx's hints
+    sphinx_build: Callable[[Sequence[str]], int] | None
+    from sphinx.cmd.build import main as sphinx_build
+except ImportError:
+    sphinx_build = None
 
 from . import args
 from .base import BaseCommand
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
-    from collections.abc import Generator
+    from collections.abc import Callable, Generator, Sequence
 
     class CompilationDatabaseEntry(TypedDict):
         """Typing stub for data in `compile_commands.json`."""
@@ -278,6 +283,12 @@ class Docs(BaseCommand):
         if not arguments.verbose:
             # --quiet keeps warnings on stderr
             sphinx_args.append("--silent")
+
+        if sphinx_build is None:
+            sys.stderr.write(
+                "Dependencies missing, run `pip install .[docs]`\n",
+            )
+            return 1
 
         return sphinx_build(sphinx_args)
 
