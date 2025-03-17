@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from elpekenin_userspace import args
@@ -11,10 +10,7 @@ from elpekenin_userspace.commands import BaseCommand
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
-
-THIS = Path(__file__)
-HERE = THIS.parent
-NAME = THIS.stem
+    from pathlib import Path
 
 DOCSTRING = "//!"
 CONTENT = "//|"

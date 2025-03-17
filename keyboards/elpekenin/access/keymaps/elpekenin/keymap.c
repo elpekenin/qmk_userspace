@@ -211,16 +211,16 @@ const indicator_t PROGMEM indicators[] = {
 #endif
 
 bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
-#ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
-    mp_embed_exec_str(program);
-#endif
-
 #ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
     draw_ledmap(led_min, led_max);
 #endif
 
-#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+#ifdef COMMUNITY_MODULE_INDICATORS_ENABLE
     draw_indicators(led_min, led_max);
+#endif
+
+#ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
+    mp_embed_exec_str(program);
 #endif
 
     return true;

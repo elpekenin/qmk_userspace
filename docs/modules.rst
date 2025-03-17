@@ -68,8 +68,8 @@ rng
 .. c:autodoc:: modules/elpekenin/rng/elpekenin/rng.h
 
 
-sdk_wrappers
-############
+rp_sdk_wrappers
+###############
 
 Replaces some C builtins (eg: ``__clzsi2``) with fine-tuned versions in the ROM of RP2040
 
@@ -93,3 +93,7 @@ There are no hooks for user logic in this module because its only purpose is set
                 __preinit_array_end__ = .;
             } > XTORS_FLASH AT > XTORS_FLASH_LMA
         }
+
+scrolling_text
+##############
+.. c:autodoc:: modules/elpekenin/scrolling_text/elpekenin/scrolling_text.h
