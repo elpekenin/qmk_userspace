@@ -7,6 +7,7 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/qp/graphics.h"
+#include "elpekenin/scrolling_text.h"
 #include "elpekenin/shortcuts.h"
 
 // *** Handlers ***

@@ -7,6 +7,7 @@
 
 #include "elpekenin/logging.h"
 #include "elpekenin/qp/graphics.h"
+#include "elpekenin/scrolling_text.h"
 #include "elpekenin/sections.h"
 
 #ifndef LOG_N_LINES

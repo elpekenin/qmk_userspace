@@ -1,3 +1,36 @@
+# project metadata and building
+[project]
+name = "elpekenin_userspace"
+version = "0.0.0a"
+
+[project.optional-dependencies]
+completion = [
+    "argcomplete",
+]
+docs = [
+    "clang==14",  # must match your libclangX.so
+    "furo",
+    "hawkmoth",
+    "sphinx",
+    "sphinx-tabs",
+]
+
+[project.scripts]
+manage = "elpekenin_userspace.main:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["elpekenin_userspace*"]
+
+# tools, sorted by name
+[tool.mypy]
+python_version = "3.9"
+strict = true
+exclude = ["modules"]
+
 [tool.ruff]
 target-version = "py39"
 exclude = ["modules"]
@@ -8,8 +41,3 @@ extend-ignore = [
     "FIX002",  # line contains TODO
     "TD003",  # TODO without link to issue
 ]
-
-[tool.mypy]
-python_version = "3.9"
-strict = true
-exclude = ["modules"]

@@ -21,8 +21,8 @@ try:
 except ImportError:
     sphinx_build = None
 
-from . import args
-from .base import BaseCommand
+from elpekenin_userspace import args
+from elpekenin_userspace.commands import BaseCommand
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace

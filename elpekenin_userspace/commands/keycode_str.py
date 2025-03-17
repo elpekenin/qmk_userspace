@@ -9,21 +9,19 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from elpekenin_userspace.commands import args
-from elpekenin_userspace.commands.codegen import C_HEADER, H_HEADER, lines
-
-from . import CodegenCommand
+from elpekenin_userspace import args
+from elpekenin_userspace.codegen import C_HEADER, H_HEADER, lines
+from elpekenin_userspace.commands import CodegenCommand
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
     from pathlib import Path
 
+OUTPUT_NAME = "keycode_str"
 
 COMMENT = re.compile(r"//(.*)")
 MULTI_COMMENT = re.compile(r"/\*(.*?)\*/")
 LAYOUT = re.compile(r"\[(.*)\]( *)=( *)LAYOUT(.*)\(")
-
-OUTPUT_NAME = "keycode_str"
 
 H_FILE = lines(
     H_HEADER,
@@ -32,40 +30,9 @@ H_FILE = lines(
     "",
 )
 
-C_FILE = lines(
-    C_HEADER,
-    "",
-    "#include <quantum/quantum.h>",
-    "",
-    '#include "elpekenin/keycodes.h"',
-    '#include "elpekenin/layers.h"',
-    "",
-    "static const char *keycode_names[] = {{",
-    "{qmk_data}"  # intentional lack of comma
-    "{keymap_data}"
-    "}};",
-    "",
-    "const char *get_keycode_name(uint16_t keycode) {{",
-    # no keycode whatsoever
-    # without this, tap/hold keys seems to cause noise on keylogger
-    # maybe they inject a "dummy" event with keycode = KC_NO instead of actual value (?)
-    "    if (keycode == KC_NO) {{",
-    "        return NULL;",
-    "    }}",
-    "",
-    # in bounds -> index array
-    "    if (keycode < ARRAY_SIZE(keycode_names)) {{",
-    "        return keycode_names[keycode];",
-    "    }}",
-    "",
-    # out of bounds -> nothing
-    "    return NULL;",
-    "}}",
-    "",
-)
 
-
-def _remove_comments(raw_file: str) -> str:
+def remove_comments(raw_file: str) -> str:
+    """Clean all comments from a C file."""
     clean = raw_file
 
     while res := COMMENT.search(clean):
@@ -79,7 +46,8 @@ def _remove_comments(raw_file: str) -> str:
     return clean
 
 
-def _extract_keycodes(clean_file: str) -> list[str]:
+def extract_keycodes(clean_file: str) -> list[str]:
+    """Collect all keycodes in a keymap."""
     accumulated = ""
     layers = []
     parens = 0
@@ -115,7 +83,8 @@ def _extract_keycodes(clean_file: str) -> list[str]:
     return layers
 
 
-def _keymap_data(layers: list[str]) -> str:
+def keymap_data(layers: list[str]) -> str:
+    """Generate mapping of keycode names in the user's keymap."""
     keycodes = set()
     for layer in layers:
         for keycode in layer.split(","):
@@ -128,6 +97,68 @@ def _keymap_data(layers: list[str]) -> str:
     return strings
 
 
+def gen_h_file(file: Path) -> None:
+    """Create contents for H file."""
+    file.write_text(H_FILE)
+
+
+def gen_c_file(file: Path, keymap_file: Path) -> None:
+    """Create contents for C file."""
+    # lazy import for sys.path patching
+    import qmk.keycodes  # type: ignore[import-not-found]
+
+    # read file
+    raw = keymap_file.read_text()
+    clean = remove_comments(raw)
+    layers = extract_keycodes(clean)
+
+    # generate contents
+    spec = qmk.keycodes.load_spec("latest")
+    qmk = ""
+    for entry in spec["keycodes"].values():
+        keycode = entry["key"]
+        qmk += f'    [{keycode}] = "{keycode}",\n'
+
+    keymap = keymap_data(layers)
+
+    file.write_text(
+        lines(
+            C_HEADER,
+            "",
+            f'#include "generated/{OUTPUT_NAME}.h"',
+            "",
+            "#include <quantum/quantum.h>",
+            "",
+            '#include "elpekenin/keycodes.h"',
+            '#include "elpekenin/layers.h"',
+            "",
+            "static const char *keycode_names[] = {{",
+            "{qmk}"  # intentional lack of comma
+            "{keymap}"
+            "}};",
+            "",
+            "const char *get_keycode_name(uint16_t keycode) {{",
+            # no keycode whatsoever
+            # without this, tap/hold keys seems to cause noise on keylogger
+            # maybe they inject a "dummy" event with keycode = KC_NO
+            # ... instead of actual value (?)
+            "    if (keycode == KC_NO) {{",
+            "        return NULL;",
+            "    }}",
+            "",
+            # in bounds -> index array
+            "    if (keycode < ARRAY_SIZE(keycode_names)) {{",
+            "        return keycode_names[keycode];",
+            "    }}",
+            "",
+            # out of bounds -> nothing
+            "    return NULL;",
+            "}}",
+            "",
+        ).format(qmk=qmk, keymap=keymap),
+    )
+
+
 class KeycodeStr(CodegenCommand):
     """Create a map from keycode values(u16) to their names (char*)."""
 
@@ -138,45 +169,15 @@ class KeycodeStr(CodegenCommand):
             "keymap",
             help="the keymap file to analyze",
             metavar="FILE",
-            type=args.File(require_existence=True),
+            type=args.File(require_existence=True, name="keymap.c"),
         )
         return super().add_args(parser)
 
     def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
         output_directory: Path = arguments.output_directory
-        keymap_file: Path = arguments.keymap
 
-        if keymap_file.name != "keymap.c":
-            msg = "Keymap file should be a 'keymap.c'"
-            raise ValueError(msg)
-
-        # parse file
-        raw = keymap_file.read_text()
-        clean = _remove_comments(raw)
-        layers = _extract_keycodes(clean)
-
-        # lazy import for sys.path patching
-        import qmk.keycodes  # type: ignore[import-not-found]
-
-        # generate file
-        spec = qmk.keycodes.load_spec("latest")
-        qmk_data = ""
-        for entry in spec["keycodes"].values():
-            keycode = entry["key"]
-            qmk_data += f'    [{keycode}] = "{keycode}",\n'
-
-        keymap_data = _keymap_data(layers)
-
-        c_file = output_directory / f"{OUTPUT_NAME}.c"
-        c_file.write_text(
-            C_FILE.format(
-                qmk_data=qmk_data,
-                keymap_data=keymap_data,
-            ),
-        )
-
-        h_file = output_directory / f"{OUTPUT_NAME}.h"
-        h_file.write_text(H_FILE)
+        gen_h_file(output_directory / f"{OUTPUT_NAME}.h")
+        gen_c_file(output_directory / f"{OUTPUT_NAME}.c", arguments.keymap)
 
         return 0

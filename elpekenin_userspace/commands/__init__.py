@@ -1,9 +1,11 @@
-"""Common logic for any command."""
+"""Common logic for every command."""
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, final
+
+from elpekenin_userspace import args
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -31,3 +33,20 @@ class BaseCommand(ABC):
     def run(self, arguments: Namespace) -> int:
         """Logic of command, returns exitcode."""
         raise NotImplementedError
+
+
+class CodegenCommand(BaseCommand):
+    """Common logic to all commands generating code."""
+
+    @classmethod
+    def add_args(cls, parser: ArgumentParser) -> None:
+        """Register codegen-specific arguments."""
+        parser.add_argument(
+            "--output",
+            dest="output_directory",
+            help="directory where to write generated files",
+            metavar="DIR",
+            type=args.Directory(require_existence=True),
+            required=True,
+        )
+        return super().add_args(parser)

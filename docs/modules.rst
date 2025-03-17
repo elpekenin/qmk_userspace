@@ -42,7 +42,7 @@ To execute some code, store it as a string and feed it into the ``mp_embed_exec_
 
 ..
     notes to self
-        start at line 3 to skip "generated file" comment + empty line below it
+        :lines: to skip "generated file" heading comment
 
 Available APIs are:
 
@@ -51,17 +51,17 @@ Available APIs are:
     .. tab:: ``qmk``
 
         .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/stubs/qmk.pyi
-            :lines: 3-
+            :lines: 5-
 
     .. tab:: ``qmk.keycode``
 
         .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/stubs/_keycode.pyi
-            :lines: 3-
+            :lines: 5-
 
     .. tab:: ``qmk.rgb``
 
         .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/stubs/_rgb.pyi
-            :lines: 3-
+            :lines: 5-
 
 rng
 ###

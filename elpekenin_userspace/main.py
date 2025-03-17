@@ -16,17 +16,18 @@ except ImportError:
 
 import qmk_cli.helpers  # type: ignore[import-untyped]
 
-from .commands import args
-from .commands.docs import Docs
-from .commands.generate.features import Features
-from .commands.generate.keycode_str import KeycodeStr
-from .commands.generate.qp_resources import QpResources
+from elpekenin_userspace import args
+from elpekenin_userspace.commands.docs import Docs
+from elpekenin_userspace.commands.features import Features
+from elpekenin_userspace.commands.keycode_str import KeycodeStr
+from elpekenin_userspace.commands.qp_resources import QpResources
+from elpekenin_userspace.commands.stubs import Stubs
 
 if TYPE_CHECKING:
     from pathlib import Path
     from types import ModuleType
 
-    from .commands.base import BaseCommand
+    from elpekenin_userspace.commands import BaseCommand
 
 
 SUBCOMMANDS: dict[str, type[BaseCommand]] = {
@@ -34,6 +35,7 @@ SUBCOMMANDS: dict[str, type[BaseCommand]] = {
     "features": Features,
     "keycode_str": KeycodeStr,
     "qp_resources": QpResources,
+    "stubs": Stubs,
 }
 
 
