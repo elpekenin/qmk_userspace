@@ -2,7 +2,7 @@
 
 # ruff: noqa: INP001  # part of implicit namespace
 
-# NOTE: Environment variables named CONF_* are provided by `py manage.py docs`
+# NOTE: Environment variables named CONF_* are provided by `docs` subcommand
 
 from __future__ import annotations
 

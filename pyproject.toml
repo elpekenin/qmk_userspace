@@ -2,6 +2,9 @@
 [project]
 name = "elpekenin_userspace"
 version = "0.0.0a"
+dependencies = [
+    "qmk",  # aka: `import qmk_cli`
+]
 
 [project.optional-dependencies]
 completion = [
@@ -16,7 +19,7 @@ docs = [
 ]
 
 [project.scripts]
-manage = "elpekenin_userspace.main:main"
+elpekenin_userspace = "elpekenin_userspace.main:main"
 
 [build-system]
 requires = ["setuptools"]

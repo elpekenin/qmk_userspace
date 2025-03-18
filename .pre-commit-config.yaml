@@ -13,7 +13,7 @@ repos:
     hooks:
       - id: clang-format
   - repo: https://github.com/elpekenin/qmk_userspace
-    rev: 85d36db8bee5b0f7ef3468b63c0ca4ca39693c39
+    rev: 207188766a0a84f850b3eb2a6797df2884d88acf
     hooks:
       - id: stubs
         name: Generate stubs for C files

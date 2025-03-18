@@ -1,6 +1,6 @@
 - id: stubs
   name: generate stubs
   description: Automatically generate stubs for MicroPython C source
-  entry: python -m elpekenin_userspace stubs
+  entry: elpekenin_userspace stubs
   language: python
   types: [c]
