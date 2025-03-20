@@ -51,17 +51,17 @@ Available APIs are:
     .. tab:: ``qmk``
 
         .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/stubs/qmk.pyi
-            :lines: 5-
+            :lines: 6-
 
     .. tab:: ``qmk.keycode``
 
         .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/stubs/_keycode.pyi
-            :lines: 5-
+            :lines: 6-
 
     .. tab:: ``qmk.rgb``
 
         .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/stubs/_rgb.pyi
-            :lines: 5-
+            :lines: 6-
 
 rng
 ###

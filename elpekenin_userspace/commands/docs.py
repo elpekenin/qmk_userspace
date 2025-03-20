@@ -14,6 +14,8 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
+from git import Repo
+
 try:
     # NOTE: function signature copied from sphinx's hints
     sphinx_build: Callable[[Sequence[str]], int] | None
@@ -129,25 +131,8 @@ def get_args_and_dir_from_file(file: Path) -> tuple[list[str], Path]:
 
 def get_commit(directory: Path) -> str:
     """Get full hash of a repository folder."""
-    git = shutil.which("git")
-    if git is None:
-        msg = "git not found"
-        raise RuntimeError(msg)
-
-    return (
-        subprocess.run(  # noqa: S603  # out of attacker control
-            [
-                git,
-                "rev-parse",
-                "HEAD",
-            ],
-            capture_output=True,
-            cwd=directory,
-            check=True,
-        )
-        .stdout.decode()
-        .rstrip("\n")
-    )
+    head = Repo(directory).head
+    return str(head.commit)
 
 
 def add_conf_environment(userspace: Path) -> None:

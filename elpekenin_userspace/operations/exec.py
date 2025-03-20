@@ -1,0 +1,42 @@
+"""Build step."""
+
+from __future__ import annotations
+
+import subprocess
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+from elpekenin_userspace import error
+from elpekenin_userspace.operations.base import BaseOperation
+
+if TYPE_CHECKING:
+    from typing import Any
+
+    from elpekenin_userspace.build import Recipe
+
+
+class Exec(BaseOperation):
+    """Run a command."""
+
+    def __init__(
+        self,
+        _: Recipe,
+        entry: dict[str, Any],
+    ) -> None:
+        """Initialize an instance."""
+        path = entry.get("path")
+        if path is None:
+            self.path = Path.cwd()
+        else:
+            self.path = Path(path)
+
+        self.cmd = entry.get("cmd") or error.missing("cmd")
+
+    def __str__(self) -> str:
+        """Display this operation."""
+        return f"run '{self.cmd}' at {self.path}"
+
+    def run(self) -> int:
+        """Entrypoint."""
+        subprocess.run(self.cmd, cwd=self.path, check=True, shell=True)  # noqa: S602
+        return 0

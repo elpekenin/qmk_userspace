@@ -13,7 +13,7 @@ repos:
     hooks:
       - id: clang-format
   - repo: https://github.com/elpekenin/qmk_userspace
-    rev: 207188766a0a84f850b3eb2a6797df2884d88acf
+    rev: 4d192307bb987cc9b8dacde3f315fa06891eefb0
     hooks:
       - id: stubs
         name: Generate stubs for C files
@@ -37,7 +37,12 @@ repos:
     hooks:
       - id: mypy
         args: [--strict]
-        additional_dependencies: [qmk, sphinx]
+        additional_dependencies: [
+          gitpython,
+          qmk,
+          sphinx,
+          typing_extensions,
+        ]
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:

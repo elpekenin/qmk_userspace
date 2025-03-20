@@ -102,8 +102,8 @@ def gen_mk_file(file: Path, assets: AssetsDictT) -> None:
         code += f"# {key}\n"
 
         for path in paths:
-            file = path.with_suffix(".c")
-            code += f"SRC += {file}\n"
+            full_path = path.with_suffix(".c").resolve()
+            code += f"SRC += {full_path}\n"
 
     file.write_text(
         lines(

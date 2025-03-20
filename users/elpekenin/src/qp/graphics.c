@@ -216,14 +216,14 @@ static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
     glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
 
-    size_t used = get_used_heap();
+    size_t used_heap = get_used_heap();
 
-    char   buff[100];
-    size_t buff_size = sizeof(buff);
+    string_t str = new_string(100);
+    int      len = 0;
 
     static size_t last_used = 0;
 
-    if (args->device == NULL || args->font == NULL || last_used == used || state->running) {
+    if (args->device == NULL || args->font == NULL || last_used == used_heap || state->running) {
         return 1000;
     }
 
@@ -232,32 +232,27 @@ static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
     if (!flash) {
         flash = true;
 
-        strlcpy(buff, "Flash: ", sizeof(buff));
+        len = lcpy(&str, "Flash: ");
+        len += pretty_bytes(&str, get_used_flash());
+        len += lcat(&str, "/");
+        len += pretty_bytes(&str, get_flash_size());
 
-        size_t offset = strlen(buff);
-        pretty_bytes(get_used_flash(), buff + offset, buff_size - offset);
+        qp_drawtext(args->device, args->x, args->y - args->font->line_height, args->font, str.ptr - len);
 
-        strlcat(buff, "/", sizeof(buff));
-
-        offset = strlen(buff);
-        pretty_bytes(get_flash_size(), buff + offset, buff_size - offset);
-
-        qp_drawtext(args->device, args->x, args->y - args->font->line_height, args->font, buff);
+        // reset buffer
+        str.ptr -= len;
+        str.len += len;
     }
 
-    last_used      = used;
+    last_used      = used_heap;
     state->running = true;
 
-    size_t offset = 0;
-    pretty_bytes(used, buff + offset, buff_size - offset);
-
-    strlcat(buff, "/", sizeof(buff));
-
-    offset = strlen(buff);
-    pretty_bytes(get_heap_size(), buff + offset, buff_size - offset);
+    len = pretty_bytes(&str, used_heap);
+    len += lcat(&str, "/");
+    len += pretty_bytes(&str, get_heap_size());
 
     // start the animation
-    strlcpy(state->dest, buff, sizeof(state->dest));
+    strlcpy(state->dest, str.ptr - len, sizeof(state->dest));
     state->mask  = 0;
     state->state = FILLING;
     defer_exec(10, glitch_text_callback, args);

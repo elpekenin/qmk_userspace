@@ -3,7 +3,9 @@
 name = "elpekenin_userspace"
 version = "0.0.0a"
 dependencies = [
+    "gitpython",
     "qmk",  # aka: `import qmk_cli`
+    "typing_extensions",
 ]
 
 [project.optional-dependencies]

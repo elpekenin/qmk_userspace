@@ -32,7 +32,6 @@ class BaseCommand(ABC):
     @abstractmethod
     def run(self, arguments: Namespace) -> int:
         """Logic of command, returns exitcode."""
-        raise NotImplementedError
 
 
 class CodegenCommand(BaseCommand):

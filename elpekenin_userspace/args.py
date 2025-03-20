@@ -3,7 +3,12 @@
 from __future__ import annotations
 
 from argparse import ArgumentTypeError
-from pathlib import Path
+from typing import TYPE_CHECKING
+
+import elpekenin_userspace.path
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class _Common:
@@ -21,7 +26,8 @@ class _Common:
 
     def __call__(self, raw: str) -> Path:
         """Conversion function for arguments."""
-        path = Path(raw)
+        path = elpekenin_userspace.path.resolve(raw)
+
         if self.require_existence and not path.exists():
             msg = f"{path} does not exist"
             raise ArgumentTypeError(msg)

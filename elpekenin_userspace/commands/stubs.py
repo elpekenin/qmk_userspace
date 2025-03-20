@@ -104,8 +104,10 @@ def generate_pyi_file(input_file: Path) -> None:
     if content is not None:
         code += content
 
-    output_file = input_file.parent / "stubs" / input_file.with_suffix(".pyi").name
+    output_directory = input_file.parent / "stubs"
+    output_directory.mkdir(exist_ok=True)
 
+    output_file = output_directory / (input_file.stem + ".pyi")
     output_file.write_text(
         lines(
             PY_HEADER,
@@ -123,6 +125,8 @@ class Stubs(BaseCommand):
         """Command-specific arguments."""
         parser.add_argument(
             "files",
+            help="the C file to generate stubs for",
+            metavar="FILE",
             type=args.File(require_existence=True),
             nargs="*",
         )

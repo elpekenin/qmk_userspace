@@ -1,46 +1,41 @@
 {
     "repo": "https://github.com/qmk/qmk_firmware",
     "branch": "xap",
-    "path": "~/workspace/qmk",
-    "default_compilation": false,
+    "path": "$QMK_HOME",
     "operations": [
         {
             "operation": "cp",
-            "orig": "keyboards/elpekenin/access/*",
-            "destination": "keyboards/elpekenin/access"
+            "src": "keyboards/elpekenin/access",
+            "dst": "$QMK_HOME/keyboards/elpekenin/access"
         },
         {
             "operation": "cp",
-            "orig": "users/elpekenin/*",
-            "destination": "users/elpekenin"
+            "src": "users/elpekenin",
+            "dst": "$QMK_HOME/users/elpekenin"
         },
         {
-            // if submodules are not present, download
+            "": "if submodules are not present, download",
             "operation": "exec",
-            "command": "ls modules/elpekenin || git submodule update --init --recursive"
+            "cmd": "ls modules/elpekenin > /dev/null || git submodule update --init --recursive"
         },
         {
             "operation": "cp",
-            "orig": "modules/*",
-            "destination": "modules"
+            "src": "modules",
+            "dst": "$QMK_HOME/modules"
         },
         {
-            "operation": "exec",
-            "command": "pip install ."
-        },
-        {
-            // 3color eink
+            "": "3color eink",
             "operation": "pr",
             "id": 20032
         },
         {
-            // 22538-ish
+            "": "22538-ish",
             "operation": "merge",
             "repo": "https://github.com/elpekenin/qmk_firmware",
             "branch": "feature/rtt"
         },
         {
-            // 24848-ish
+            "": "24848-ish",
             "operation": "merge",
             "repo": "https://github.com/elpekenin/qmk_firmware",
             "branch": "fix/modules"
@@ -53,24 +48,35 @@
         },
         {
             "operation": "diff",
-            "file": "il91874.diff"
+            "file": "patches/il91874.diff"
         },
         {
             "operation": "diff",
-            "file": "spi_comms.diff"
+            "file": "patches/spi_comms.diff"
         },
         {
             "operation": "diff",
-            "file": "generic_rotation.diff"
+            "file": "patches/generic_rotation.diff"
+        },
+        {
+            "operation": "exec",
+            "cmd": "qmk compile -kb elpekenin/access -km elpekenin -e TARGET=left -e MAKECMDGOALS=uf2-split-left",
+            "at": "$QMK_HOME"
+        },
+        {
+            "operation": "exec",
+            "cmd": "qmk compile -kb elpekenin/access -km elpekenin -e TARGET=right -e MAKECMDGOALS=uf2-split-right --compiledb",
+            "at": "$QMK_HOME"
+        },
+        {
+            "operation": "cp",
+            "src": "$QMK_HOME/left.uf2",
+            "dst": "."
+        },
+        {
+            "operation": "cp",
+            "src": "$QMK_HOME/right.uf2",
+            "dst": "."
         }
-        // {
-        //     // was this for 2nd core anims?
-        //     "operation": "diff",
-        //     "file": "animation.diff"
-        // },
-    ],
-    "compile_command": "./keyboards/elpekenin/access/compile",
-    "wsl": {
-        "destination": "/mnt/d"
-    }
+    ]
 }

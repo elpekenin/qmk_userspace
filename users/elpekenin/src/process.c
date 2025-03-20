@@ -89,7 +89,7 @@ bool keylog_enabled = true;
 #endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    char buff[15];
+    string_t str = new_string(15);
 
 #if defined(KEYLOG_ENABLE)
     if (keylog_enabled) {
@@ -203,7 +203,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         case PK_SIZE:
             if (pressed) {
-                logging(UNKNOWN, LOG_INFO, "Binary takes %s", pretty_bytes(get_flash_size(), buff, sizeof(buff)));
+                int len = pretty_bytes(&str, get_flash_size());
+                logging(UNKNOWN, LOG_INFO, "Binary takes %s", str.ptr - len);
             }
             return false;
 

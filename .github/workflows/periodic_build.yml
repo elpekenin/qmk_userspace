@@ -6,9 +6,6 @@ on:
     - cron: "0 0 */5 * *"
   workflow_dispatch:
 
-env:
-  RUST_LOG: trace
-
 defaults:
   run:
     shell: bash
@@ -39,35 +36,14 @@ jobs:
           qmk config compile.parallel=20
           echo "QMK_HOME=~/workspace/qmk" >> $GITHUB_ENV
 
-      - name: Install Rust
-        run: |
-          apt-get -y update
-          apt-get -y install curl
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-
-      - name: Compile qmk_build
-        run: |
-          git clone https://github.com/elpekenin/qmk_build
-          source $HOME/.profile
-          cargo install --path qmk_build
-
       - name: Show environment info
         run: |
-          source "$HOME/.cargo/env"
           echo -n "    distro: " && uname -a || true
           echo -n "       pip: " && pip -V || true
           echo -n "       qmk: " && qmk -V || true
           echo -n "qmk config: " && qmk config || true
-          echo -n " qmk_build: " && qmk_build -V || true
 
-      - name: Run qmk_build
+      - name: Install and run build command
         run: |
-          # put qmk_build (.cargo) in scope
-          source $HOME/.profile
-          qmk_build
-
-      - name: Upload logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          path: ${{ env.QMK_HOME }}/users/elpekenin/logs/
+          pip install .
+          elpekenin_userspace build
