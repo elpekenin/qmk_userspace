@@ -3,11 +3,9 @@ elpekenin QMK
 #############
 
 .. caution::
-  This is not an usual QMK external userspace
+  This is not an usual QMK external userspace. I use a custom script to compile (``elpekenin_userspace build``)
 
-  I use a custom tool  (`qmk_build <https://github.com/elpekenin/qmk_build>`_) to compile
-
-  Reasoning for this setup is easily keeping my code out of tree, but up to date with QMK changes. A fork wasn't good enough for me
+  Motivation for this setup is to easily keep code out of tree, but in sync with QMK changes.
 
 ************
 Introduction

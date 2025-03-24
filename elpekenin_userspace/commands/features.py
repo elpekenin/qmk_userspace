@@ -71,7 +71,7 @@ def gen_h_file(file: Path, features: set[str]) -> None:
             "typedef union {{",
             "    {type} raw;",
             "    struct {{",
-            "{code}",
+            "{code}"  # intentional lack of comma
             "    }};",
             "}} enabled_features_t;",
             "",
@@ -90,6 +90,7 @@ def gen_c_file(file: Path, features: set[str]) -> None:
             f"        features.{feature.lower()} = true;",
             "    #endif",
             "",
+            "",
         )
 
     file.write_text(
@@ -103,7 +104,7 @@ def gen_c_file(file: Path, features: set[str]) -> None:
             "",
             "    features.raw = 0;",
             "",
-            "{code}",
+            "{code}"  # intentional lack of comma
             "    return features;",
             "}}",
             "",
@@ -135,6 +136,7 @@ def gen_draw_file(file: Path, features: set[str]) -> None:
             "           return;",
             "        }",
             "    }",
+            "",
             "",
         )
 
@@ -180,19 +182,22 @@ class Features(CodegenCommand):
         """Command-specific arguments."""
         parser.add_argument(
             "--foreground",
+            help="color to use for text",
             required=False,
             default=DEFAULT_FG,
         )
 
         parser.add_argument(
             "--background",
+            help="color to use for text's background",
             required=False,
             default=DEFAULT_BG,
         )
 
         parser.add_argument(
             "features",
-            nargs="?",
+            help="features to be inspected",
+            nargs="*",
             default=DEFAULT_FEATURES,
         )
 
