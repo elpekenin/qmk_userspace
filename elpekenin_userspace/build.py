@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from git import Repo
 from typing_extensions import Self
@@ -15,10 +15,9 @@ from elpekenin_userspace.operations import OPERATIONS
 
 if TYPE_CHECKING:
     from pathlib import Path
-    from typing import Any, TypedDict
+    from typing import TypedDict
 
-    from typing_extensions import Required
-
+    from elpekenin_userspace.operations import Args
     from elpekenin_userspace.operations.base import BaseOperation
 
     class Json(TypedDict, total=False):
@@ -27,12 +26,7 @@ if TYPE_CHECKING:
         repo: str
         branch: str
         path: str
-        operations: list[Operation]
-
-    class Operation(TypedDict, total=False):
-        """Contents of each operation in JSON file."""
-
-        operation: Required[str]
+        operations: list[Args]
 
 
 class Recipe:
@@ -44,7 +38,7 @@ class Recipe:
         repo: str,
         branch: str,
         path: Path,
-        operations: list[Operation],
+        operations: list[Args],
     ) -> None:
         """Initialize an instance."""
         self.repo = repo
@@ -57,8 +51,11 @@ class Recipe:
         operations: list[BaseOperation] = []
         for entry in self.operations:
             name = entry.get("operation") or error.missing("operation")
-            cls = OPERATIONS.get(name) or error.abort(f"Unknown operation '{name}'")
-            operation = cls(self, cast("dict[str, Any]", entry))
+            if name not in OPERATIONS:
+                error.abort(f"Unknown operation '{name}'")
+
+            cls = OPERATIONS[name]
+            operation = cls(self, entry)
             operations.append(operation)
 
         return operations

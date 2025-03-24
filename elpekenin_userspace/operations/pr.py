@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from git import Repo
 
@@ -10,7 +10,9 @@ from elpekenin_userspace import constants, error, git_helpers
 from elpekenin_userspace.operations.base import BaseOperation
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Literal
+
+    from typing_extensions import NotRequired
 
     from elpekenin_userspace.build import Recipe
 
@@ -18,10 +20,17 @@ if TYPE_CHECKING:
 class Pr(BaseOperation):
     """Fetch changes from a PR."""
 
+    class Args(TypedDict):
+        """Arguments for this operation."""
+
+        operation: Literal["pr"]
+        repo: NotRequired[str]
+        id: int
+
     def __init__(
         self,
         recipe: Recipe,
-        entry: dict[str, Any],
+        entry: Args,
     ) -> None:
         """Initialize an instance."""
         self.workdir = recipe.path

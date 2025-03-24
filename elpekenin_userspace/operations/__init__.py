@@ -13,8 +13,19 @@ from elpekenin_userspace.operations.pr import Pr
 from elpekenin_userspace.operations.stop import Stop
 
 if TYPE_CHECKING:
+    from typing import Union
+
     from elpekenin_userspace.operations.base import BaseOperation
 
+    Args = Union[
+        Checkout.Args,
+        Cp.Args,
+        Diff.Args,
+        Exec.Args,
+        Merge.Args,
+        Pr.Args,
+        Stop.Args,
+    ]
 
 OPERATIONS: dict[str, type[BaseOperation]] = {
     "checkout": Checkout,

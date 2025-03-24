@@ -71,12 +71,12 @@
         {
             "operation": "cp",
             "src": "$QMK_HOME/left.uf2",
-            "dst": "."
+            "dst": "/mnt/d"
         },
         {
             "operation": "cp",
             "src": "$QMK_HOME/right.uf2",
-            "dst": "."
+            "dst": "/mnt/d"
         }
     ]
 }

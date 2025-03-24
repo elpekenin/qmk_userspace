@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from elpekenin_userspace import error
 from elpekenin_userspace.operations.base import BaseOperation
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Literal
+
+    from typing_extensions import NotRequired
 
     from elpekenin_userspace.build import Recipe
 
@@ -18,10 +20,17 @@ if TYPE_CHECKING:
 class Exec(BaseOperation):
     """Run a command."""
 
+    class Args(TypedDict):
+        """Arguments for this operation."""
+
+        operation: Literal["exec"]
+        cmd: str
+        path: NotRequired[str]
+
     def __init__(
         self,
         _: Recipe,
-        entry: dict[str, Any],
+        entry: Args,
     ) -> None:
         """Initialize an instance."""
         path = entry.get("path")

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from git import Repo
 
@@ -10,7 +10,7 @@ from elpekenin_userspace import error, git_helpers
 from elpekenin_userspace.operations.base import BaseOperation
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Literal
 
     from elpekenin_userspace.build import Recipe
 
@@ -18,16 +18,24 @@ if TYPE_CHECKING:
 class Checkout(BaseOperation):
     """Grab some files from another branch."""
 
+    class Args(TypedDict):
+        """Arguments for this operation."""
+
+        operation: Literal["checkout"]
+        repo: str
+        branch: str
+        files: list[str]
+
     def __init__(
         self,
         recipe: Recipe,
-        entry: dict[str, Any],
+        entry: Args,
     ) -> None:
         """Initialize an instance."""
         self.workdir = recipe.path
         self.remote = entry.get("repo") or error.missing("repo")
         self.branch = entry.get("branch") or error.missing("branch")
-        self.files: list[str] = entry.get("files") or error.missing("files")
+        self.files = entry.get("files") or error.missing("files")
 
     def __str__(self) -> str:
         """Display this operation."""

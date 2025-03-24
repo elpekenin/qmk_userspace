@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from git import Repo
 
@@ -11,7 +11,7 @@ from elpekenin_userspace import error
 from elpekenin_userspace.operations.base import BaseOperation
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Literal
 
     from elpekenin_userspace.build import Recipe
 
@@ -19,10 +19,16 @@ if TYPE_CHECKING:
 class Diff(BaseOperation):
     """Apply a patch."""
 
+    class Args(TypedDict):
+        """Arguments for this operation."""
+
+        operation: Literal["diff"]
+        file: str
+
     def __init__(
         self,
         recipe: Recipe,
-        entry: dict[str, Any],
+        entry: Args,
     ) -> None:
         """Initialize an instance."""
         self.workdir = recipe.path

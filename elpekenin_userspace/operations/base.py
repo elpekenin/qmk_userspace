@@ -6,21 +6,20 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from elpekenin_userspace.build import Recipe
+    from elpekenin_userspace.operations import Args
 
 
 class BaseOperation(ABC):
     """Represent an operation."""
 
-    @abstractmethod
     def __init__(
         self,
         recipe: Recipe,
-        entry: dict[str, Any],
+        entry: Args,
     ) -> None:
         """Initialize an instance."""
+        raise NotImplementedError
 
     @abstractmethod
     def run(self) -> int:
