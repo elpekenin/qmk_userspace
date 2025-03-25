@@ -21,16 +21,6 @@ SRC += $(USER_GENERATED)/keycode_str.c
 
 # QP assets
 ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
-    VPATH += \
-        $(USER_PATH)/painter/fonts \
-        $(USER_PATH)/painter/images
-
-    # not really codegen, but lets convert images to .qgf here
-    # it will iterate all files on every folder under $(USER_PATH)/painter/images
-    QGF_FORMAT ?= rgb565
-    $(shell $(USER_PATH)/painter/images/img2qgf $(QGF_FORMAT))
-
-    # actual codegen
     QP_DIRS := $(KEYBOARD_PATHS) $(KEYMAP_PATH) $(USER_PATH)
 
     $(USER_GENERATED)/qp_resources.c $(USER_GENERATED)/features_draw.c: FORCE

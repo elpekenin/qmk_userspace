@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from elpekenin_userspace import args
-from elpekenin_userspace.codegen import C_HEADER, H_HEADER, MK_HEADER, lines
+from elpekenin_userspace.codegen import C_HEADER, H_HEADER, MK_HEADER
 from elpekenin_userspace.commands import CodegenCommand
 
 if TYPE_CHECKING:
@@ -51,67 +51,81 @@ def asset_name(type_: str, path: Path) -> str:
 
 def gen_h_file(file: Path, assets: AssetsDictT) -> None:
     """Create contents for H file."""
-    code = ""
-    for key, paths in assets.items():
-        code += f"// {key}\n"
-        for path in paths:
-            code += f'#include "{path.name}"\n'
-        code += "\n"
+    with file.open("w") as f:
+        f.writelines(
+            [
+                H_HEADER + "\n",
+                "\n",
+            ],
+        )
 
-    file.write_text(
-        lines(
-            H_HEADER,
-            "",
-            "{code}",
-            "",
-            "void load_qp_resources(void);",
-        ).format(code=code),
-    )
+        for key, paths in assets.items():
+            f.writelines(
+                [
+                    f"// {key}\n",
+                    *(f'#include "{path.name}"\n' for path in paths),
+                    "\n",
+                ],
+            )
+
+        f.write("void load_qp_resources(void);\n")
 
 
 def gen_c_file(file: Path, assets: AssetsDictT) -> None:
     """Create contents for C file."""
-    code = ""
-    for key, paths in assets.items():
-        function = "qp_set_font_by_name" if key == "fonts" else "qp_set_image_by_name"
+    with file.open("w") as f:
+        f.writelines(
+            [
+                C_HEADER + "\n",
+                "\n",
+                f'#include "generated/{OUTPUT_NAME}.h"\n',
+                "\n",
+                '#include "elpekenin/qp/assets.h"',  # set_{font,image}_by_name
+                "\n",
+                "void load_qp_resources(void) {\n",
+            ],
+        )
 
-        code += f"    // {key}\n"
-        for path in paths:
-            name = asset_name(key, path)
-            code += f'    {function}("{name}", {name});\n'
+        for key, paths in assets.items():
+            function = (
+                "qp_set_font_by_name" if key == "fonts" else "qp_set_image_by_name"
+            )
 
-    file.write_text(
-        lines(
-            C_HEADER,
-            "",
-            f'#include "generated/{OUTPUT_NAME}.h"',
-            "",
-            '#include "elpekenin/qp/assets.h"',  # set_{font,image}_by_name
-            "",
-            "void load_qp_resources(void) {{",
-            "{code}"  # no comma here intentionally
-            "}}",
-        ).format(code=code),
-    )
+            f.writelines(
+                [
+                    f"    // {key}\n",
+                    *(
+                        f'    {function}("{name}", {name});\n'
+                        for name in (asset_name(key, p) for p in paths)
+                    ),
+                ],
+            )
+
+        f.write("}\n")
 
 
 def gen_mk_file(file: Path, assets: AssetsDictT) -> None:
     """Create contents for MK file."""
-    code = ""
-    for key, paths in assets.items():
-        code += f"# {key}\n"
+    with file.open("w") as f:
+        f.writelines(
+            [
+                MK_HEADER + "\n",
+                "\n",
+            ],
+        )
 
-        for path in paths:
-            full_path = path.with_suffix(".c").resolve()
-            code += f"SRC += {full_path}\n"
+        for key, paths in assets.items():
+            f.writelines(
+                [
+                    f"# {key}\n",
+                    *(
+                        f"SRC += {full_path}\n" + f"VPATH += {full_path.parent}\n\n"
+                        for full_path in (p.with_suffix(".c").resolve() for p in paths)
+                    ),
+                ],
+            )
 
-    file.write_text(
-        lines(
-            MK_HEADER,
-            "",
-            "{code}",
-        ).format(code=code),
-    )
+        f.write("\n")
 
 
 class QpResources(CodegenCommand):
