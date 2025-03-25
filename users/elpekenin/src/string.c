@@ -11,7 +11,7 @@ bool is_utf8(char c) {
 }
 
 bool is_utf8_continuation(char c) {
-    return is_utf8(c) & !GET_BIT(c, 6); // 10xx xxxx
+    return is_utf8(c) && !GET_BIT(c, 6); // 10xx xxxx
 }
 
 int pretty_bytes(string_t *str, size_t n) {
@@ -25,7 +25,7 @@ int pretty_bytes(string_t *str, size_t n) {
         index++;
     }
 
-    const int ret = snprintf(str->ptr, str->len, "%3d%s", copy, magnitudes[index]);
+    const int ret = snprintf(str->ptr, str->len, "%3d%s", (int)copy, magnitudes[index]);
     str->ptr += ret;
     str->len -= ret;
     return ret;

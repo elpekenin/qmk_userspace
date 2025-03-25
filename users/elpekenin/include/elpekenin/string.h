@@ -10,7 +10,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <stdlib.h> // alloca
 #include <string.h> // srlen
 
 /**
@@ -34,8 +33,9 @@ typedef struct {
 } string_view_t;
 
 static inline string_t new_string(size_t n) {
+    char buf[n];
     return (string_t){
-        .ptr = alloca(n),
+        .ptr = buf,
         .len = n,
     };
 }
