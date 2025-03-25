@@ -1,6 +1,6 @@
 exclude: |
   (?x)^(
-    (.*)3rd_party(.*)
+    arm_math_m0/src/(.*)
     |micropython/src/(.*)
   )$
 

@@ -15,12 +15,6 @@
 */
 
 /*
- * NOTE: clang thinks this is a header, due to .h extension
- * and formats this is a way that breaks the linker
- */
-// clang-format off
-
-/*
  * RP2040 memory setup.
  */
 MEMORY
@@ -114,8 +108,8 @@ INCLUDE rules_stacks_c1.ld
 INCLUDE RP2040_rules_code_with_boot2.ld
 INCLUDE RP2040_rules_data_with_timecrit.ld
 
+/* Keep pico SDK symbols */
 SECTIONS {
-   /* from pico SDK */
    .preinit : ALIGN(4){
       . = ALIGN(4);
       /* preinit data */
@@ -128,7 +122,25 @@ SECTIONS {
 
 INCLUDE rules_memory.ld
 
-#include "ld/elpekenin_sections.h"
+/* My custom sections */
+SECTIONS {
+   .elpekenin_funcs : ALIGN(4) {
+       . = ALIGN(4);
+       __elpekenin_pre_init_base__ = .;
+       KEEP(*(SORT(.elpekenin_pre_init.*)));
+       __elpekenin_pre_init_end__ = .;
+
+       . = ALIGN(4);
+       __elpekenin_post_init_base__ = .;
+       KEEP(*(SORT(.elpekenin_post_init.*)));
+       __elpekenin_post_init_end__ = .;
+
+       . = ALIGN(4);
+       __elpekenin_deinit_base__ = .;
+       KEEP(*(SORT(.elpekenin_deinit.*)));
+       __elpekenin_deinit_end__ = .;
+   } > flash1
+}
 
 SECTIONS {
    .flash_end : {

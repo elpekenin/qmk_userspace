@@ -50,7 +50,7 @@ bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *co
 
     // on space tap dance
     // ... fix the typo
-    for (int8_t i = 0; i < backspaces; ++i) {
+    for (uint8_t i = 0; i < backspaces; ++i) {
         tap_code(BSPC);
     }
     send_string_P(str);

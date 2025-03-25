@@ -59,6 +59,11 @@
             "file": "patches/generic_rotation.diff"
         },
         {
+            "operation": "cp",
+            "src": "users/elpekenin/ld/elpekenin_rp2040.ld",
+            "dst": "$QMK_HOME/platforms/chibios/boards/common/ld/elpekenin.ld"
+        },
+        {
             "operation": "exec",
             "cmd": "qmk compile -kb elpekenin/access -km elpekenin -e TARGET=left -e MAKECMDGOALS=uf2-split-left",
             "at": "$QMK_HOME"

@@ -135,16 +135,6 @@ void build_info_sync_keymap_callback(void) {
 #endif
 }
 
-#if 0 && defined(QUANTUM_PAINTER_ENABLE) && IS_RIGHT_HAND
-static void start_animation(void) {
-    qp_animate(qp_get_device_by_name("ili9163"), 0, 0, qp_get_img_by_name(<image>));
-}
-// somehow fails from PEKE_CORE1_INIT, but not PEKE_POST_INIT
-// ... which makes no sense as the actual logic happens on core1 (__real_deferred_exec_task)
-// regardless of starting the animation from one core or another
-PEKE_POST_INIT(start_animation, 9000);
-#endif
-
 #ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
 // clang-format off
 static const char program[] =

@@ -47,7 +47,7 @@ size_t get_used_heap(void) {
     int8_t              n;
     const allocator_t **allocators = get_known_allocators(&n);
 
-    for (int8_t i = 0; i < n; ++i) {
+    for (uint8_t i = 0; i < n; ++i) {
         const allocator_t *allocator = allocators[i];
         used += allocator->used;
     }

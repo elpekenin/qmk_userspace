@@ -27,7 +27,7 @@ static log_level_t    qp_log_levels[LOG_N_LINES];
 
 static void qp_log_init(void) {
     memset(qp_log, 0, sizeof(qp_log));
-    for (int8_t i = 0; i < LOG_N_LINES; ++i) {
+    for (uint8_t i = 0; i < LOG_N_LINES; ++i) {
         qp_log_pointers[i] = qp_log[i];
         qp_log_tokens[i]   = INVALID_DEFERRED_TOKEN;
     }
@@ -35,14 +35,14 @@ static void qp_log_init(void) {
 }
 PEKE_PRE_INIT(qp_log_init, INIT_QP_LOG);
 
-static int8_t sendchar_qp_hook(uint8_t c) {
+int8_t sendchar_qp_hook(uint8_t c) {
     if (c == '\n') {
         // Add null pointer to current line
         qp_log_pointers[LOG_N_LINES - 1][qp_log_current_col] = 0;
 
         // Move everything 1 line upwards
         char *temp = qp_log_pointers[0];
-        for (int8_t i = 0; i < LOG_N_LINES - 1; ++i) {
+        for (uint8_t i = 0; i < LOG_N_LINES - 1; ++i) {
             qp_log_pointers[i] = qp_log_pointers[i + 1];
             qp_log_levels[i]   = qp_log_levels[i + 1];
         }
@@ -64,10 +64,9 @@ static int8_t sendchar_qp_hook(uint8_t c) {
 
     return 0;
 }
-PEKE_SENDCHAR(sendchar_qp_hook);
 
 void qp_log_clear(void) {
-    for (int8_t i = 0; i < LOG_N_LINES; ++i) {
+    for (uint8_t i = 0; i < LOG_N_LINES; ++i) {
         sendchar_qp_hook('\n');
     }
 }
@@ -98,7 +97,7 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
     qp_rect(args->device, args->x, args->y, qp_get_width(args->device), args->y + LOG_N_LINES * args->font->line_height, HSV_BLACK, true);
 
     uint16_t y = args->y;
-    for (int8_t i = 0; i < LOG_N_LINES; ++i) {
+    for (uint8_t i = 0; i < LOG_N_LINES; ++i) {
         int16_t textwidth = qp_textwidth(args->font, (const char *)qp_log_pointers[i]);
 
         bool text_fits = textwidth < (qp_get_width(args->device) - args->x);

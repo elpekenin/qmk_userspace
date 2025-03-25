@@ -1,7 +1,6 @@
 {
     "modules": [
         "elpekenin/crash",
-        "elpekenin/dual_rp",
         "elpekenin/indicators",
         "elpekenin/ledmap",
         "elpekenin/logging",

@@ -11,8 +11,6 @@
 
 #include <stdbool.h>
 
-#include "elpekenin/ld.h"
-
 /* Start at 1000 because alphabetical order.
  * Does not take extra resources, is the name of a linker section, not a value.
  * 1000 instead of 100 or 10 provides plenty of room to tweak order in the future.
@@ -63,17 +61,12 @@ typedef void (*init_fn)(void);
  */
 typedef void (*deinit_fn)(bool jump_to_bootloader);
 
-/**
- * Signature for a low-level function called by :c:func:`printf`.
- */
-typedef int8_t (*sendchar_func_t)(uint8_t character);
-
 // -- barrier --
 
 #define SECTION(x) __attribute__((section(x)))
 #define USED __attribute__((used))
 
-#define FULL_SECTION_NAME(name, func, prio) SECTION(STR(LD_NAME(name)) "." #prio "." #func)
+#define FULL_SECTION_NAME(name, func, prio) SECTION(STR(.elpekenin_##name) "." #prio "." #func)
 
 /**
  * Put a function in the pre-initialization section.
@@ -94,22 +87,6 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
 #define PEKE_POST_INIT(func, prio) FULL_SECTION_NAME(post_init, func, prio) USED static init_fn __##func = func
 
 /**
- * Put a function in the second core's initialization section.
- *
- * Args:
- *     func: The function to be added.
- */
-#define PEKE_CORE1_INIT(func) FULL_SECTION_NAME(core1_init, func, 0) USED static init_fn __##func = func
-
-/**
- * Put a function in the second core's mainloop section.
- *
- * Args:
- *     func: The function to be added.
- */
-#define PEKE_CORE1_LOOP(func) FULL_SECTION_NAME(core1_loop, func, 0) USED static init_fn __##func = func
-
-/**
  * Put a function in the finalizer section.
  *
  * Args:
@@ -119,14 +96,6 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
 #define PEKE_DEINIT(func, prio) FULL_SECTION_NAME(deinit, func, prio) USED static deinit_fn __##func = func
 
 /**
- * Put a function in the section that implements :c:func:`printf`'s logic.
- *
- * Args:
- *     func: The function to be added.
- */
-#define PEKE_SENDCHAR(func) FULL_SECTION_NAME(sendchar, func, 0) USED static sendchar_func_t __##func = func
-
-/**
  * Macro to iterate all elements on a linker section.
  *
  * Args:
@@ -134,6 +103,7 @@ typedef int8_t (*sendchar_func_t)(uint8_t character);
  *     name: Name of the section to be iterated.
  *     var: Name of the variable used on the ``for``
  */
-#define FOREACH_SECTION(type, name, var)      \
-    extern type LD_START(name), LD_END(name); \
-    for (type *var = &LD_START(name); var < &LD_END(name); ++var)
+#define FOREACH_SECTION(type, name, var)     \
+    extern type __elpekenin_##name##_base__; \
+    extern type __elpekenin_##name##_end__;  \
+    for (type *var = &__elpekenin_##name##_base__; var < &__elpekenin_##name##_end__; ++var)

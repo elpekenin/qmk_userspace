@@ -38,7 +38,6 @@ include $(MK_PATH)/split.mk
 include $(MK_PATH)/unicode.mk
 include $(MK_PATH)/utils.mk
 include $(MK_PATH)/xap.mk
-include $(MK_PATH)/3rd_party.mk
 include $(MK_PATH)/mcu.mk
 
 # downloaded (sometimes) using qmk_build

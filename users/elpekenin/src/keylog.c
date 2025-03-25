@@ -115,7 +115,7 @@ PEKE_PRE_INIT(replacements_init, INIT_KEYLOG_MAP);
 static void skip_prefix(const char **str) {
     char *prefixes[] = {"KC_", "RGB_", "QK_", "ES_", "TD_", "TL_"};
 
-    for (int8_t i = 0; i < ARRAY_SIZE(prefixes); ++i) {
+    for (uint8_t i = 0; i < ARRAY_SIZE(prefixes); ++i) {
         char   *prefix = prefixes[i];
         uint8_t len    = strlen(prefix);
 
@@ -200,7 +200,7 @@ static void keylog_clear(void) {
 }
 
 static void _keylog_shift_right_byte(void) {
-    for (int8_t i = KEYLOG_SIZE - 1; i > 0; --i) {
+    for (uint8_t i = KEYLOG_SIZE - 1; i > 0; --i) {
         keylog[i] = keylog[i - 1];
     }
     keylog[0] = ' ';
@@ -234,7 +234,7 @@ static void keylog_append(const char *str) {
     uint8_t len = strlen(str);
 
     keylog_shift_left(len);
-    for (int8_t i = 0; i < len; ++i) {
+    for (uint8_t i = 0; i < len; ++i) {
         keylog[KEYLOG_SIZE - len + i] = str[i];
     }
 }

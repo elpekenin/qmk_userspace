@@ -35,7 +35,7 @@ static inline void print_sipo_byte(uint8_t x) {
 static inline void print_sipo_status(void) {
     logging(SIPO, LOG_DEBUG, "MCU");
 
-    for (int i = (SIPO_BYTES - 1); i >= 0; --i) {
+    for (uint8_t i = (SIPO_BYTES - 1); i >= 0; --i) {
         print_sipo_byte(i);
     }
 

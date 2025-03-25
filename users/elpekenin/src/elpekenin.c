@@ -47,7 +47,7 @@ void keyboard_post_init_user(void) {
 
     if (depth != 0) {
         logging(UNKNOWN, LOG_WARN, "Crash (%s)", msg);
-        for (int8_t i = 0; i < depth; ++i) {
+        for (uint8_t i = 0; i < depth; ++i) {
             logging(UNKNOWN, LOG_ERROR, "%s", call_stack[i].name);
             logging(UNKNOWN, LOG_ERROR, "%p", call_stack[i].address);
         }

@@ -6,6 +6,11 @@ Custom features exposed as Community Modules
 
 Refer to `QMK's documentation <https://docs.qmk.fm/features/community_modules>`_ for details on how to use this feature
 
+arm_math_m0
+###########
+
+Replaces some C builtins for floating point numbers (eg: ``sinf``) with optimized implementations for Cortex-M0 and M0+ cores.
+
 crash
 #####
 .. c:autodoc:: modules/elpekenin/crash/elpekenin/crash.h
@@ -71,7 +76,7 @@ rng
 rp_sdk_wrappers
 ###############
 
-Replaces some C builtins (eg: ``__clzsi2``) with fine-tuned versions in the ROM of RP2040
+Replaces several C builtins (eg: ``__clzsi2``) with optimized implementations provided in the ROM of RP2040
 
 There are no hooks for user logic in this module because its only purpose is setting up such functions
 

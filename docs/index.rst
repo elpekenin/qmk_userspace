@@ -36,7 +36,6 @@ File structure
   * scripts: Python that generates code at compile time
   * painter: `Quantum Painter <https://docs.qmk.fm/quantum_painter>`_ assets
   * autocorrect: database of corrections
-  * 3rd_party: a couple of external dependencies that are used
 
 * Then, ``patches/`` and ``build.json`` will put everything together into a clone of ``qmk_firmware`` to build
 

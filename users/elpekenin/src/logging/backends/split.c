@@ -27,7 +27,7 @@ _Static_assert(sizeof(split_logging_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
 
 static new_rbuf(char, 200, slave_rbuf);
 
-static int8_t sendchar_split_hook(uint8_t c) {
+int8_t sendchar_split_hook(uint8_t c) {
     // on master, this does nothing
     if (is_keyboard_master()) {
         return 0;
@@ -41,7 +41,6 @@ static int8_t sendchar_split_hook(uint8_t c) {
 
     return 0;
 }
-PEKE_SENDCHAR(sendchar_split_hook);
 
 void user_logging_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
     split_logging_t data = {0};

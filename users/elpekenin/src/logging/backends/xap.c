@@ -5,13 +5,12 @@
 #include <tmk_core/protocol/usb_descriptor.h>
 
 #include "elpekenin/ring_buffer.h"
-#include "elpekenin/sections.h"
 
 #define MAX_PAYLOAD_SIZE (XAP_EPSIZE - sizeof(xap_broadcast_header_t)) // -1 for terminator
 
 static new_rbuf(char, 200, rbuf);
 
-static int8_t sendchar_xap_hook(uint8_t c) {
+int8_t sendchar_xap_hook(uint8_t c) {
     rbuf_push(rbuf, c);
 
     if (c == '\n' || rbuf_full(rbuf)) {
@@ -23,4 +22,3 @@ static int8_t sendchar_xap_hook(uint8_t c) {
 
     return 0;
 }
-PEKE_SENDCHAR(sendchar_xap_hook);
