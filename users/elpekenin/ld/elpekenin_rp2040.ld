@@ -134,11 +134,6 @@ SECTIONS {
        __elpekenin_post_init_base__ = .;
        KEEP(*(SORT(.elpekenin_post_init.*)));
        __elpekenin_post_init_end__ = .;
-
-       . = ALIGN(4);
-       __elpekenin_deinit_base__ = .;
-       KEEP(*(SORT(.elpekenin_deinit.*)));
-       __elpekenin_deinit_end__ = .;
    } > flash1
 }
 

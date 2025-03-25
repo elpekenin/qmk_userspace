@@ -36,30 +36,14 @@
 
 /* Set up custom split communications. */
 #define INIT_SPLIT 1050
-/* Set up QMK's trilayer feature. */
-#define INIT_TRI_LAYER 1050
-/* Enable QMK's autocorrect setup. */
-#define INIT_AUTOCORRECT 1050
 
 /* Set up games. */
 #define INIT_GAME 1060
-
-/* Warn computer we shutting down/restarting. */
-#define DEINIT_XAP 1010
-/* Clean up screens. */
-#define DEINIT_QP 1020
-/* Stop lights as a marker that we aren't running. */
-#define DEINIT_RGB 1020
 
 /**
  * Signature for an initializer function.
  */
 typedef void (*init_fn)(void);
-
-/**
- * Signature for a finalizer function.
- */
-typedef void (*deinit_fn)(bool jump_to_bootloader);
 
 // -- barrier --
 
@@ -85,15 +69,6 @@ typedef void (*deinit_fn)(bool jump_to_bootloader);
  *     prio: Its priority, lower number -> called earlier
  */
 #define PEKE_POST_INIT(func, prio) FULL_SECTION_NAME(post_init, func, prio) USED static init_fn __##func = func
-
-/**
- * Put a function in the finalizer section.
- *
- * Args:
- *     func: The function to be added.
- *     prio: Its priority, lower number -> called earlier
- */
-#define PEKE_DEINIT(func, prio) FULL_SECTION_NAME(deinit, func, prio) USED static deinit_fn __##func = func
 
 /**
  * Macro to iterate all elements on a linker section.

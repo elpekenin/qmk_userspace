@@ -110,10 +110,3 @@ static void split_init(void) {
     }
 }
 PEKE_PRE_INIT(split_init, INIT_SPLIT);
-
-// static void split_deinit(bool jump_to_bootloader) {
-//     if (is_keyboard_master_impl()) {
-//         transaction_rpc_send(RPC_ID_USER_SHUTDOWN, sizeof(jump_to_bootloader), &jump_to_bootloader);
-//     }
-// }
-// PEKE_DEINIT(split_deinit, DEINIT_SPLIT);

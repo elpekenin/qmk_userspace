@@ -3,7 +3,6 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/sections.h"
 #include "elpekenin/shortcuts.h"
 #include "elpekenin/signatures.h"
 
@@ -32,18 +31,3 @@ bool led_update_user(led_t led_state) {
 
     return false;
 }
-
-void rgb_shutdown(bool jump_to_bootloader) {
-    if (jump_to_bootloader) {
-        // off for bootloader
-        rgb_matrix_set_color_all(RGB_OFF);
-    } else {
-        // red for reboot
-        rgb_matrix_set_color_all(RGB_MATRIX_MAXIMUM_BRIGHTNESS, 0, 0);
-    }
-
-    // flush
-    void rgb_matrix_update_pwm_buffers(void);
-    rgb_matrix_update_pwm_buffers();
-}
-PEKE_DEINIT(rgb_shutdown, DEINIT_RGB);

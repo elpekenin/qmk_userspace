@@ -19,7 +19,7 @@ static sendchar_func_t hooks[] = {
     sendchar_qp_hook,
 #endif
 
-#ifdef RTT_DRIVER_ENABLE
+#ifdef SEGGER_RTT_ENABLE
     sendchar_rtt_hook,
 #endif
 
