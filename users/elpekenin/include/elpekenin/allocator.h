@@ -76,6 +76,11 @@ struct allocator_t {
 } PACKED;
 
 /**
+ * Initialize the feature.
+ */
+void alloc_pool_init(void);
+
+/**
  * .. caution::
  *   These wrappers add some extra logic as well as calling ``allocator->function(args)``.
  *

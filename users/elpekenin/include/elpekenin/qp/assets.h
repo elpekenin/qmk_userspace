@@ -5,6 +5,10 @@
 
 #include <quantum/quantum.h>
 
+void qp_assets_init(void);
+
+//
+
 void qp_set_device_by_name(const char *name, painter_device_t display);
 
 painter_device_t qp_get_device_by_name(const char *name);

@@ -7,7 +7,6 @@
 #include "elpekenin/logging/backends/rtt.h"
 #include "elpekenin/logging/backends/split.h"
 #include "elpekenin/logging/backends/xap.h"
-#include "elpekenin/sections.h"
 
 static sendchar_func_t hooks[] = {
     // default logging provided by QMK
@@ -44,11 +43,6 @@ static int8_t user_sendchar(uint8_t c) {
     return 0;
 }
 
-static void init_sendchar(void) {
-#if ENABLE_SENDCHAR == 1
+void sendchar_init(void) {
     print_set_sendchar(user_sendchar);
-#else
-    (void)user_sendchar;
-#endif
 }
-PEKE_PRE_INIT(init_sendchar, INIT_SENDCHAR);

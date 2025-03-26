@@ -2,15 +2,6 @@
 Userspace
 *********
 
-``elpekenin.c`` contains some cool (yet complex code)
-
-Namely, it invokes initializer and finalizer functions, registered by other files
-
-.. note::
-    These are stored in special linker sections. See `sections` for details
-
-    Take a look at your own risk, it is confusing
-
 elpekenin/allocator.h
 #####################
 .. c:autodoc:: users/elpekenin/include/elpekenin/allocator.h
@@ -38,10 +29,6 @@ elpekenin/memory.h
 elpekenin/ring_buffer.h
 #######################
 .. c:autodoc:: users/elpekenin/include/elpekenin/ring_buffer.h
-
-elpekenin/sections.h
-####################
-.. c:autodoc:: users/elpekenin/include/elpekenin/sections.h
 
 elpekenin/shortcuts.h
 #####################

@@ -118,9 +118,6 @@ enum userspace_keycodes {
     // Logging
     PK_LOG, // cycle overall logging level for general features (UNKNOWN)
 
-    // Games
-    PK_GAME, // start a new game
-
     PK_SIZE, // print used flash
 
     // First value that can be used on a keymap, keep last

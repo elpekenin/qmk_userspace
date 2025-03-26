@@ -36,6 +36,11 @@ typedef struct PACKED {
 } build_info_t;
 
 /**
+ * Initialize the feature.
+ */
+void build_info_init(void);
+
+/**
  * Get current binary's information.
  */
 build_info_t get_build_info(void);

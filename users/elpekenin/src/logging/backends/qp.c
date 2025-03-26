@@ -8,7 +8,6 @@
 #include "elpekenin/logging.h"
 #include "elpekenin/qp/graphics.h"
 #include "elpekenin/scrolling_text.h"
-#include "elpekenin/sections.h"
 
 #ifndef LOG_N_LINES
 #    define LOG_N_LINES 9
@@ -25,7 +24,7 @@ static deferred_token qp_log_tokens[LOG_N_LINES];
 static bool           qp_log_redraw;
 static log_level_t    qp_log_levels[LOG_N_LINES];
 
-static void qp_log_init(void) {
+void qp_log_init(void) {
     memset(qp_log, 0, sizeof(qp_log));
     for (uint8_t i = 0; i < LOG_N_LINES; ++i) {
         qp_log_pointers[i] = qp_log[i];
@@ -33,7 +32,6 @@ static void qp_log_init(void) {
     }
     qp_log_redraw = false;
 }
-PEKE_PRE_INIT(qp_log_init, INIT_QP_LOG);
 
 int8_t sendchar_qp_hook(uint8_t c) {
     if (c == '\n') {

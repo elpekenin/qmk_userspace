@@ -30,7 +30,6 @@ INTROSPECTION_KEYMAP_C = $(USER_SRC)/introspection.c
 # Include everything, checks are inside the files
 include $(MK_PATH)/codegen.mk
 include $(MK_PATH)/custom_features.mk
-include $(MK_PATH)/games.mk
 include $(MK_PATH)/logging.mk
 include $(MK_PATH)/painter.mk
 include $(MK_PATH)/rgb_matrix.mk

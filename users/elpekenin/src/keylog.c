@@ -10,7 +10,6 @@
 #include "elpekenin/allocator.h" // memory_heap_t
 #include "elpekenin/logging.h"
 #include "elpekenin/map.h"
-#include "elpekenin/sections.h"
 #include "elpekenin/shortcuts.h"
 #include "elpekenin/string.h"
 #include "generated/keycode_str.h"
@@ -56,7 +55,7 @@ static replacements_t replacements_buff[100];
 static memory_heap_t  replacements_heap;
 static allocator_t    replacements_allocator;
 
-static void replacements_init(void) {
+void keylog_init(void) {
     chHeapObjectInit(&replacements_heap, &replacements_buff, sizeof(replacements_buff));
 
     replacements_allocator = new_ch_heap_allocator(&replacements_heap, "replacements heap");

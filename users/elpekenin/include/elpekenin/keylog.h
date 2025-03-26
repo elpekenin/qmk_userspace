@@ -14,6 +14,11 @@
 #include <quantum/quantum.h>
 
 /**
+ * Initialize the feature.
+ */
+void keylog_init(void);
+
+/**
  * Hook into :c:func:`process_record_user` that performs the tracking.
  */
 void keylog_process(uint16_t keycode, keyrecord_t *record);

@@ -8,7 +8,6 @@
 #include "elpekenin/build_info.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backends/split.h"
-#include "elpekenin/sections.h"
 #include "elpekenin/signatures.h"
 
 // race condition, QMK fills the left/master fields **after** post_init funcs
@@ -83,7 +82,7 @@ void reset_ee_slave(void) {
 }
 
 void xap_execute_slave(const void* data) {
-    if (!is_keyboard_master_impl()) {
+    if (!is_keyboard_master()) {
         return;
     }
 
@@ -95,18 +94,17 @@ void xap_execute_slave(const void* data) {
 
 // *** Register messages ***
 
-static void split_init(void) {
+void transactions_init(void) {
     transaction_register_rpc(RPC_ID_BUILD_INFO, build_info_slave_callback);
     transaction_register_rpc(RPC_ID_USER_SHUTDOWN, user_shutdown_slave_callback);
     transaction_register_rpc(RPC_ID_USER_LOGGING, user_logging_slave_callback);
     transaction_register_rpc(RPC_ID_USER_EE_CLR, user_ee_clr_callback);
     transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
 
-    if (is_keyboard_master_impl()) {
+    if (is_keyboard_master()) {
         // 5 secs to prevent drawing on eInk right after flash
         // and issues if slave is not yet working (or w/eekenin))
         defer_exec(5000, build_info_sync_callback, NULL);
         defer_exec(5000, slave_log_sync_callback, NULL);
     }
 }
-PEKE_PRE_INIT(split_init, INIT_SPLIT);

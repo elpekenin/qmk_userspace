@@ -122,21 +122,6 @@ SECTIONS {
 
 INCLUDE rules_memory.ld
 
-/* My custom sections */
-SECTIONS {
-   .elpekenin_funcs : ALIGN(4) {
-       . = ALIGN(4);
-       __elpekenin_pre_init_base__ = .;
-       KEEP(*(SORT(.elpekenin_pre_init.*)));
-       __elpekenin_pre_init_end__ = .;
-
-       . = ALIGN(4);
-       __elpekenin_post_init_base__ = .;
-       KEEP(*(SORT(.elpekenin_post_init.*)));
-       __elpekenin_post_init_end__ = .;
-   } > flash1
-}
-
 SECTIONS {
    .flash_end : {
       __flash_binary_end = .;

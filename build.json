@@ -24,6 +24,11 @@
             "dst": "$QMK_HOME/modules"
         },
         {
+            "": "module path",
+            "operation": "pr",
+            "id": 25061
+        },
+        {
             "": "3color eink",
             "operation": "pr",
             "id": 20032

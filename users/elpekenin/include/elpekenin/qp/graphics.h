@@ -5,6 +5,8 @@
 
 #include <quantum/quantum.h>
 
+void qp_tasks_init(void);
+
 // *** Show build info ***
 
 void draw_commit(painter_device_t device);

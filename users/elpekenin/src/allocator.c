@@ -10,7 +10,6 @@
 #include <stdlib.h>
 
 #include "elpekenin/logging.h"
-#include "elpekenin/sections.h"
 #include "elpekenin/shortcuts.h"
 
 // *** Track heap usage ***
@@ -27,14 +26,14 @@ typedef struct PACKED {
 } alloc_info_t;
 
 // size is fixed to prevent the tracker to be dynamic (use malloc) itself
-static alloc_info_t  alloc_info_buff[100] = {0};
+#define ALLOC_BUFF_SIZE 100
+static alloc_info_t  alloc_info_buff[ALLOC_BUFF_SIZE] = {0};
 static memory_pool_t alloc_info_pool;
 
-static void alloc_pool_init(void) {
+void alloc_pool_init(void) {
     chPoolObjectInit(&alloc_info_pool, sizeof(alloc_info_t), NULL);
-    chPoolLoadArray(&alloc_info_pool, alloc_info_buff, ARRAY_SIZE(alloc_info_buff));
+    chPoolLoadArray(&alloc_info_pool, alloc_info_buff, ALLOC_BUFF_SIZE);
 }
-PEKE_PRE_INIT(alloc_pool_init, INIT_ALLOC);
 
 const allocator_t **get_known_allocators(int8_t *n) {
     *n = n_known;
@@ -56,7 +55,8 @@ size_t get_used_heap(void) {
 }
 
 static inline alloc_info_t *find_info(void *ptr) {
-    for (alloc_info_t *info = alloc_info_buff; info < &alloc_info_buff[ARRAY_SIZE(alloc_info_buff)]; ++info) {
+    for (uint8_t i = 0; i < ALLOC_BUFF_SIZE; ++i) {
+        alloc_info_t *info = &alloc_info_buff[i];
         if (info->ptr == ptr) {
             return info;
         }

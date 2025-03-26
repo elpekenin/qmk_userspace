@@ -8,15 +8,10 @@
 #include "elpekenin/keycodes.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/memory.h"
-#include "elpekenin/sections.h"
 #include "elpekenin/shortcuts.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/string.h"
 #include "generated/keycode_str.h"
-
-#if defined(GAME_ENABLE)
-#    include "elpekenin/game.h"
-#endif
 
 #if defined(KEYLOG_ENABLE)
 #    include "elpekenin/keylog.h"
@@ -174,30 +169,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 step_level_for(UNKNOWN, !l_sft);
             }
             return false;
-
-#if defined(GAME_ENABLE)
-        case W:
-            set_game_movement(TOP);
-            break;
-
-        case A:
-            set_game_movement(LEFT);
-            break;
-
-        case S:
-            set_game_movement(BOTTOM);
-            break;
-
-        case D:
-            set_game_movement(RIGHT);
-            break;
-
-        case PK_GAME:
-            if (pressed) {
-                game_reset();
-            }
-            return false;
-#endif
 
         case PK_SIZE:
             if (pressed) {

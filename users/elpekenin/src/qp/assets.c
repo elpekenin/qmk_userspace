@@ -8,7 +8,6 @@
 #include "elpekenin/dyn_array.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/map.h"
-#include "elpekenin/sections.h"
 #include "generated/qp_resources.h"
 
 static new_map(painter_device_t, device_map);
@@ -108,7 +107,7 @@ static uint8_t       qp_heap_buf[1000];
 static memory_heap_t qp_heap;
 static allocator_t   qp_allocator;
 
-static void elpekenin_qp_maps_init(void) {
+void qp_assets_init(void) {
     chHeapObjectInit(&qp_heap, &qp_heap_buf, sizeof(qp_heap_buf));
     qp_allocator = new_ch_heap_allocator(&qp_heap, "qp heap");
 
@@ -118,4 +117,3 @@ static void elpekenin_qp_maps_init(void) {
 
     load_qp_resources();
 }
-PEKE_PRE_INIT(elpekenin_qp_maps_init, INIT_QP_MAPS);

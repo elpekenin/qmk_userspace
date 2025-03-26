@@ -7,6 +7,8 @@
 
 #include "elpekenin/qp/graphics.h" // qp_callback_args_t
 
+void qp_log_init(void);
+
 int8_t sendchar_qp_hook(uint8_t c);
 
 void qp_log_clear(void);

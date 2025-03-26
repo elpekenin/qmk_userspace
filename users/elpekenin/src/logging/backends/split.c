@@ -5,7 +5,6 @@
 
 #include "elpekenin/logging.h"
 #include "elpekenin/ring_buffer.h"
-#include "elpekenin/sections.h"
 #include "elpekenin/split/transactions.h"
 #include "elpekenin/string.h"
 

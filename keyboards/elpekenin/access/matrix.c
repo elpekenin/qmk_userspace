@@ -9,7 +9,6 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/sections.h"
 #include "elpekenin/spi_custom.h"
 
 #if defined(TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND

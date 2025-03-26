@@ -14,7 +14,6 @@
 #include "elpekenin/memory.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/rng.h"
-#include "elpekenin/sections.h"
 #include "elpekenin/string.h"
 #include "elpekenin/time.h"
 
@@ -338,7 +337,7 @@ static uint32_t layer_task_callback(uint32_t trigger_time, void *cb_arg) {
     return 100;
 }
 
-static void elpekenin_qp_init(void) {
+void qp_tasks_init(void) {
     painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
     if (font == NULL) {
         logging(QP, LOG_ERROR, "Font was NULL");
@@ -375,4 +374,3 @@ static void elpekenin_qp_init(void) {
     keylog_args.font = fira_code;
 #endif
 }
-PEKE_PRE_INIT(elpekenin_qp_init, INIT_QP_TASKS_ARGS);

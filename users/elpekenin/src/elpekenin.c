@@ -2,16 +2,26 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "elpekenin/allocator.h"
+#include "elpekenin/build_info.h"
 #include "elpekenin/crash.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/sections.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/string.h"
 #include "generated/features.h"
 
+#if defined(KEYLOG_ENABLE)
+#    include "elpekenin/keylog.h"
+#endif
+
 #if defined(QUANTUM_PAINTER_ENABLE)
+#    include "elpekenin/logging/backends/qp.h"
 #    include "elpekenin/qp/assets.h"
+#    include "elpekenin/qp/graphics.h"
+#endif
+
+#if defined(SPLIT_KEYBOARD)
+#    include "elpekenin/split/transactions.h"
 #endif
 
 #if defined(XAP_ENABLE)
@@ -22,27 +32,31 @@ void housekeeping_task_user(void) {
     housekeeping_task_keymap();
 }
 
-/**
- * Iterate the ``pre_init`` linker section, executing all functions put into it (initializers).
- *
- * Then, call :c:func:`keyboard_pre_init_keymap` for ``keymap.c``-level extensions.
- */
 void keyboard_pre_init_user(void) {
-    // PEKE_PRE_INIT
-    FOREACH_SECTION(init_fn, pre_init, func) {
-        (*func)();
-    }
+    // these have to happen as soon as possible, so that code relying on them doesn't break
+    //
+    // first of all, malloc-tracking
+    // custom sendchar
+    // fill build info
+    // populate name->asset mappings for QP
+    //
+    // then, keymap-level setup
+
+    alloc_pool_init();
+
+    qp_log_init();
+
+#if ENABLE_SENDCHAR == 1
+    sendchar_init();
+#endif
+
+    build_info_init();
+
+    qp_assets_init();
 
     keyboard_pre_init_keymap();
 }
 
-/**
- * First, check if previous execution crashed, printing traceback.
- *
- * Then, call :c:func:`keyboard_post_init_keymap` for ``keymap.c``-level extensions.
- *
- * Finally, iterate the ``post_init`` linker section, executing all functions put into it (initializers).
- */
 void keyboard_post_init_user(void) {
     uint8_t      depth;
     const char  *msg;
@@ -62,23 +76,25 @@ void keyboard_post_init_user(void) {
     autocorrect_enable();
 #endif
 
+#if defined(KEYLOG_ENABLE)
+    keylog_init();
+#endif
+
+#if defined(QUANTUM_PAINTER_ENABLE)
+    qp_tasks_init();
+#endif
+
+#if defined(SPLIT_KEYBOARD)
+    transactions_init();
+#endif
+
 #if defined(TRI_LAYER_ENABLE)
     set_tri_layer_lower_layer(_FN1);
     set_tri_layer_upper_layer(_FN2);
     set_tri_layer_adjust_layer(_RST);
 #endif
-
-    // PEKE_POST_INIT
-    FOREACH_SECTION(init_fn, post_init, func) {
-        (*func)();
-    }
 }
 
-/**
- * Call :c:func:`shutdown_keymap` for ``keymap.c``-level customization
- *   If it returns ``false``, this function will exit.
- *   Otherwise, the default cleanup logic will be run.
- */
 bool shutdown_user(bool jump_to_bootloader) {
     if (!shutdown_keymap(jump_to_bootloader)) {
         return false;
