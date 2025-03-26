@@ -26,6 +26,7 @@ class Exec(BaseOperation):
         operation: Literal["exec"]
         cmd: str
         path: NotRequired[str]
+        display: NotRequired[str]
 
     def __init__(
         self,
@@ -40,10 +41,11 @@ class Exec(BaseOperation):
             self.path = Path(path)
 
         self.cmd = entry.get("cmd") or error.missing("cmd")
+        self.display = entry.get("display") or self.cmd
 
     def __str__(self) -> str:
         """Display this operation."""
-        return f"run '{self.cmd}' at {self.path}"
+        return self.display
 
     def run(self) -> int:
         """Entrypoint."""

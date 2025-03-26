@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from argparse import ArgumentParser, Namespace
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
+
+from tqdm import tqdm
 
 from elpekenin_userspace import args
 from elpekenin_userspace.build import Recipe
@@ -12,6 +14,32 @@ from elpekenin_userspace.commands import BaseCommand
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
+
+
+def display(recipe: Recipe) -> None:
+    """Show the steps in this build recipe."""
+    for operation in recipe.get_all_operations():
+        sys.stdout.write(f"{operation}\n")
+
+
+def build(recipe: Recipe) -> int:
+    """Perform the build."""
+    # consume generator so that tqdm can display progress
+    operations = list(recipe.get_all_operations())
+
+    with tqdm(
+        operations,
+        desc="Building",
+        bar_format="[{n_fmt}/{total_fmt}] {desc}{bar}",
+    ) as progress:
+        for operation in progress:
+            progress.set_description(str(operation))
+
+            ret = operation.run()
+            if ret != 0:
+                return ret
+
+    return 0
 
 
 class Build(BaseCommand):
@@ -42,7 +70,7 @@ class Build(BaseCommand):
         recipe = Recipe.from_file(arguments.file)
 
         if arguments.dry_run:
-            recipe.display()
+            display(recipe)
             return 0
 
-        return recipe.run()
+        return build(recipe)

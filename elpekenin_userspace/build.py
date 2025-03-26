@@ -3,22 +3,22 @@
 from __future__ import annotations
 
 import json
-import sys
 from typing import TYPE_CHECKING
 
-from git import Repo
 from typing_extensions import Self
 
 import elpekenin_userspace.path
-from elpekenin_userspace import constants, error, git_helpers
+from elpekenin_userspace import constants, error
 from elpekenin_userspace.operations import OPERATIONS
+from elpekenin_userspace.operations.git import Branch, Clean, Clone, Submodules
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
     from pathlib import Path
     from typing import TypedDict
 
     from elpekenin_userspace.operations import Args
-    from elpekenin_userspace.operations.base import BaseOperation
+    from elpekenin_userspace.operations.base import BaseOperation, SetupOperation
 
     class Json(TypedDict, total=False):
         """Expected contents of JSON file."""
@@ -46,76 +46,34 @@ class Recipe:
         self.path = path
         self.operations = operations
 
-    def get_operations(self) -> list[BaseOperation]:
+    def get_setup_operations(self) -> list[SetupOperation]:
+        """Configure initial state of the repository."""
+        return [
+            Clean(self) if self.path.exists() else Clone(self),
+            Branch(self),
+            Submodules(self),
+        ]
+
+    def get_all_operations(self) -> Generator[SetupOperation | BaseOperation]:
         """Get all the steps in this recipe."""
-        operations: list[BaseOperation] = []
+        yield from self.get_setup_operations()
+
         for entry in self.operations:
             name = entry.get("operation") or error.missing("operation")
             if name not in OPERATIONS:
                 error.abort(f"Unknown operation '{name}'")
 
             cls = OPERATIONS[name]
-            operation = cls(self, entry)
-            operations.append(operation)
-
-        return operations
-
-    def setup_repo(self) -> int:
-        """Configure initial state of the repository."""
-        if not self.path.exists():
-            sys.stdout.write("Cloning repo, may take a while...\n")
-            repo = Repo.clone_from(self.repo, self.path)
-        else:
-            if not self.path.is_dir():
-                sys.stderr.write(f"'{self.path}' is not a directory\n")
-                return 1
-
-            sys.stdout.write("Found existing repo\n")
-            repo = Repo(self.path)
-
-            # remove changes
-            repo.git.reset("--hard")
-
-        # get to the desired repo:branch
-        remote_name = git_helpers.fetch(repo, self.repo)
-        repo.git.checkout(f"{remote_name}/{self.branch}")
-
-        # remove leftover changes
-        repo.git.clean("-dxf")
-
-        sys.stdout.write(f"Working at '{self.branch}' ({self.repo})\n")
-
-        sys.stdout.write("Synchronizing submodules, may take a while...\n")
-        repo.git.submodule("sync", "--recursive")
-        repo.git.submodule("update", "--init", "--recursive", "--progress")
-
-        return 0
-
-    def display(self) -> None:
-        """Show the steps in this build recipe."""
-        for operation in self.get_operations():
-            sys.stdout.write(f"{operation}\n")
-
-    def run(self) -> int:
-        """Entrypoint."""
-        ret = self.setup_repo()
-        if ret != 0:
-            return ret
-
-        for operation in self.get_operations():
-            sys.stdout.write(f"Running: {operation}\n")
-
-            ret = operation.run()
-            if ret != 0:
-                return ret
-
-        return 0
+            yield cls(self, entry)
 
     @classmethod
     def from_file(cls, file: Path) -> Self:
         """Create an instance by reading a file."""
-        if not file.is_file() or file.name != "build.json":
-            error.abort("Unexpected filename")
+        if not file.is_file():
+            error.abort(f"'{file}' is not a file")
+
+        if file.name != constants.JSON:
+            error.abort(f"Build script should be named '{constants.JSON}'")
 
         data: Json = json.loads(file.read_text())
 

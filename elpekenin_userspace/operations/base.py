@@ -10,16 +10,31 @@ if TYPE_CHECKING:
     from elpekenin_userspace.operations import Args
 
 
-class BaseOperation(ABC):
-    """Represent an operation."""
+class SetupOperation(ABC):
+    """Represent a setup operation, out of user control."""
 
+    @abstractmethod
+    def __init__(
+        self,
+        recipe: Recipe,
+    ) -> None:
+        """Initialize an instance."""
+
+    @abstractmethod
+    def run(self) -> int:
+        """Logic of operation."""
+
+
+class BaseOperation(ABC):
+    """Represent an operation available over JSON."""
+
+    @abstractmethod
     def __init__(
         self,
         recipe: Recipe,
         entry: Args,
     ) -> None:
         """Initialize an instance."""
-        raise NotImplementedError
 
     @abstractmethod
     def run(self) -> int:

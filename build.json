@@ -24,11 +24,6 @@
             "dst": "$QMK_HOME/modules"
         },
         {
-            "": "module path",
-            "operation": "pr",
-            "id": 25061
-        },
-        {
             "": "3color eink",
             "operation": "pr",
             "id": 20032
@@ -70,12 +65,14 @@
         },
         {
             "operation": "exec",
-            "cmd": "qmk compile -kb elpekenin/access -km elpekenin -e TARGET=left -e MAKECMDGOALS=uf2-split-left",
+            "display": "compile left side",
+            "cmd": "qmk compile -kb elpekenin/access -km elpekenin -e TARGET=left -e MAKECMDGOALS=uf2-split-left > left.log 2>&1",
             "at": "$QMK_HOME"
         },
         {
             "operation": "exec",
-            "cmd": "qmk compile -kb elpekenin/access -km elpekenin -e TARGET=right -e MAKECMDGOALS=uf2-split-right --compiledb",
+            "display": "compile right side",
+            "cmd": "qmk compile -kb elpekenin/access -km elpekenin -e TARGET=right -e MAKECMDGOALS=uf2-split-right --compiledb > right.log 2>&1",
             "at": "$QMK_HOME"
         },
         {

@@ -40,7 +40,7 @@ class Cp(BaseOperation):
 
     def __str__(self) -> str:
         """Display this operation."""
-        return f"copy {self.src} -> {self.dst}"
+        return f"Copying '{self.src.name}'"
 
     def run(self) -> int:
         """Entrypoint."""

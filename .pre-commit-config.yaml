@@ -41,6 +41,7 @@ repos:
           gitpython,
           qmk,
           sphinx,
+          types-tqdm,
           typing_extensions,
         ]
   - repo: https://github.com/codespell-project/codespell
