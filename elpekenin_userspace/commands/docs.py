@@ -119,6 +119,9 @@ def cleanup_args(args: list[str], *, userspace: Path, qmk: Path) -> list[str]:
         f"-I{qmk}",
         *define_flags(args),
         *include_flags(args, userspace=userspace, qmk=qmk),
+        # `#include "generated/..."` would fail due to the redirection of paths here
+        # need to look for these files on build folder, they dont exist in repository
+        f"-I{qmk / 'users' / 'elpekenin'}",
     ]
 
 
