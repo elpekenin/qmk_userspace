@@ -112,9 +112,6 @@ enum userspace_keycodes {
     PK_QCLR, // clear logging (print)
     PK_KLOG, // toggle keylogger
 
-    // Unicode
-    PK_UCIS, // starts UCIS mode
-
     // Logging
     PK_LOG, // cycle overall logging level for general features (UNKNOWN)
 

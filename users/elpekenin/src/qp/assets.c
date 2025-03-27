@@ -4,116 +4,156 @@
 #include "elpekenin/qp/assets.h"
 
 #include <quantum/quantum.h>
+#include <quantum/util.h>
 
-#include "elpekenin/dyn_array.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/map.h"
 #include "generated/qp_resources.h"
 
-static new_map(painter_device_t, device_map);
-static new_map(painter_font_handle_t, font_map);
-static new_map(painter_image_handle_t, image_map);
+typedef enum {
+    EMPTY,
+    DEVICE,
+    FONT,
+    IMAGE,
+} asset_kind_t;
 
-void qp_set_device_by_name(const char *name, painter_device_t display) {
-    logging(QP, LOG_DEBUG, "'%s' at [%d]", name, array_len(device_map.values));
-    map_set(device_map, name, display);
+typedef struct PACKED {
+    asset_kind_t kind;
+    const char  *name;
+    const void  *ptr;
+} asset_t;
+
+static struct {
+    uint8_t devices;
+    uint8_t fonts;
+    uint8_t images;
+} count = {0};
+
+static asset_t assets[POOL_SIZE] = {
+    [0 ... POOL_SIZE - 1] =
+        {
+            .kind = EMPTY,
+            .name = NULL,
+            .ptr  = NULL,
+        },
+};
+
+static void set(asset_kind_t kind, const char *name, const void *ptr) {
+    const uint8_t n = count.devices + count.fonts + count.images + 1;
+    if (n >= POOL_SIZE) {
+        logging(QP, LOG_ERROR, "%s: too many assets", __func__);
+        return;
+    }
+
+    assets[n] = (asset_t){
+        .kind = kind,
+        .name = name,
+        .ptr  = ptr,
+    };
+
+    logging(QP, LOG_DEBUG, "Stored '%s' at index %d of assets pool", name, n);
+
+    switch (kind) {
+        case DEVICE:
+            count.devices += 1;
+            break;
+
+        case FONT:
+            count.fonts += 1;
+            break;
+
+        case IMAGE:
+            count.images += 1;
+            break;
+
+        default:
+            logging(QP, LOG_ERROR, "%s: unreachable?", __func__);
+            break;
+    }
 }
 
-painter_device_t qp_get_device_by_name(const char *name) {
-    int ret;
+static const void *get_by_index(asset_kind_t kind, uint8_t index) {
+    const uint8_t n = count.devices + count.fonts + count.images;
 
-    painter_device_t device = map_get(device_map, name, ret);
-    if (ret == 0) {
-        return device;
+    uint8_t counter = 0;
+    for (uint8_t i = 0; i < n; ++i) {
+        asset_t asset = assets[i];
+
+        if (asset.kind == kind) {
+            if (counter == index) {
+                return asset.ptr;
+            }
+
+            counter += 1;
+        }
     }
 
     return NULL;
 }
 
-uint8_t qp_get_num_displays(void) {
-    return array_len(device_map.values);
+static const void *get_by_name(asset_kind_t kind, const char *name) {
+    const uint8_t n = count.devices + count.fonts + count.images;
+
+    for (uint8_t i = 0; i < n; ++i) {
+        asset_t asset = assets[i];
+
+        if (asset.kind == kind && (strcmp(asset.name, name) == 0)) {
+            return asset.ptr;
+        }
+    }
+
+    return NULL;
+}
+
+//
+
+void qp_set_device_by_name(const char *name, painter_device_t device) {
+    set(DEVICE, name, device);
+}
+
+painter_device_t qp_get_device_by_name(const char *name) {
+    return get_by_name(DEVICE, name);
+}
+
+uint8_t qp_get_num_devices(void) {
+    return count.devices;
 }
 
 painter_device_t qp_get_device_by_index(uint8_t index) {
-    if (index >= qp_get_num_displays()) {
-        return NULL;
-    }
-
-    return device_map.values[index];
+    return get_by_index(DEVICE, index);
 }
 
 //
 
 void qp_set_font_by_name(const char *name, const uint8_t *font) {
-    logging(QP, LOG_DEBUG, "'%s' at [%d]", name, array_len(font_map.values));
-    map_set(font_map, name, qp_load_font_mem(font));
+    set(FONT, name, font);
 }
 
 painter_font_handle_t qp_get_font_by_name(const char *name) {
-    int ret;
-
-    painter_font_handle_t font = map_get(font_map, name, ret);
-    if (ret == 0) {
-        return font;
-    }
-
-    return NULL;
+    return get_by_name(FONT, name);
 }
 
 uint8_t qp_get_num_fonts(void) {
-    return array_len(font_map.values);
+    return count.fonts;
 }
 
 painter_font_handle_t qp_get_font_by_index(uint8_t index) {
-    if (index >= qp_get_num_fonts()) {
-        return NULL;
-    }
-
-    return font_map.values[index];
+    return get_by_index(FONT, index);
 }
 
 //
 
-void qp_set_image_by_name(const char *name, const uint8_t *img) {
-    logging(QP, LOG_DEBUG, "'%s' at [%d]", name, array_len(image_map.values));
-    map_set(image_map, name, qp_load_image_mem(img));
+void qp_set_image_by_name(const char *name, const uint8_t *image) {
+    set(IMAGE, name, image);
 }
 
 painter_image_handle_t qp_get_image_by_name(const char *name) {
-    int ret;
-
-    painter_image_handle_t img = map_get(image_map, name, ret);
-    if (ret == 0) {
-        return img;
-    }
-
-    return NULL;
+    return get_by_name(IMAGE, name);
 }
 
 uint8_t qp_get_num_images(void) {
-    return array_len(image_map.values);
+    return count.images;
 }
 
 painter_image_handle_t qp_get_image_by_index(uint8_t index) {
-    if (index >= qp_get_num_images()) {
-        return NULL;
-    }
-
-    return image_map.values[index];
-}
-
-// initialize maps
-static uint8_t       qp_heap_buf[1000];
-static memory_heap_t qp_heap;
-static allocator_t   qp_allocator;
-
-void qp_assets_init(void) {
-    chHeapObjectInit(&qp_heap, &qp_heap_buf, sizeof(qp_heap_buf));
-    qp_allocator = new_ch_heap_allocator(&qp_heap, "qp heap");
-
-    map_init(device_map, 2, &qp_allocator);
-    map_init(font_map, 2, &qp_allocator);
-    map_init(image_map, 10, &qp_allocator);
-
-    load_qp_resources();
+    return get_by_index(IMAGE, index);
 }

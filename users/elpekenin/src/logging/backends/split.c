@@ -1,12 +1,12 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <ctype.h>
 #include <quantum/quantum.h>
 
 #include "elpekenin/logging.h"
 #include "elpekenin/ring_buffer.h"
 #include "elpekenin/split/transactions.h"
-#include "elpekenin/string.h"
 
 // *** Split data ***
 
@@ -32,9 +32,7 @@ int8_t sendchar_split_hook(uint8_t c) {
         return 0;
     }
 
-    if (c >= '\n'      // terminator/non-printable chars
-        && !is_utf8(c) // only accept ASCII
-    ) {
+    if (isprint(c) || c == '\n') {
         rbuf_push(slave_rbuf, c);
     }
 

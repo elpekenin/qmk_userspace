@@ -10,17 +10,12 @@
 #include "elpekenin/logging/backends/split.h"
 #include "elpekenin/signatures.h"
 
-// race condition, QMK fills the left/master fields **after** post_init funcs
-// lets manually invoke it to make sure we get the right thing
-bool is_keyboard_master_impl(void);
-
 static inline void __split_size_err(void) {
     logging(SPLIT, LOG_ERROR, "%s size", __func__);
 }
 
-// *** Callbacks ***
-
-void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+// slave-side callbacks
+static void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
     if (m2s_size != sizeof(build_info_t)) {
         return __split_size_err();
     }
@@ -31,7 +26,7 @@ void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t
     build_info_sync_keymap_callback();
 }
 
-void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+static void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
     if (m2s_size != sizeof(bool)) {
         return __split_size_err();
     }
@@ -40,7 +35,7 @@ void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint
     shutdown_quantum(*(bool*)m2s_buffer);
 }
 
-void user_ee_clr_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+static void user_ee_clr_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
     if (m2s_size != 0) {
         return __split_size_err();
     }
@@ -48,25 +43,31 @@ void user_ee_clr_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_
     eeconfig_init();
 }
 
-extern void xap_receive_base(const void* data);
-
 void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
     if (m2s_size != XAP_EPSIZE) {
         return __split_size_err();
     }
 
+    extern void xap_receive_base(const void* data);
     xap_receive_base(m2s_buffer);
 }
 
-// *** Periodic tasks ***
+// periodic tasks
+static inline uint32_t build_info_sync_task(uint32_t trigger_time, void* cb_arg) {
+    if (!is_keyboard_master()) {
+        return 0;
+    }
 
-static inline uint32_t build_info_sync_callback(uint32_t trigger_time, void* cb_arg) {
     build_info_t build_info = get_build_info();
     transaction_rpc_send(RPC_ID_BUILD_INFO, sizeof(build_info_t), &build_info);
     return 30000;
 }
 
-static inline uint32_t slave_log_sync_callback(uint32_t trigger_time, void* cb_arg) {
+static inline uint32_t slave_log_sync_task(uint32_t trigger_time, void* cb_arg) {
+    if (!is_keyboard_master()) {
+        return 0;
+    }
+
     user_logging_master_poll();
     return 3000;
 }
@@ -74,7 +75,7 @@ static inline uint32_t slave_log_sync_callback(uint32_t trigger_time, void* cb_a
 // *** Exposed to other places ***
 
 void reset_ee_slave(void) {
-    if (!is_keyboard_master_impl()) {
+    if (!is_keyboard_master()) {
         return;
     }
 
@@ -101,10 +102,8 @@ void transactions_init(void) {
     transaction_register_rpc(RPC_ID_USER_EE_CLR, user_ee_clr_callback);
     transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
 
-    if (is_keyboard_master()) {
-        // 5 secs to prevent drawing on eInk right after flash
-        // and issues if slave is not yet working (or w/eekenin))
-        defer_exec(5000, build_info_sync_callback, NULL);
-        defer_exec(5000, slave_log_sync_callback, NULL);
-    }
+    // wait a bit to prevent drawing on eInk right after flash, also ensures that
+    // initialization has run, making sure `is_keyboard_master` returns correct value
+    defer_exec(5000, build_info_sync_task, NULL);
+    defer_exec(5000, slave_log_sync_task, NULL);
 }

@@ -14,9 +14,9 @@
             "dst": "$QMK_HOME/users/elpekenin"
         },
         {
-            "": "if submodules are not present, download",
             "operation": "exec",
-            "cmd": "ls modules/elpekenin > /dev/null || git submodule update --init --recursive"
+            "display": "download submodules in CICD",
+            "cmd": "if [ \"$IS_CICD\" = \"1\" ]; then git submodule update --init --recursive; fi"
         },
         {
             "operation": "cp",
@@ -27,18 +27,6 @@
             "": "3color eink",
             "operation": "pr",
             "id": 20032
-        },
-        {
-            "": "22538-ish",
-            "operation": "merge",
-            "repo": "https://github.com/elpekenin/qmk_firmware",
-            "branch": "feature/rtt"
-        },
-        {
-            "": "24848-ish",
-            "operation": "merge",
-            "repo": "https://github.com/elpekenin/qmk_firmware",
-            "branch": "fix/modules"
         },
         {
             "operation": "checkout",
@@ -65,25 +53,15 @@
         },
         {
             "operation": "exec",
-            "display": "compile left side",
-            "cmd": "qmk compile -kb elpekenin/access -km elpekenin -e TARGET=left -e MAKECMDGOALS=uf2-split-left > left.log 2>&1",
+            "display": "compiling left half",
+            "cmd": "qmk --no-color compile -kb elpekenin/access -km elpekenin -e TARGET=left -e MAKECMDGOALS=uf2-split-left > left.log 2>&1",
             "at": "$QMK_HOME"
         },
         {
             "operation": "exec",
-            "display": "compile right side",
-            "cmd": "qmk compile -kb elpekenin/access -km elpekenin -e TARGET=right -e MAKECMDGOALS=uf2-split-right --compiledb > right.log 2>&1",
+            "display": "compiling right half",
+            "cmd": "qmk --no-color compile -kb elpekenin/access -km elpekenin -e TARGET=right -e MAKECMDGOALS=uf2-split-right --compiledb > right.log 2>&1",
             "at": "$QMK_HOME"
-        },
-        {
-            "operation": "cp",
-            "src": "$QMK_HOME/left.uf2",
-            "dst": "/mnt/d"
-        },
-        {
-            "operation": "cp",
-            "src": "$QMK_HOME/right.uf2",
-            "dst": "/mnt/d"
         }
     ]
 }

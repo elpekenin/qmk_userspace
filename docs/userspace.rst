@@ -2,25 +2,13 @@
 Userspace
 *********
 
-elpekenin/allocator.h
-#####################
-.. c:autodoc:: users/elpekenin/include/elpekenin/allocator.h
-
 elpekenin/build_info.h
 ######################
 .. c:autodoc:: users/elpekenin/include/elpekenin/build_info.h
 
-elpekenin/dyn_array.h
-#####################
-.. c:autodoc:: users/elpekenin/include/elpekenin/dyn_array.h
-
 elpekenin/keylog.h
 ##################
 .. c:autodoc:: users/elpekenin/include/elpekenin/keylog.h
-
-elpekenin/map.h
-###############
-.. c:autodoc:: users/elpekenin/include/elpekenin/map.h
 
 elpekenin/memory.h
 ##################

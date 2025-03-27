@@ -6,14 +6,13 @@
 #include <errno.h>
 #include <quantum/quantum.h>
 
-#include "elpekenin/allocator.h"
 #include "elpekenin/build_info.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backends/qp.h"
 #include "elpekenin/memory.h"
 #include "elpekenin/qp/assets.h"
-#include "elpekenin/rng.h"
+#include "elpekenin/qp/glitch_text.h"
 #include "elpekenin/string.h"
 #include "elpekenin/time.h"
 
@@ -21,82 +20,33 @@
 #    include "elpekenin/keylog.h"
 #endif
 
-// *** Macro magic for defer_exec handling ***
-
-#define TASK(__name)                                                                                  \
-    static deferred_token     __name##_token = INVALID_DEFERRED_TOKEN;                                \
-    static qp_callback_args_t __name##_args  = {0};                                                   \
-    static uint32_t           __name##_task_callback(uint32_t trigger_time, void *cb_arg);            \
-    void                      set_##__name##_device(painter_device_t device) {                        \
-        __name##_args.device = device;                                           \
-        cancel_deferred_exec(__name##_token);                                    \
-        __name##_token = defer_exec(10, __name##_task_callback, &__name##_args); \
-    }
-
-// *** Internal variables ***
-
-TASK(logging)
-TASK(uptime)
-TASK(heap_stats)
-TASK(layer)
-#if defined(KEYLOG_ENABLE)
-TASK(keylog)
+#if defined(COMMUNITY_MODULE_ALLOCATOR_ENABLE)
+#    include "elpekenin/allocator.h"
 #endif
 
-typedef enum {
-    FILLING,
-    COPYING,
-    DONE,
-} anim_phase_t;
+#if defined(COMMUNITY_MODULE_RNG_ENABLE)
+#    include "elpekenin/rng.h"
+#endif
 
-typedef struct {
-    size_t       used;
-    bool         running;
-    uint64_t     mask;
-    anim_phase_t state;
-    char         curr[65]; // u64 mask + '\0'
-    char         dest[65]; // u64 mask + '\0'
-    void (*callback)(void *);
-} glitch_text_state_t;
-
-static glitch_text_state_t heap_stats_extra = {0};
-static glitch_text_state_t layer_extra      = {0};
-
-// *** Build info ***
-
-void draw_commit(painter_device_t device) {
-    painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
-    if (font == NULL) {
-        logging(QP, LOG_ERROR, "Font was NULL");
-        return;
-    }
-
-    painter_driver_t *driver     = (painter_driver_t *)device;
-    uint16_t          width      = driver->panel_width;
-    uint16_t          height     = driver->panel_height;
-    int16_t           hash_width = qp_textwidth(font, get_build_info().commit);
-
-    uint16_t real_width  = width;
-    uint16_t real_height = height;
-
-    if (driver->rotation == QP_ROTATION_90 || driver->rotation == QP_ROTATION_270) {
-        real_width  = height;
-        real_height = width;
-    }
-
-    uint16_t x = real_width - hash_width;
-    uint16_t y = real_height - font->line_height;
-
-    qp_drawtext_recolor(device, x, y, font, get_build_info().commit, HSV_RED, HSV_WHITE);
-}
-
-// *** Callbacks ***
+// logging task
+static deferred_token     logging_token = INVALID_DEFERRED_TOKEN;
+static qp_callback_args_t logging_args  = {0};
 
 static uint32_t logging_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
     qp_logging_backend_render(args); // no-op if nothing to draw
     return 100;
 }
+
+void set_logging_device(painter_device_t device) {
+    logging_args.device = device;
+    cancel_deferred_exec(logging_token);
+    logging_token = defer_exec(10, logging_task_callback, &logging_args);
+}
+
+// uptime task
+static deferred_token     uptime_token = INVALID_DEFERRED_TOKEN;
+static qp_callback_args_t uptime_args  = {0};
 
 static uint32_t uptime_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
@@ -122,16 +72,70 @@ static uint32_t uptime_task_callback(uint32_t trigger_time, void *cb_arg) {
     return 1000;
 }
 
-static uint16_t gen_random_pos(uint16_t max, uint64_t *mask) {
-    uint16_t pos;
-
-    do { // dont mess already-done char
-        pos = rng_min_max(0, max);
-    } while ((*mask & (1 << pos)));
-
-    *mask |= (1 << pos);
-    return pos;
+void set_uptime_device(painter_device_t device) {
+    uptime_args.device = device;
+    cancel_deferred_exec(uptime_token);
+    uptime_token = defer_exec(10, uptime_task_callback, &uptime_args);
 }
+
+// layer task
+static deferred_token      layer_token = INVALID_DEFERRED_TOKEN;
+static qp_callback_args_t  layer_args  = {0};
+static glitch_text_state_t layer_extra = {0};
+
+static void draw_layer(void *cb_arg) {
+    qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
+    glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
+
+    if (args->device == NULL || args->font == NULL) {
+        return;
+    }
+
+    // sat = 0 => white regardless of hue
+#if defined(COMMUNITY_MODULE_RNG_ENABLE)
+    uint8_t hue = rng_min_max(0, 255); // random color
+#else
+    uint8_t hue = 170; // blue
+#endif
+    uint8_t sat = state->running ? 255 : 0;
+
+    qp_drawtext_recolor(args->device, args->x, args->y, args->font, state->curr, hue, sat, 255, HSV_BLACK);
+}
+
+static uint32_t layer_task_callback(uint32_t trigger_time, void *cb_arg) {
+    qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
+    glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
+
+    static uint8_t last_layer = UINT8_MAX;
+
+    const uint8_t layer = get_highest_layer(layer_state | default_layer_state);
+
+    if (args->device == NULL || args->font == NULL || last_layer == layer || state->running) {
+        return 100;
+    }
+
+    last_layer     = layer;
+    state->running = true;
+
+    // start the animation
+    strlcpy(state->dest, get_layer_name(layer), sizeof(state->dest));
+    state->mask  = 0;
+    state->state = FILLING;
+    defer_exec(10, glitch_text_callback, args);
+
+    return 100;
+}
+
+void set_layer_device(painter_device_t device) {
+    layer_args.device = device;
+    cancel_deferred_exec(layer_token);
+    layer_token = defer_exec(10, layer_task_callback, &layer_args);
+}
+
+#if defined(COMMUNITY_MODULE_ALLOCATOR_ENABLE)
+static deferred_token      heap_stats_token = INVALID_DEFERRED_TOKEN;
+static qp_callback_args_t  heap_stats_args  = {0};
+static glitch_text_state_t heap_stats_extra = {0};
 
 static void draw_heap(void *cb_arg) {
     qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
@@ -147,119 +151,55 @@ static void draw_heap(void *cb_arg) {
     qp_drawtext(args->device, args->x + width, args->y, args->font, state->curr);
 }
 
-static uint32_t glitch_text_callback(uint32_t trigger_time, void *cb_arg) {
-    qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
-    glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
-
-    // getting here means arguments are none, executing this function is guarded by checks
-
-    // strings converged, draw and quit
-    if (state->state == DONE) {
-        state->running = false;
-
-        strlcpy(state->curr, state->dest, sizeof(state->curr));
-        // keep terminator untouched
-        memset(state->dest, ' ', ARRAY_SIZE(state->dest) - 1);
-
-        state->callback(args);
-        return 0;
-    }
-
-    // actual logic
-    size_t len = strlen(state->dest);
-
-    char chr = '\0';
-    do { // dont want a terminator mid-string
-        chr = rng_min_max('!', '~');
-    } while (chr == '\0');
-
-    // all bits that should be set are set, change state
-    uint64_t mask = (1 << (len - 1)) - 1;
-    if ((state->mask & mask) == mask) {
-        state->mask = 0;
-        switch (state->state) {
-            case FILLING:
-                state->state = COPYING;
-                break;
-
-            case COPYING:
-                state->state = DONE;
-                break;
-
-            case DONE:
-                break;
-        }
-    }
-
-    // this is an index, -1 prevents out of bounds str[len]
-    uint16_t pos = gen_random_pos(len - 1, &state->mask);
-
-    switch (state->state) {
-        case FILLING:
-            state->curr[pos] = chr;
-            break;
-
-        case COPYING:
-            state->curr[pos] = state->dest[pos];
-            break;
-
-        case DONE:
-            break;
-    }
-
-    state->callback(args);
-    return 30;
-}
-
 static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
     glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
 
-    size_t used_heap = get_used_heap();
-
-    string_t str = new_string(100);
-    int      len = 0;
-
     static size_t last_used = 0;
+    const size_t  used_heap = get_used_heap();
 
     if (args->device == NULL || args->font == NULL || last_used == used_heap || state->running) {
         return 1000;
     }
+    last_used = used_heap;
 
-    // on first run, draw flash size
-    static bool flash = false;
-    if (!flash) {
-        flash = true;
+    // on first go, draw the consumed flash
+    string_t str = new_string(100);
 
-        len = lcpy(&str, "Flash: ");
-        len += pretty_bytes(&str, get_used_flash());
-        len += lcat(&str, "/");
-        len += pretty_bytes(&str, get_flash_size());
+    int len = lcpy(&str, "Flash: ");
+    len += pretty_bytes(&str, get_used_flash());
+    len += lcat(&str, "/");
+    len += pretty_bytes(&str, get_flash_size());
+    qp_drawtext(heap_stats_args.device, heap_stats_args.x, heap_stats_args.y - heap_stats_args.font->line_height + 2, heap_stats_args.font, str.ptr - len);
 
-        qp_drawtext(args->device, args->x, args->y - args->font->line_height, args->font, str.ptr - len);
-
-        // reset buffer
-        str.ptr -= len;
-        str.len += len;
-    }
-
-    last_used      = used_heap;
-    state->running = true;
+    // reset buffer
+    str.ptr -= len;
+    str.len += len;
 
     len = pretty_bytes(&str, used_heap);
     len += lcat(&str, "/");
     len += pretty_bytes(&str, get_heap_size());
 
-    // start the animation
     strlcpy(state->dest, str.ptr - len, sizeof(state->dest));
-    state->mask  = 0;
-    state->state = FILLING;
+    state->running = true;
+    state->mask    = 0;
+    state->state   = FILLING;
     defer_exec(10, glitch_text_callback, args);
 
     return 1000;
 }
 
+void set_heap_stats_device(painter_device_t device) {
+    heap_stats_args.device = device;
+    cancel_deferred_exec(heap_stats_token);
+    heap_stats_token = defer_exec(10, heap_stats_task_callback, &heap_stats_args);
+}
+#endif
+
 #if defined(KEYLOG_ENABLE)
+static deferred_token     keylog_token = INVALID_DEFERRED_TOKEN;
+static qp_callback_args_t keylog_args  = {0};
+
 static uint32_t keylog_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
@@ -295,46 +235,40 @@ static uint32_t keylog_task_callback(uint32_t trigger_time, void *cb_arg) {
 
     return 10;
 }
+
+void set_keylog_device(painter_device_t device) {
+    keylog_args.device = device;
+    cancel_deferred_exec(keylog_token);
+    keylog_token = defer_exec(10, keylog_task_callback, &keylog_args);
+}
 #endif
 
-static void draw_layer(void *cb_arg) {
-    qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
-    glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
+// *** Build info ***
 
-    if (args->device == NULL || args->font == NULL) {
+void draw_commit(painter_device_t device) {
+    painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
+    if (font == NULL) {
+        logging(QP, LOG_ERROR, "Font was NULL");
         return;
     }
 
-    // random color
-    // sat = 0 => white regardless of hue
-    uint8_t hue = rng_min_max(0, 255);
-    uint8_t sat = state->running ? 255 : 0;
+    painter_driver_t *driver     = (painter_driver_t *)device;
+    uint16_t          width      = driver->panel_width;
+    uint16_t          height     = driver->panel_height;
+    int16_t           hash_width = qp_textwidth(font, get_build_info().commit);
 
-    qp_drawtext_recolor(args->device, args->x, args->y, args->font, state->curr, hue, sat, 255, HSV_BLACK);
-}
+    uint16_t real_width  = width;
+    uint16_t real_height = height;
 
-static uint32_t layer_task_callback(uint32_t trigger_time, void *cb_arg) {
-    qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
-    glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
-
-    static uint8_t last_layer = UINT8_MAX;
-
-    const uint8_t layer = get_highest_layer(layer_state | default_layer_state);
-
-    if (args->device == NULL || args->font == NULL || last_layer == layer || state->running) {
-        return 100;
+    if (driver->rotation == QP_ROTATION_90 || driver->rotation == QP_ROTATION_270) {
+        real_width  = height;
+        real_height = width;
     }
 
-    last_layer     = layer;
-    state->running = true;
+    uint16_t x = real_width - hash_width;
+    uint16_t y = real_height - font->line_height;
 
-    // start the animation
-    strlcpy(state->dest, get_layer_name(layer), sizeof(state->dest));
-    state->mask  = 0;
-    state->state = FILLING;
-    defer_exec(10, glitch_text_callback, args);
-
-    return 100;
+    qp_drawtext_recolor(device, x, y, font, get_build_info().commit, HSV_RED, HSV_WHITE);
 }
 
 void qp_tasks_init(void) {
@@ -346,7 +280,8 @@ void qp_tasks_init(void) {
 
     // positions are hard-coded for ILI9341 on access
 
-    size_t spacing = font->line_height + 2;
+    uint16_t y       = 55;
+    size_t   spacing = font->line_height + 2;
 
     logging_args.font                   = font;
     logging_args.x                      = 160;
@@ -356,21 +291,27 @@ void qp_tasks_init(void) {
 
     uptime_args.font = font;
     uptime_args.x    = 50;
-    uptime_args.y    = 55;
+    uptime_args.y    = y;
 
+    y += spacing;
+
+#if defined(COMMUNITY_MODULE_ALLOCATOR_ENABLE)
     heap_stats_args.font      = font;
     heap_stats_args.x         = 50;
-    heap_stats_args.y         = uptime_args.y + 2 * spacing;
+    heap_stats_args.y         = y;
     heap_stats_extra.callback = draw_heap;
     heap_stats_args.extra     = &heap_stats_extra;
 
+    y += spacing;
+#endif
+
     layer_args.font      = font;
     layer_args.x         = 70;
-    layer_args.y         = heap_stats_args.y + spacing;
+    layer_args.y         = y;
     layer_extra.callback = draw_layer;
     layer_args.extra     = &layer_extra;
 
 #if defined(KEYLOG_ENABLE)
-    keylog_args.font = fira_code;
+    keylog_args.font = font;
 #endif
 }

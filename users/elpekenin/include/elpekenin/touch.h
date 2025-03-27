@@ -18,7 +18,7 @@
 // for pin_t
 #include <platforms/chibios/gpio.h>
 #include <platforms/gpio.h>
-#include <quantum/util.h> // PACKED
+#include <quantum/util.h>
 
 /**
  * Current status of a screen.

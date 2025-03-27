@@ -27,23 +27,11 @@ typedef struct {
     size_t len;
 } string_t;
 
-typedef struct {
-    const char *ptr;
-    size_t      len;
-} string_view_t;
-
 static inline string_t new_string(size_t n) {
     char buf[n];
     return (string_t){
         .ptr = buf,
         .len = n,
-    };
-}
-
-static inline string_view_t new_string_view(char *str) {
-    return (string_view_t){
-        .ptr = str,
-        .len = strlen(str),
     };
 }
 

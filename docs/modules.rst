@@ -6,6 +6,10 @@ Custom features exposed as Community Modules
 
 Refer to `QMK's documentation <https://docs.qmk.fm/features/community_modules>`_ for details on how to use this feature
 
+allocator.h
+###########
+.. c:autodoc:: modules/elpekenin/allocator/elpekenin/allocator.h
+
 arm_math_m0
 ###########
 

@@ -11,8 +11,7 @@
         "console": true,
         "extrakey": true,
         "quantum_painter": true,
-        "rgb_matrix": true,
-        "unicode": false
+        "rgb_matrix": true
     },
     "processor": "RP2040",
     "rgb_matrix": {

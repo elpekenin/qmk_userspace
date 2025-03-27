@@ -1,17 +1,15 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "elpekenin/allocator.h"
 #include "elpekenin/build_info.h"
-#include "elpekenin/crash.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/string.h"
 #include "generated/features.h"
 
-#if defined(KEYLOG_ENABLE)
-#    include "elpekenin/keylog.h"
+#if defined(COMMUNITY_MODULE_CRASH_ENABLE)
+#    include "elpekenin/crash.h"
 #endif
 
 #if defined(QUANTUM_PAINTER_ENABLE)
@@ -34,16 +32,7 @@ void housekeeping_task_user(void) {
 
 void keyboard_pre_init_user(void) {
     // these have to happen as soon as possible, so that code relying on them doesn't break
-    //
-    // first of all, malloc-tracking
-    // custom sendchar
-    // fill build info
-    // populate name->asset mappings for QP
-    //
     // then, keymap-level setup
-
-    alloc_pool_init();
-
     qp_log_init();
 
 #if ENABLE_SENDCHAR == 1
@@ -52,12 +41,11 @@ void keyboard_pre_init_user(void) {
 
     build_info_init();
 
-    qp_assets_init();
-
     keyboard_pre_init_keymap();
 }
 
 void keyboard_post_init_user(void) {
+#if defined(COMMUNITY_MODULE_CRASH_ENABLE)
     uint8_t      depth;
     const char  *msg;
     backtrace_t *call_stack = get_crash_call_stack(&depth, &msg);
@@ -65,19 +53,13 @@ void keyboard_post_init_user(void) {
     if (depth != 0) {
         logging(UNKNOWN, LOG_WARN, "Crash (%s)", msg);
         for (uint8_t i = 0; i < depth; ++i) {
-            logging(UNKNOWN, LOG_ERROR, "%s", call_stack[i].name);
-            logging(UNKNOWN, LOG_ERROR, "%p", call_stack[i].address);
+            logging(UNKNOWN, LOG_ERROR, "%s (%p)", call_stack[i].name, call_stack[i].address);
         }
     }
-
-    keyboard_post_init_keymap();
+#endif
 
 #if defined(AUTOCORRECT_ENABLE)
     autocorrect_enable();
-#endif
-
-#if defined(KEYLOG_ENABLE)
-    keylog_init();
 #endif
 
 #if defined(QUANTUM_PAINTER_ENABLE)
@@ -93,6 +75,8 @@ void keyboard_post_init_user(void) {
     set_tri_layer_upper_layer(_FN2);
     set_tri_layer_adjust_layer(_RST);
 #endif
+
+    keyboard_post_init_keymap();
 }
 
 bool shutdown_user(bool jump_to_bootloader) {
@@ -102,7 +86,7 @@ bool shutdown_user(bool jump_to_bootloader) {
 
     // power off all screens
 #if defined(QUANTUM_PAINTER_ENABLE)
-    for (uint8_t i = 0; i < qp_get_num_displays(); ++i) {
+    for (uint8_t i = 0; i < qp_get_num_devices(); ++i) {
         painter_device_t device = qp_get_device_by_index(i);
         qp_power(device, false);
     }

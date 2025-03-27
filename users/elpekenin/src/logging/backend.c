@@ -4,7 +4,6 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/logging/backends/qp.h"
-#include "elpekenin/logging/backends/rtt.h"
 #include "elpekenin/logging/backends/split.h"
 #include "elpekenin/logging/backends/xap.h"
 
@@ -14,19 +13,15 @@ static sendchar_func_t hooks[] = {
     //    - no-op otherwise
     sendchar,
 
-#ifdef QUANTUM_PAINTER_ENABLE
+#if defined(QUANTUM_PAINTER_ENABLE)
     sendchar_qp_hook,
 #endif
 
-#ifdef SEGGER_RTT_ENABLE
-    sendchar_rtt_hook,
-#endif
-
-#ifdef SPLIT_KEYBOARD
+#if defined(SPLIT_KEYBOARD)
     sendchar_split_hook,
 #endif
 
-#ifdef XAP_ENABLE
+#if defined(XAP_ENABLE)
     sendchar_xap_hook,
 #endif
 };

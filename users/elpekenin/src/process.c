@@ -156,14 +156,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
 #endif
 
-#if defined(UCIS_ENABLE)
-        case PK_UCIS:
-            if (pressed) {
-                ucis_start();
-            }
-            return false;
-#endif
-
         case PK_LOG:
             if (pressed) {
                 step_level_for(UNKNOWN, !l_sft);

@@ -1,5 +1,8 @@
 name: Build vs latest QMK
 
+env:
+  IS_CICD: 1
+
 on:
   # every 5 days
   schedule:

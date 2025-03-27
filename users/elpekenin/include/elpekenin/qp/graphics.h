@@ -4,6 +4,7 @@
 #pragma once
 
 #include <quantum/quantum.h>
+#include <quantum/util.h>
 
 void qp_tasks_init(void);
 

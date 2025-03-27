@@ -2,8 +2,7 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#ifdef QUANTUM_PAINTER_SPI_ENABLE
-
+#if defined(QUANTUM_PAINTER_SPI_ENABLE)
 #    include "elpekenin/sipo.h"
 
 #    include "elpekenin/spi_custom.h"

@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <quantum/util.h>
+
 #include "generated/features.h"
 
 /**

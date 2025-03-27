@@ -1,10 +1,10 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-// Having this file on 'users/elpekenin/include' does not work, even though it is on path, there's probably something like:
-// >>> #include "$(USER_PATH)/config.h"
-
 #pragma once
+
+// debug
+#define ALLOCATOR_DEBUG
 
 // misc
 #define MAX_DEFERRED_EXECUTORS 32
@@ -37,7 +37,3 @@
 #define SPLIT_LAYER_STATE_ENABLE
 #define RPC_M2S_BUFFER_SIZE 80
 #define RPC_S2M_BUFFER_SIZE 80
-
-// unicode
-#define UNICODE_SELECTED_MODES UNICODE_MODE_WINCOMPOSE
-#define UCIS_MAX_CODE_POINTS 11

@@ -3,19 +3,19 @@
 
 #include QMK_KEYBOARD_H
 
-#ifdef COMMUNITY_MODULE_INDICATORS_ENABLE
+#if defined(COMMUNITY_MODULE_INDICATORS_ENABLE)
 #    include "elpekenin/indicators.h"
 #endif
 
-#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+#if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
 #    include "elpekenin/ledmap.h"
 #endif
 
-#ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
+#if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
 #    include "port/micropython_embed.h"
 #endif
 
-#ifdef COMMUNITY_MODULE_RNG_ENABLE
+#if defined(COMMUNITY_MODULE_RNG_ENABLE)
 #    include <platforms/chibios/drivers/analog.h>
 
 #    include "elpekenin/rng.h"
@@ -25,7 +25,6 @@
 #include "elpekenin/layers.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/qp/graphics.h"
-#include "elpekenin/rng.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/xap.h"
 
@@ -45,7 +44,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, LBRC,    RBRC,    XXXXXXX,
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, LCBR,    RCBR,    PK_CPYR,
         _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RM_VALU, XXXXXXX,
-        _______, _______, _______, _______,    PK_UCIS,                  _______,      _______, RM_SPDU, RM_VALD, RM_SPDD
+        _______, _______, _______, _______,    _______,                  _______,      _______, RM_SPDU, RM_VALD, RM_SPDD
     ),
 
     // UPPER
@@ -122,7 +121,7 @@ void keyboard_post_init_keymap(void) {
 #    endif
 #endif
 
-#ifdef COMMUNITY_MODULE_RNG_ENABLE
+#if defined(COMMUNITY_MODULE_RNG_ENABLE)
     rng_set_seed(analogReadPin(GP28) * analogReadPin(GP28));
 #endif
 }
@@ -134,7 +133,7 @@ void build_info_sync_keymap_callback(void) {
 #endif
 }
 
-#ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
+#if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
 // clang-format off
 static const char program[] =
 "import qmk\n"
@@ -148,7 +147,7 @@ static const char program[] =
 // clang-format on
 #endif
 
-#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+#if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
 // clang-format off
 const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
     [_QWERTY] = LAYOUT(
@@ -183,7 +182,7 @@ const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 #endif
 
-#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+#if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
 const indicator_t PROGMEM indicators[] = {
     LAYER_INDICATOR(_RST, RGB_OFF),
 
@@ -200,17 +199,21 @@ const indicator_t PROGMEM indicators[] = {
 #endif
 
 bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
-#ifdef COMMUNITY_MODULE_LEDMAP_ENABLE
+#if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
     draw_ledmap(led_min, led_max);
 #endif
 
-#ifdef COMMUNITY_MODULE_INDICATORS_ENABLE
+#if defined(COMMUNITY_MODULE_INDICATORS_ENABLE)
     draw_indicators(led_min, led_max);
 #endif
 
-#ifdef COMMUNITY_MODULE_MICROPYTHON_ENABLE
+#if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
     mp_embed_exec_str(program);
 #endif
 
     return true;
+}
+
+void housekeeping_task_keymap(void) {
+    printf("Alive\n");
 }

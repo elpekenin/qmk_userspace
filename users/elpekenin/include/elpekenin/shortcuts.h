@@ -31,14 +31,3 @@
         debug_config.enable      = false;               \
         code debug_config.enable = old_debug_state;     \
     } while (0)
-
-/**
- * Wrap :c:macro:`WITHOUT_DEBUG`, silencing ``feature``'s messages too.
- */
-#define WITHOUT_LOGGING(feature, code...)               \
-    do {                                                \
-        log_level_t old_level = get_level_for(feature); \
-        set_level_for(feature, LOG_NONE);               \
-        WITHOUT_DEBUG(code);                            \
-        set_level_for(feature, old_level);              \
-    } while (0)

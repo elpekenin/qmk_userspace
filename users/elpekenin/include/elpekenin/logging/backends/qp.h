@@ -7,6 +7,14 @@
 
 #include "elpekenin/qp/graphics.h" // qp_callback_args_t
 
+#ifndef LOG_N_LINES
+#    define LOG_N_LINES 9
+#endif
+
+#ifndef LOG_N_CHARS
+#    define LOG_N_CHARS 70
+#endif
+
 void qp_log_init(void);
 
 int8_t sendchar_qp_hook(uint8_t c);

@@ -30,7 +30,6 @@ DEFAULT_FEATURES = {
     "TOUCH_SCREEN",
     "QP_XAP",
     "QUANTUM_PAINTER",
-    "UNICODE_COMMON",
     "WPM",
     "XAP",
 }

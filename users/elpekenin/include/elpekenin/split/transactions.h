@@ -5,6 +5,7 @@
 
 #include <quantum/quantum.h>
 #include <quantum/split_common/transactions.h>
+#include <quantum/util.h>
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
 
 void transactions_init(void);

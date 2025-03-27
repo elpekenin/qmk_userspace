@@ -3,22 +3,17 @@
 
 #include "elpekenin/keylog.h"
 
+#include <ctype.h>
 #include <quantum/quantum.h>
+#include <quantum/util.h>
 #include <string.h>
 #include <tmk_core/protocol/host.h> // keyboard_led_state
 
-#include "elpekenin/allocator.h" // memory_heap_t
 #include "elpekenin/logging.h"
-#include "elpekenin/map.h"
-#include "elpekenin/shortcuts.h"
 #include "elpekenin/string.h"
 #include "generated/keycode_str.h"
 
 // *** Internal variables ***
-
-#ifndef KEYLOG_SIZE
-#    define KEYLOG_SIZE (40)
-#endif
 
 static bool keylog_dirty            = true;
 static char keylog[KEYLOG_SIZE + 1] = {
@@ -37,77 +32,65 @@ typedef enum {
 } active_mods_t;
 
 typedef struct PACKED {
+    const char *raw;
     const char *strings[__N_MODS__];
 } replacements_t;
 
-#define replacement(no_mods, shift, al_gr) \
-    (replacements_t) {                     \
-        .strings = {                       \
-            [NO_MODS] = no_mods,           \
-            [SHIFT]   = shift,             \
-            [AL_GR]   = al_gr,             \
-        },                                 \
+#define replacement(_raw, no_mods, shift, al_gr) \
+    (replacements_t) {                           \
+        .raw     = _raw,                         \
+        .strings = {                             \
+            [NO_MODS] = no_mods,                 \
+            [SHIFT]   = shift,                   \
+            [AL_GR]   = al_gr,                   \
+        },                                       \
     }
 
-static new_map(replacements_t, replacements_map);
-
-static replacements_t replacements_buff[100];
-static memory_heap_t  replacements_heap;
-static allocator_t    replacements_allocator;
-
-void keylog_init(void) {
-    chHeapObjectInit(&replacements_heap, &replacements_buff, sizeof(replacements_buff));
-
-    replacements_allocator = new_ch_heap_allocator(&replacements_heap, "replacements heap");
-
-    map_init(replacements_map, 50, &replacements_allocator);
-
-    // add replacements to the map
-    // clang-format off
-    map_set(replacements_map, "0",       replacement(NULL,  "=",  NULL));
-    map_set(replacements_map, "1",       replacement(NULL,  "!",  "|" ));
-    map_set(replacements_map, "2",       replacement(NULL,  "\"", "@" ));
-    map_set(replacements_map, "3",       replacement(NULL,  NULL, "#" )); // · breaks keylog
-    map_set(replacements_map, "4",       replacement(NULL,  "$",  "~" ));
-    map_set(replacements_map, "5",       replacement(NULL,  "%",  NULL));
-    map_set(replacements_map, "6",       replacement(NULL,  "&",  NULL));
-    map_set(replacements_map, "7",       replacement(NULL,  "/",  NULL));
-    map_set(replacements_map, "8",       replacement(NULL,  "(",  NULL));
-    map_set(replacements_map, "9",       replacement(NULL,  ")",  NULL));
-    map_set(replacements_map, "_______", replacement("__",  NULL, NULL));
-    map_set(replacements_map, "AT",      replacement("@",   NULL, NULL));
-    map_set(replacements_map, "BSLS",    replacement("\\",  NULL, NULL));
-    map_set(replacements_map, "BSPC",    replacement("⇤",   NULL, NULL));
-    map_set(replacements_map, "CAPS",    replacement("↕",   NULL, NULL));
-    map_set(replacements_map, "COMM",    replacement(",",   ";",  NULL));
-    map_set(replacements_map, "DB_TOGG", replacement("DBG", NULL, NULL));
-    map_set(replacements_map, "DOT",     replacement(".",   ":",  NULL));
-    map_set(replacements_map, "DOWN",    replacement("↓",   NULL, NULL));
-    map_set(replacements_map, "ENT",     replacement("↲",   NULL, NULL));
-    map_set(replacements_map, "GRV",     replacement("`",   "^",  NULL));
-    map_set(replacements_map, "HASH",    replacement("#",   NULL, NULL));
-    map_set(replacements_map, "LBRC",    replacement("[",   NULL, NULL));
-    map_set(replacements_map, "LCBR",    replacement("{",   NULL, NULL));
-    map_set(replacements_map, "LEFT",    replacement("←",   NULL, NULL));
-    map_set(replacements_map, "LOWR",    replacement("▼",   NULL, NULL));
-    map_set(replacements_map, "MINS",    replacement("-",   "_",  NULL));
-    map_set(replacements_map, "NTIL",    replacement("´",   NULL, NULL));
-    map_set(replacements_map, "R_SPC",   replacement(" ",   NULL, NULL));
-    map_set(replacements_map, "RBRC",    replacement("]",   NULL, NULL));
-    map_set(replacements_map, "RCBR",    replacement("}",   NULL, NULL));
-    map_set(replacements_map, "RIGHT",   replacement("→",   NULL, NULL));
-    map_set(replacements_map, "PLUS",    replacement("+",   "*",  NULL));
-    map_set(replacements_map, "PIPE",    replacement("|",   NULL, NULL));
-    map_set(replacements_map, "QUOT",    replacement("'",   "?",  NULL));
-    map_set(replacements_map, "SPC",     replacement(" ",   NULL, NULL));
-    map_set(replacements_map, "TAB",     replacement("⇥",   NULL, NULL));
-    map_set(replacements_map, "TILD",    replacement("~",   NULL, NULL));
-    map_set(replacements_map, "UP",      replacement("↑",   NULL, NULL));
-    map_set(replacements_map, "UPPR",    replacement("▲",   NULL, NULL));
-    map_set(replacements_map, "VOLU",    replacement("♪",   "♪",  NULL));
-    // clang-format on
-}
-PEKE_PRE_INIT(replacements_init, INIT_KEYLOG_MAP);
+// clang-format off
+static const replacements_t replacements[] = {
+    replacement("0",       NULL,  "=",  NULL),
+    replacement("1",       NULL,  "!",  "|" ),
+    replacement("2",       NULL,  "\"", "@" ),
+    replacement("3",       NULL,  NULL, "#" ), // · breaks keylog
+    replacement("4",       NULL,  "$",  "~" ),
+    replacement("5",       NULL,  "%",  NULL),
+    replacement("6",       NULL,  "&",  NULL),
+    replacement("7",       NULL,  "/",  NULL),
+    replacement("8",       NULL,  "(",  NULL),
+    replacement("9",       NULL,  ")",  NULL),
+    replacement("_______", "__",  NULL, NULL),
+    replacement("AT",      "@",   NULL, NULL),
+    replacement("BSLS",    "\\",  NULL, NULL),
+    replacement("BSPC",    "⇤",   NULL, NULL),
+    replacement("CAPS",    "↕",   NULL, NULL),
+    replacement("COMM",    ",",   ";",  NULL),
+    replacement("DB_TOGG", "DBG", NULL, NULL),
+    replacement("DOT",     ".",   ":",  NULL),
+    replacement("DOWN",    "↓",   NULL, NULL),
+    replacement("ENT",     "↲",   NULL, NULL),
+    replacement("GRV",     "`",   "^",  NULL),
+    replacement("HASH",    "#",   NULL, NULL),
+    replacement("LBRC",    "[",   NULL, NULL),
+    replacement("LCBR",    "{",   NULL, NULL),
+    replacement("LEFT",    "←",   NULL, NULL),
+    replacement("LOWR",    "▼",   NULL, NULL),
+    replacement("MINS",    "-",   "_",  NULL),
+    replacement("NTIL",    "´",   NULL, NULL),
+    replacement("R_SPC",   " ",   NULL, NULL),
+    replacement("RBRC",    "]",   NULL, NULL),
+    replacement("RCBR",    "}",   NULL, NULL),
+    replacement("RIGHT",   "→",   NULL, NULL),
+    replacement("PLUS",    "+",   "*",  NULL),
+    replacement("PIPE",    "|",   NULL, NULL),
+    replacement("QUOT",    "'",   "?",  NULL),
+    replacement("SPC",     " ",   NULL, NULL),
+    replacement("TAB",     "⇥",   NULL, NULL),
+    replacement("TILD",    "~",   NULL, NULL),
+    replacement("UP",      "↑",   NULL, NULL),
+    replacement("UPPR",    "▲",   NULL, NULL),
+    replacement("VOLU",    "♪",   "♪",  NULL),
+};
+// clang-format on
 
 // *** Formatting helpers ***
 
@@ -125,30 +108,37 @@ static void skip_prefix(const char **str) {
     }
 }
 
+static const replacements_t *find_replacement(const char *str) {
+    for (uint8_t i = 0; i < ARRAY_SIZE(replacements); ++i) {
+        const replacements_t *replacement = &replacements[i];
+
+        if (strcmp(replacement->raw, str) == 0) {
+            return replacement;
+        }
+    }
+
+    return NULL;
+}
+
 static void maybe_symbol(const char **str) {
-    int            ret;
-    replacements_t replacements;
-
-    // disable hash logging momentarily, as a lot of strings won't be in the replacements map
-    WITHOUT_LOGGING(MAP, replacements = map_get(replacements_map, *str, ret););
-
-    if (ret == -ENODEV) {
+    const replacements_t *replacement = find_replacement(*str);
+    if (replacement == NULL) {
         return;
     }
 
     const char *target;
     switch (get_mods()) {
         case 0:
-            target = replacements.strings[NO_MODS];
+            target = replacement->strings[NO_MODS];
             break;
 
         case MOD_BIT_LCTRL:
         case MOD_BIT_RCTRL:
-            target = replacements.strings[SHIFT];
+            target = replacement->strings[SHIFT];
             break;
 
         case MOD_BIT_RALT:
-            target = replacements.strings[AL_GR];
+            target = replacement->strings[AL_GR];
             break;
 
         default:
@@ -172,7 +162,7 @@ static void apply_casing(const char **str) {
     }
 
     // not a letter
-    if (**str < 'A' || **str > 'Z') {
+    if (!isalpha((unsigned char)**str)) {
         return;
     }
 

@@ -9,14 +9,6 @@
 #include "elpekenin/qp/graphics.h"
 #include "elpekenin/scrolling_text.h"
 
-#ifndef LOG_N_LINES
-#    define LOG_N_LINES 9
-#endif
-
-#ifndef LOG_N_CHARS
-#    define LOG_N_CHARS 70
-#endif
-
 static char           qp_log[LOG_N_LINES][LOG_N_CHARS + 1];
 static uint8_t        qp_log_current_col;
 static char          *qp_log_pointers[LOG_N_LINES];

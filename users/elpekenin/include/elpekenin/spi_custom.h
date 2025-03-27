@@ -48,7 +48,7 @@
 
 #define SPI_COUNT (ARRAY_SIZE((SPIDriver *[])SPI_DRIVERS))
 
-#if !defined(SPI_SCK_PINS)
+#ifndef SPI_SCK_PINS
 #    if defined(SPI_SCK_PIN)
 #        define SPI_SCK_PINS {SPI_SCK_PIN}
 #    else
@@ -56,7 +56,7 @@
 #    endif
 #endif
 
-#if !defined(SPI_MOSI_PINS)
+#ifndef SPI_MOSI_PINS
 #    if defined(SPI_MOSI_PIN)
 #        define SPI_MOSI_PINS {SPI_MOSI_PIN}
 #    else

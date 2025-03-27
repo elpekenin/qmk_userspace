@@ -5,7 +5,9 @@
 
 #include <quantum/quantum.h>
 
-void qp_assets_init(void);
+#ifndef POOL_SIZE
+#    define POOL_SIZE 30
+#endif
 
 //
 
@@ -13,7 +15,7 @@ void qp_set_device_by_name(const char *name, painter_device_t display);
 
 painter_device_t qp_get_device_by_name(const char *name);
 
-uint8_t qp_get_num_displays(void);
+uint8_t qp_get_num_devices(void);
 
 painter_device_t qp_get_device_by_index(uint8_t index);
 

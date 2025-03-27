@@ -18,6 +18,7 @@
 #pragma once
 
 #include <quantum/quantum.h>
+#include <quantum/util.h>
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
 
 #if defined(TOUCH_SCREEN_ENABLE)
