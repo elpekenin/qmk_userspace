@@ -81,36 +81,31 @@ def fixed_path(raw: str, *, userspace: Path, qmk: Path) -> str:
     return str(qmk / path)
 
 
-def include_flags(args: list[str], *, userspace: Path, qmk: Path) -> list[str]:
+def include_flags(args: list[str], *, userspace: Path, qmk: Path) -> Generator[str]:
     """From all args, filter the ones adding include paths or files."""
-    ret: list[str] = []
     for i, arg in enumerate(args):
         if arg.startswith("-I"):
-            ret.append(
-                "-I"
-                + fixed_path(
-                    arg.removeprefix("-I"),
-                    userspace=userspace,
-                    qmk=qmk,
-                ),
+            yield "-I" + fixed_path(
+                arg.removeprefix("-I"),
+                userspace=userspace,
+                qmk=qmk,
             )
 
         if arg in {"-isystem", "-include"}:
-            ret.append(arg)
-            ret.append(
-                fixed_path(
-                    args[i + 1],
-                    userspace=userspace,
-                    qmk=qmk,
-                ),
+            yield arg
+            yield fixed_path(
+                args[i + 1],
+                userspace=userspace,
+                qmk=qmk,
             )
 
-    return ret
 
-
-def define_flags(args: list[str]) -> list[str]:
+def define_flags(args: list[str]) -> Generator[str]:
     """From all args, filter the ones defining pre-processor macros."""
-    return [arg for arg in args if arg.startswith("-D")]
+    for arg in args:
+        # define flags, but not the GCC-specific stuff... hawkmoth uses clang
+        if arg.startswith("-D") and not arg.startswith(("-D__GNU", "-D__GCC")):
+            yield arg
 
 
 def cleanup_args(args: list[str], *, userspace: Path, qmk: Path) -> list[str]:
