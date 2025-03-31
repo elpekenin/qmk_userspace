@@ -5,8 +5,11 @@
 
 #include <quantum/quantum.h>
 
-#ifndef POOL_SIZE
-#    define POOL_SIZE 30
+/**
+ * How big the array to store different assets will be.
+ */
+#ifndef ASSET_POOL_SIZE
+#    define ASSET_POOL_SIZE 30
 #endif
 
 //

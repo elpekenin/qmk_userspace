@@ -2,7 +2,7 @@ KEYLOG_ENABLE    = no
 TAP_DANCE_ENABLE = yes
 TOUCH_SCREEN     = no
 WPM_ENABLE       = yes
-XAP_ENABLE       = yes
+XAP_ENABLE       = no
 
 # for RNG
 ANALOG_DRIVER_REQUIRED = yes

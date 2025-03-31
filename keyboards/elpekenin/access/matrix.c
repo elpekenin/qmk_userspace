@@ -21,27 +21,27 @@ void matrix_init_custom(void) {
     spi_custom_init(REGISTERS_SPI_DRIVER_ID);
 }
 
-static matrix_row_t scanned_matrix[ROWS_PER_HAND];
+static matrix_row_t last_scan[ROWS_PER_HAND];
 
-bool matrix_scan_custom(matrix_row_t *current_matrix) {
+bool matrix_scan_custom(matrix_row_t *scan) {
     if (!spi_custom_start(PISO_CS_PIN, false, REGISTERS_SPI_MODE, PISO_SPI_DIV, REGISTERS_SPI_DRIVER_ID)) {
         // could not start SPI, quit
         return false;
     }
 
     // perform scanning over SPI
-    spi_custom_receive((uint8_t *)scanned_matrix, ROWS_PER_HAND, REGISTERS_SPI_DRIVER_ID);
+    spi_custom_receive((uint8_t *)scan, ROWS_PER_HAND, REGISTERS_SPI_DRIVER_ID);
     spi_custom_stop(REGISTERS_SPI_DRIVER_ID);
 
     // IRQ pin is connected to the 1st input of the last shift register
     // invert its value so it reflects whether the screen is pressed
     if (!is_keyboard_left()) {
-        scanned_matrix[4] ^= (1 << 0); // column 0
+        scan[4] ^= (1 << 0); // column 0
     }
 
-    bool changed = memcmp(current_matrix, scanned_matrix, ROWS_PER_HAND) != 0;
+    bool changed = memcmp(scan, last_scan, ROWS_PER_HAND) != 0;
     if (changed) {
-        memcpy(current_matrix, scanned_matrix, ROWS_PER_HAND);
+        memcpy(last_scan, scan, ROWS_PER_HAND);
     }
 
     return changed;

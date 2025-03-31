@@ -38,7 +38,7 @@ void touch_spi_stop(spi_touch_comms_config_t comms_config) {
     send_sipo_state();
 }
 
-static inline int16_t read_coord(uint8_t cmd, spi_touch_comms_config_t comms_config) {
+static int16_t read_coord(uint8_t cmd, spi_touch_comms_config_t comms_config) {
     set_sipo_pin(comms_config.chip_select_pin, false);
     send_sipo_state();
 
@@ -67,7 +67,7 @@ touch_report_t get_spi_touch_report(touch_device_t device, bool check_irq) {
     }
 
     if (!touch_spi_start(comms_config)) {
-        logging(TOUCH, LOG_DEBUG, "Start comms");
+        logging(LOG_DEBUG, "Start comms");
         goto err;
     }
 

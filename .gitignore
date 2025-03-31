@@ -13,6 +13,7 @@
 
 # notes to self
 TODO.md
+*.log
 
 compile_commands.json
 

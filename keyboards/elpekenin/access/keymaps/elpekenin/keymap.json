@@ -1,14 +1,14 @@
 {
     "modules": [
         // "elpekenin/allocator",
-        // "elpekenin/crash",
-        // "elpekenin/dual_rp",
-        // "elpekenin/indicators",
-        // "elpekenin/ledmap",
+        "elpekenin/crash",
+        "elpekenin/dual_rp",
+        "elpekenin/indicators",
+        "elpekenin/ledmap",
         "elpekenin/logging",
         // "elpekenin/micropython",
-        // "elpekenin/rng",
-        // "elpekenin/rp_sdk_wrappers",
+        "elpekenin/rng",
+        "elpekenin/rp_sdk_wrappers",
         "elpekenin/scrolling_text"
     ]
 }

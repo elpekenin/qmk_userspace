@@ -3,6 +3,4 @@
 
 #pragma once
 
-#include <stdint.h>
-
-int8_t sendchar_xap(uint8_t c);
+void sendchar_init(void);

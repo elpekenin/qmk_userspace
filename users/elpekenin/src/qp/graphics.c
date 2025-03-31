@@ -4,6 +4,7 @@
 #include "elpekenin/qp/graphics.h"
 
 #include <errno.h>
+#include <quantum/color.h>
 #include <quantum/quantum.h>
 
 #include "elpekenin/build_info.h"
@@ -248,7 +249,7 @@ void set_keylog_device(painter_device_t device) {
 void draw_commit(painter_device_t device) {
     painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
     if (font == NULL) {
-        logging(QP, LOG_ERROR, "Font was NULL");
+        logging(LOG_ERROR, "%s: font == NULL", __func__);
         return;
     }
 
@@ -274,12 +275,11 @@ void draw_commit(painter_device_t device) {
 void qp_tasks_init(void) {
     painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
     if (font == NULL) {
-        logging(QP, LOG_ERROR, "Font was NULL");
+        logging(LOG_ERROR, "%s: font == NULL", __func__);
         return;
     }
 
     // positions are hard-coded for ILI9341 on access
-
     uint16_t y       = 55;
     size_t   spacing = font->line_height + 2;
 

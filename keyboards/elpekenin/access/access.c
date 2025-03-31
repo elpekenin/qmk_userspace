@@ -3,6 +3,8 @@
 
 #include QMK_KEYBOARD_H
 
+#include <quantum/color.h>
+
 #include "elpekenin/logging.h"
 
 #if defined(QUANTUM_PAINTER_ENABLE)
@@ -51,7 +53,8 @@ touch_device_t ili9341_touch = &ili9341_touch_driver;
 void keyboard_post_init_kb(void) {
     debug_config.enable = true;
 
-    __attribute__((used)) bool ret = true;
+    bool ret = true;
+    (void)ret; // compiler warns "unused" when features are disabled
 
 #if defined(QUANTUM_PAINTER_ENABLE)
     // *** SIPO ***
@@ -82,13 +85,21 @@ void keyboard_post_init_kb(void) {
     qp_rect(ili9341, 0, 0, ILI9341_WIDTH, ILI9341_HEIGHT, HSV_BLACK, true);
 #    endif
 
-    log_success(ret, QP, "QP setup");
+    if (!ret) {
+        logging(LOG_ERROR, "QP setup");
+    } else {
+        logging(LOG_INFO, "QP setup");
+    }
 #endif
 
 #if defined(QUANTUM_PAINTER_ENABLE) && defined(TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND
     ret = touch_spi_init(ili9341_touch);
 
-    log_success(ret, TOUCH, "Touch setup");
+    if (!ret) {
+        logging(LOG_ERROR, "Touch setup");
+    } else {
+        logging(LOG_INFO, "Touch setup");
+    }
 #endif
 
     // *** User ***

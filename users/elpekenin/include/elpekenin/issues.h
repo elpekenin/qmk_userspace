@@ -5,6 +5,4 @@
 
 #pragma once
 
-#define ENABLE_SENDCHAR 0
 #define ENABLE_LOGGING 0
-#define ENABLE_MALLOC_TRACKING 0

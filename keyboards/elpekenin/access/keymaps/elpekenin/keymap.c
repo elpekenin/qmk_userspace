@@ -3,6 +3,11 @@
 
 #include QMK_KEYBOARD_H
 
+#include "elpekenin/keycodes.h"
+#include "elpekenin/layers.h"
+#include "elpekenin/logging.h"
+#include "elpekenin/signatures.h"
+
 #if defined(COMMUNITY_MODULE_INDICATORS_ENABLE)
 #    include "elpekenin/indicators.h"
 #endif
@@ -21,12 +26,14 @@
 #    include "elpekenin/rng.h"
 #endif
 
-#include "elpekenin/keycodes.h"
-#include "elpekenin/layers.h"
-#include "elpekenin/qp/assets.h"
-#include "elpekenin/qp/graphics.h"
-#include "elpekenin/signatures.h"
-#include "elpekenin/xap.h"
+#if defined(QUANTUM_PAINTER_ENABLE)
+#    include "elpekenin/qp/assets.h"
+#    include "elpekenin/qp/graphics.h"
+#endif
+
+#if defined(XAP_ENABLE)
+#    include "elpekenin/xap.h"
+#endif
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -81,16 +88,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 static uint32_t read_touch_callback(uint32_t trigger_time, void *cb_arg) {
     uint32_t interval = TOUCH_MS;
 
-    // Do nothing until sensor initialised or when screen isn't pressed
+#    if defined(XAP_ENABLE)
     if (!is_ili9341_pressed()) {
         xap_screen_released(ILI9341_ID);
         return interval;
     }
+#    endif
 
     // Make a read and send it to Tauri
     touch_report_t ili9341_touch_report = get_spi_touch_report(ili9341_touch, false);
 
+#    if defined(XAP_ENABLE)
     xap_screen_pressed(ILI9341_ID, ili9341_touch_report);
+#    else
+    (void)ili9341_touch_report;
+#    endif
 
     return interval;
 }
@@ -182,7 +194,7 @@ const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 #endif
 
-#if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
+#if defined(COMMUNITY_MODULE_INDICATORS_ENABLE)
 const indicator_t PROGMEM indicators[] = {
     LAYER_INDICATOR(_RST, RGB_OFF),
 
@@ -214,6 +226,18 @@ bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
     return true;
 }
 
+const char *log_time(void) {
+    static char buff[15];
+
+    div_t secs = div(timer_read32(), 1000);
+    snprintf(buff, sizeof(buff), "%d.%ds", secs.quot, secs.rem);
+
+    return buff;
+}
+
 void housekeeping_task_keymap(void) {
-    printf("Alive\n");
+    static uint8_t cnt = 0;
+    if (++cnt == 0) {
+        logging(LOG_INFO, "Alive");
+    }
 }

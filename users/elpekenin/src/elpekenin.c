@@ -4,9 +4,11 @@
 #include "elpekenin/build_info.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
+#include "elpekenin/logging/backend.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/string.h"
 #include "generated/features.h"
+#include "generated/qp_resources.h"
 
 #if defined(COMMUNITY_MODULE_CRASH_ENABLE)
 #    include "elpekenin/crash.h"
@@ -33,11 +35,9 @@ void housekeeping_task_user(void) {
 void keyboard_pre_init_user(void) {
     // these have to happen as soon as possible, so that code relying on them doesn't break
     // then, keymap-level setup
-    qp_log_init();
-
-#if ENABLE_SENDCHAR == 1
     sendchar_init();
-#endif
+
+    set_logging_level(LOG_INFO);
 
     build_info_init();
 
@@ -51,10 +51,12 @@ void keyboard_post_init_user(void) {
     backtrace_t *call_stack = get_crash_call_stack(&depth, &msg);
 
     if (depth != 0) {
-        logging(UNKNOWN, LOG_WARN, "Crash (%s)", msg);
+        logging(LOG_WARN, "Crash (%s)", msg);
         for (uint8_t i = 0; i < depth; ++i) {
-            logging(UNKNOWN, LOG_ERROR, "%s (%p)", call_stack[i].name, call_stack[i].address);
+            logging(LOG_ERROR, "%s (%p)", call_stack[i].name, call_stack[i].address);
         }
+    } else {
+        logging(LOG_WARN, "Previous run did not crash");
     }
 #endif
 
@@ -63,6 +65,7 @@ void keyboard_post_init_user(void) {
 #endif
 
 #if defined(QUANTUM_PAINTER_ENABLE)
+    load_qp_resources();
     qp_tasks_init();
 #endif
 

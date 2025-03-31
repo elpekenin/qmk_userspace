@@ -36,7 +36,7 @@
 static bool last_td_spc = false;
 
 bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *correct) {
-    logging(UNKNOWN, LOG_WARN, "'%s' - '%s'", typo, correct);
+    logging(LOG_WARN, "'%s' - '%s'", typo, correct);
 
     // regular handle
     if (!last_td_spc) {
@@ -98,7 +98,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #if defined(RGB_MATRIX_ENABLE)
     if (IS_RGB_MATRIX_KEYCODE(keycode)) {
         if (record->event.pressed) {
-            logging(UNKNOWN, LOG_INFO, "Used %s", get_keycode_name(keycode));
+            logging(LOG_INFO, "Used %s", get_keycode_name(keycode));
         }
 
         bool ret;
@@ -158,14 +158,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         case PK_LOG:
             if (pressed) {
-                step_level_for(UNKNOWN, !l_sft);
+                step_logging_level(!l_sft);
             }
             return false;
 
         case PK_SIZE:
             if (pressed) {
                 int len = pretty_bytes(&str, get_flash_size());
-                logging(UNKNOWN, LOG_INFO, "Binary takes %s", str.ptr - len);
+                logging(LOG_INFO, "Binary takes %s", str.ptr - len);
             }
             return false;
 

@@ -81,7 +81,10 @@
     },
     "split": {
         "enabled": true,
-        "soft_serial_pin": "GP15",
+        "serial": {
+            "driver": "vendor",
+            "pin": "GP15"
+        },
         "transport": {
             "watchdog": true
         }

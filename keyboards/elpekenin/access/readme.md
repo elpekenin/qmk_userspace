@@ -1,8 +1,8 @@
 # access
 
-![access](imgur.com image replace me!)
+![access](https://imgur.com/a/BjZoB3t)
 
-*A short description of the keyboard/project*
+*One-off-keyboard I built as a learning project*
 
 * Keyboard Maintainer: [Pablo Martinez](https://github.com/elpekenin)
 * Hardware Supported: The PCBs use RP2040s

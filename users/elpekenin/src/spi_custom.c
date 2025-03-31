@@ -38,14 +38,9 @@ bool is_initialised[] = {[0 ... SPI_COUNT - 1] = false};
 
 static MUTEX_DECL(spi_mutex);
 
-static inline spi_status_t __spi_error(uint8_t n) {
-    logging(SPI, LOG_ERROR, "n==%d invalid", n);
-    return SPI_STATUS_ERROR;
-}
-
 __attribute__((weak)) void spi_custom_init(uint8_t n) {
     if (n >= SPI_COUNT) {
-        __spi_error(n);
+        logging(LOG_ERROR, "n==%d invalid", n);
         return;
     }
 
@@ -80,7 +75,7 @@ __attribute__((weak)) void spi_custom_init(uint8_t n) {
 
 bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divisor, uint8_t n) {
     if (n >= SPI_COUNT) {
-        __spi_error(n);
+        logging(LOG_ERROR, "n==%d invalid", n);
         return false;
     }
 
@@ -300,7 +295,8 @@ err:
 
 spi_status_t spi_custom_write(uint8_t data, uint8_t n) {
     if (n >= SPI_COUNT) {
-        return __spi_error(n);
+        logging(LOG_ERROR, "n==%d invalid", n);
+        return SPI_STATUS_ERROR;
     }
 
     uint8_t rxData;
@@ -311,7 +307,8 @@ spi_status_t spi_custom_write(uint8_t data, uint8_t n) {
 
 spi_status_t spi_custom_read(uint8_t n) {
     if (n >= SPI_COUNT) {
-        return __spi_error(n);
+        logging(LOG_ERROR, "n==%d invalid", n);
+        return SPI_STATUS_ERROR;
     }
 
     uint8_t data = 0;
@@ -322,7 +319,8 @@ spi_status_t spi_custom_read(uint8_t n) {
 
 spi_status_t spi_custom_transmit(const uint8_t *data, uint16_t length, uint8_t n) {
     if (n >= SPI_COUNT) {
-        return __spi_error(n);
+        logging(LOG_ERROR, "n==%d invalid", n);
+        return SPI_STATUS_ERROR;
     }
 
     spiSend(drivers[n], length, data);
@@ -331,7 +329,8 @@ spi_status_t spi_custom_transmit(const uint8_t *data, uint16_t length, uint8_t n
 
 spi_status_t spi_custom_receive(uint8_t *data, uint16_t length, uint8_t n) {
     if (n >= SPI_COUNT) {
-        return __spi_error(n);
+        logging(LOG_ERROR, "n==%d invalid", n);
+        return SPI_STATUS_ERROR;
     }
 
     spiReceive(drivers[n], length, data);
@@ -340,7 +339,7 @@ spi_status_t spi_custom_receive(uint8_t *data, uint16_t length, uint8_t n) {
 
 void spi_custom_stop(uint8_t n) {
     if (n >= SPI_COUNT) {
-        __spi_error(n);
+        logging(LOG_ERROR, "n==%d invalid", n);
         return;
     }
 

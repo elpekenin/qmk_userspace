@@ -1,7 +1,8 @@
 CUSTOM_MATRIX = lite
 SRC += matrix.c
 
-SERIAL_DRIVER = vendor
+# debug over UART
+UART_DRIVER_REQUIRED = yes
 
 # Custom features
 SIPO_PINS = yes

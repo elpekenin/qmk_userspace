@@ -3,6 +3,7 @@
 
 #include "elpekenin/logging/backends/qp.h"
 
+#include <quantum/color.h>
 #include <quantum/quantum.h>
 
 #include "elpekenin/logging.h"
@@ -16,7 +17,7 @@ static deferred_token qp_log_tokens[LOG_N_LINES];
 static bool           qp_log_redraw;
 static log_level_t    qp_log_levels[LOG_N_LINES];
 
-void qp_log_init(void) {
+void sendchar_qp_init(void) {
     memset(qp_log, 0, sizeof(qp_log));
     for (uint8_t i = 0; i < LOG_N_LINES; ++i) {
         qp_log_pointers[i] = qp_log[i];
@@ -25,7 +26,7 @@ void qp_log_init(void) {
     qp_log_redraw = false;
 }
 
-int8_t sendchar_qp_hook(uint8_t c) {
+int8_t sendchar_qp(uint8_t c) {
     if (c == '\n') {
         // Add null pointer to current line
         qp_log_pointers[LOG_N_LINES - 1][qp_log_current_col] = 0;
@@ -48,7 +49,7 @@ int8_t sendchar_qp_hook(uint8_t c) {
     } else {
         qp_log_pointers[LOG_N_LINES - 1][qp_log_current_col++] = c;
         qp_log_pointers[LOG_N_LINES - 1][qp_log_current_col]   = '\0';
-        qp_log_levels[LOG_N_LINES - 1]                         = get_message_level();
+        qp_log_levels[LOG_N_LINES - 1]                         = get_current_message_level();
         qp_log_redraw                                          = true;
     }
 
@@ -57,7 +58,7 @@ int8_t sendchar_qp_hook(uint8_t c) {
 
 void qp_log_clear(void) {
     for (uint8_t i = 0; i < LOG_N_LINES; ++i) {
-        sendchar_qp_hook('\n');
+        sendchar_qp('\n');
     }
 }
 

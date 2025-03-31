@@ -27,6 +27,7 @@ typedef struct {
     size_t len;
 } string_t;
 
+// must be inline, for the stack-allocated buffer *not* to be a dangling pointer
 static inline string_t new_string(size_t n) {
     char buf[n];
     return (string_t){

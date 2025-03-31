@@ -15,9 +15,9 @@
 #    define LOG_N_CHARS 70
 #endif
 
-void qp_log_init(void);
+void sendchar_qp_init(void);
 
-int8_t sendchar_qp_hook(uint8_t c);
+int8_t sendchar_qp(uint8_t c);
 
 void qp_log_clear(void);
 void qp_logging_backend_render(qp_callback_args_t *args);

@@ -26,7 +26,7 @@ _Static_assert(sizeof(split_logging_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
 
 static new_rbuf(char, 200, slave_rbuf);
 
-int8_t sendchar_split_hook(uint8_t c) {
+int8_t sendchar_split(uint8_t c) {
     // on master, this does nothing
     if (is_keyboard_master()) {
         return 0;
@@ -85,7 +85,7 @@ void user_logging_master_poll(void) {
 
         // keep retrying until we get to write it
         while (true) {
-            if (logging(UNKNOWN, LOG_DEBUG, "*****\n%s*****\n", buff) == 0) {
+            if (logging(LOG_DEBUG, "*****\n%s*****\n", buff) == 0) {
                 break;
             }
         }

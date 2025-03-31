@@ -3,9 +3,6 @@
 
 #pragma once
 
-// debug
-#define ALLOCATOR_DEBUG
-
 // misc
 #define MAX_DEFERRED_EXECUTORS 32
 #define LAYER_STATE_8BIT
@@ -14,7 +11,7 @@
 // logging
 #undef PRINTF_SUPPORT_DECIMAL_SPECIFIERS
 #define PRINTF_SUPPORT_DECIMAL_SPECIFIERS 1
-#define LOGGING_FORMAT "%M\n"
+#define LOGGING_FORMAT "[%T] (%LS): %M\n"
 
 // QP
 #define QUANTUM_PAINTER_DISPLAY_TIMEOUT 0

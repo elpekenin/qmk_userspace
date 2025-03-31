@@ -19,13 +19,11 @@
 #define MATRIX_COLS 8
 #define ROWS_PER_HAND (MATRIX_ROWS / 2)
 
-// *** Debugging ***
-
+// Debugging
 // #define DEBUG_MATRIX_SCAN_RATE
 // #define QUANTUM_PAINTER_DEBUG
 
-// *** SPI config ***
-
+// SPI
 #define SCREENS_SPI_DRIVER SPID1
 #define SCREENS_SCK_PIN GP10
 #define SCREENS_MOSI_PIN GP11
@@ -57,18 +55,20 @@
 #define SPI_MOSI_PINS {SCREENS_MOSI_PIN, REGISTERS_MOSI_PIN}
 #define SPI_MISO_PINS {SCREENS_MISO_PIN, REGISTERS_MISO_PIN}
 
-// *** Displays ***
-
+// Displays
 #define IL91874_ROTATION 1
 #define ILI9163_ROTATION 0
 #define ILI9341_ROTATION 3
-
 // QP settings
 #define SURFACE_NUM_DEVICES 2
 #define QUANTUM_PAINTER_NUM_DISPLAYS 4
 #define QUANTUM_PAINTER_PIXDATA_BUFFER_SIZE 24000
 
-// *** Split ***
-
+// Split
 #define EE_HANDS
 #define USB_VBUS_PIN GP24
+
+// UART
+#define UART_DRIVER SIOD1
+#define UART_RX_PIN GP21
+#define UART_TX_PIN GP20

@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-int8_t sendchar_split_hook(uint8_t c);
+int8_t sendchar_split(uint8_t c);
 
 void user_logging_master_poll(void);
 

@@ -10,7 +10,7 @@
 
 static new_rbuf(char, 200, rbuf);
 
-int8_t sendchar_xap_hook(uint8_t c) {
+int8_t sendchar_xap(uint8_t c) {
     rbuf_push(rbuf, c);
 
     if (c == '\n' || rbuf_full(rbuf)) {

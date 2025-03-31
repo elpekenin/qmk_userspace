@@ -3,43 +3,27 @@
 
 #include "elpekenin/sipo.h"
 
-#include "elpekenin/logging.h"
-#include "elpekenin/shortcuts.h"
 #include "elpekenin/spi_custom.h"
+
+#ifdef SIPO_DEBUG
+#    define sipo_dprintf dprintf
+#else
+#    define sipo_dprintf(...)
+#endif
 
 #define SIPO_BYTES ((N_SIPO_PINS + 7) / 8)
 
 static uint8_t sipo_pin_state[SIPO_BYTES] = {0};
 static bool    sipo_state_changed         = true;
 
-static inline void print_sipo_byte(uint8_t x) {
-    uint8_t byte = sipo_pin_state[x];
+static void print_sipo_status(void) {
+    sipo_dprintf("MCU |");
 
-    // clang-format off
-    logging(
-        SIPO,
-        LOG_DEBUG,
-        "%d%d%d%d%d%d%d%d",
-        GET_BIT(byte, 0),
-        GET_BIT(byte, 1),
-        GET_BIT(byte, 2),
-        GET_BIT(byte, 3),
-        GET_BIT(byte, 4),
-        GET_BIT(byte, 5),
-        GET_BIT(byte, 6),
-        GET_BIT(byte, 7)
-    );
-    // clang-format on
-}
-
-static inline void print_sipo_status(void) {
-    logging(SIPO, LOG_DEBUG, "MCU");
-
-    for (uint8_t i = (SIPO_BYTES - 1); i >= 0; --i) {
-        print_sipo_byte(i);
+    for (uint8_t i = 0; i < SIPO_BYTES; ++i) {
+        sipo_dprintf("%b ", sipo_pin_state[SIPO_BYTES - i - 1]);
     }
 
-    logging(SIPO, LOG_DEBUG, "END");
+    sipo_dprintf("| END\n");
 }
 
 void set_sipo_pin(uint8_t position, bool state) {
@@ -50,7 +34,7 @@ void set_sipo_pin(uint8_t position, bool state) {
     // Check if pin already had that state
     uint8_t curr_value = (sipo_pin_state[byte_offset] >> bit_offset) & 1;
     if (curr_value == state) {
-        logging(SIPO, LOG_DEBUG, "%s: no changes", __func__);
+        sipo_dprintf("[INFO] %s: no changes\n", __func__);
         return;
     }
 
@@ -65,7 +49,7 @@ void set_sipo_pin(uint8_t position, bool state) {
 
 void send_sipo_state(void) {
     if (!sipo_state_changed) {
-        logging(SIPO, LOG_DEBUG, "%s: no changes", __func__);
+        sipo_dprintf("[INFO] %s: no changes\n", __func__);
         return;
     }
 
@@ -74,7 +58,7 @@ void send_sipo_state(void) {
     spi_custom_init(REGISTERS_SPI_DRIVER_ID);
 
     if (!spi_custom_start(SIPO_CS_PIN, false, REGISTERS_SPI_MODE, REGISTERS_SPI_DIV, REGISTERS_SPI_DRIVER_ID)) {
-        logging(SIPO, LOG_ERROR, "%s (init SPI)", __func__);
+        sipo_dprintf("[ERROR] %s: (init SPI)", __func__);
         return;
     }
 

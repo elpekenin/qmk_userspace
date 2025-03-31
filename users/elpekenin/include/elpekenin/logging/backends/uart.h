@@ -5,4 +5,6 @@
 
 #include <stdint.h>
 
-int8_t sendchar_xap(uint8_t c);
+void sendchar_uart_init(void);
+
+int8_t sendchar_uart(uint8_t c);

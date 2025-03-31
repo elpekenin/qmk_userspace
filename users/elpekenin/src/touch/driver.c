@@ -1,7 +1,7 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <platforms/chibios/drivers/spi_master.h>
+#include <drivers/spi_master.h>
 #include <platforms/wait.h>
 
 #include "elpekenin/logging.h"
@@ -33,7 +33,7 @@ WEAK void touch_spi_stop(spi_touch_comms_config_t comms_config) {
     gpio_write_pin_high(comms_config.chip_select_pin);
 }
 
-static inline void read_data(int16_t *x, int16_t *y, spi_touch_comms_config_t comms_config) {
+static void read_data(int16_t *x, int16_t *y, spi_touch_comms_config_t comms_config) {
     spi_write(comms_config.x_cmd);
     *x = ((spi_write(0) << 8) | spi_write(0)) >> 3;
 
@@ -42,21 +42,21 @@ static inline void read_data(int16_t *x, int16_t *y, spi_touch_comms_config_t co
 }
 
 void report_from(int16_t x, int16_t y, touch_driver_t *driver, touch_report_t *report) {
-    logging(TOUCH, LOG_DEBUG, "SPI reading (%d, %d)", x, y);
+    logging(LOG_DEBUG, "SPI reading (%d, %d)", x, y);
 
     // Map to correct range
     x = x * driver->scale_x + driver->offset_x;
     y = y * driver->scale_y + driver->offset_y;
-    logging(TOUCH, LOG_DEBUG, "Scaled: (%d, %d)", x, y);
+    logging(LOG_DEBUG, "Scaled: (%d, %d)", x, y);
 
     // Handle edge cases
     x = MIN(MAX(x, 0), driver->width);
     y = MIN(MAX(y, 0), driver->height);
-    logging(TOUCH, LOG_DEBUG, "Edge: (%d, %d)", x, y);
+    logging(LOG_DEBUG, "Edge: (%d, %d)", x, y);
 
     // Apply updside-down adjustment
     if (driver->upside_down) {
-        logging(TOUCH, LOG_DEBUG, "Upside: (%d, %d)", x, y);
+        logging(LOG_DEBUG, "Upside: (%d, %d)", x, y);
 
         report->x = driver->width - x;
     }
@@ -87,7 +87,7 @@ void report_from(int16_t x, int16_t y, touch_driver_t *driver, touch_report_t *r
             break;
     }
 
-    logging(TOUCH, LOG_DEBUG, "Final: (%d, %d)", report->x, report->y);
+    logging(LOG_DEBUG, "Final: (%d, %d)", report->x, report->y);
 }
 
 WEAK touch_report_t get_spi_touch_report(touch_device_t device, bool check_irq) {
@@ -108,7 +108,7 @@ WEAK touch_report_t get_spi_touch_report(touch_device_t device, bool check_irq) 
     }
 
     if (!touch_spi_start(comms_config)) {
-        logging(TOUCH, LOG_DEBUG, "Couldn't start touch comms");
+        logging(LOG_DEBUG, "Couldn't start touch comms");
     }
 
     report.pressed = true;

@@ -16,6 +16,13 @@ typedef enum {
     IMAGE,
 } asset_kind_t;
 
+const char *asset_names[] = {
+    [EMPTY]  = "empty",
+    [DEVICE] = "device",
+    [FONT]   = "font",
+    [IMAGE]  = "image",
+};
+
 typedef struct PACKED {
     asset_kind_t kind;
     const char  *name;
@@ -28,8 +35,8 @@ static struct {
     uint8_t images;
 } count = {0};
 
-static asset_t assets[POOL_SIZE] = {
-    [0 ... POOL_SIZE - 1] =
+static asset_t assets[ASSET_POOL_SIZE] = {
+    [0 ... ASSET_POOL_SIZE - 1] =
         {
             .kind = EMPTY,
             .name = NULL,
@@ -38,9 +45,9 @@ static asset_t assets[POOL_SIZE] = {
 };
 
 static void set(asset_kind_t kind, const char *name, const void *ptr) {
-    const uint8_t n = count.devices + count.fonts + count.images + 1;
-    if (n >= POOL_SIZE) {
-        logging(QP, LOG_ERROR, "%s: too many assets", __func__);
+    const uint8_t n = count.devices + count.fonts + count.images;
+    if (n >= ASSET_POOL_SIZE) {
+        logging(LOG_ERROR, "%s: too many assets", __func__);
         return;
     }
 
@@ -50,7 +57,8 @@ static void set(asset_kind_t kind, const char *name, const void *ptr) {
         .ptr  = ptr,
     };
 
-    logging(QP, LOG_DEBUG, "Stored '%s' at index %d of assets pool", name, n);
+    const char *asset_name = asset_names[kind];
+    logging(LOG_DEBUG, "Stored %s '%s'(%p) at index %d of assets pool", asset_name, name, ptr, n);
 
     switch (kind) {
         case DEVICE:
@@ -66,11 +74,12 @@ static void set(asset_kind_t kind, const char *name, const void *ptr) {
             break;
 
         default:
-            logging(QP, LOG_ERROR, "%s: unreachable?", __func__);
+            logging(LOG_ERROR, "%s: unreachable?", __func__);
             break;
     }
 }
 
+// (FONT, 3) is not 3rd element in pool, but the third *font* in pool
 static const void *get_by_index(asset_kind_t kind, uint8_t index) {
     const uint8_t n = count.devices + count.fonts + count.images;
 
@@ -80,6 +89,9 @@ static const void *get_by_index(asset_kind_t kind, uint8_t index) {
 
         if (asset.kind == kind) {
             if (counter == index) {
+                const char *asset_name = asset_names[kind];
+                logging(LOG_DEBUG, "Read %s with index %d: (%p)", asset_name, n, asset.ptr);
+
                 return asset.ptr;
             }
 
@@ -96,7 +108,10 @@ static const void *get_by_name(asset_kind_t kind, const char *name) {
     for (uint8_t i = 0; i < n; ++i) {
         asset_t asset = assets[i];
 
-        if (asset.kind == kind && (strcmp(asset.name, name) == 0)) {
+        if (asset.kind == kind && asset.name != NULL && strcmp(asset.name, name) == 0) {
+            const char *asset_name = asset_names[kind];
+            logging(LOG_DEBUG, "Read %s '%s': %p", asset_name, name, asset.ptr);
+
             return asset.ptr;
         }
     }
