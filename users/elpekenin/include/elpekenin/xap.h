@@ -21,7 +21,7 @@
 #include <quantum/util.h>
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
 
-#if defined(TOUCH_SCREEN_ENABLE)
+#if defined(TOUCH_SCREEN_ENABLE) || defined(__SPHINX__)
 #    include "elpekenin/touch.h"
 #endif
 
@@ -46,7 +46,7 @@ typedef uint8_t xap_msg_id_t;
 
 // *** Messages ***
 
-#if defined(TOUCH_SCREEN_ENABLE)
+#if defined(TOUCH_SCREEN_ENABLE) || defined(__SPHINX__)
 /**
  * Inform about a screen press event.
  */

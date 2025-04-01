@@ -2,30 +2,30 @@
 Userspace
 *********
 
-elpekenin/build_info.h
-######################
+build_info
+##########
 .. c:autodoc:: users/elpekenin/include/elpekenin/build_info.h
 
-elpekenin/keylog.h
-##################
+keylog
+######
 .. c:autodoc:: users/elpekenin/include/elpekenin/keylog.h
 
-elpekenin/ring_buffer.h
-#######################
+ring_buffer
+###########
 .. c:autodoc:: users/elpekenin/include/elpekenin/ring_buffer.h
 
-elpekenin/sipo.h
-################
+sipo
+####
 .. c:autodoc:: users/elpekenin/include/elpekenin/sipo.h
 
-elpekenin/spi_custom.h
-######################
+spi_custom
+##########
 .. c:autodoc:: users/elpekenin/include/elpekenin/spi_custom.h
 
-elpekenin/touch.h
-#################
+touch
+#####
 .. c:autodoc:: users/elpekenin/include/elpekenin/touch.h
 
-elpekenin/xap.h
-###############
+xap
+###
 .. c:autodoc:: users/elpekenin/include/elpekenin/xap.h

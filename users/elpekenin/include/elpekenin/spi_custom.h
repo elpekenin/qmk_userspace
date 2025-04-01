@@ -99,19 +99,11 @@
 /** */
 typedef enum {
     /** */
-    SPI_STATUS_SUCCESS =
-#define SPI_STATUS_SUCCESS (0)
-        SPI_STATUS_SUCCESS,
-
+    SPI_STATUS_SUCCESS = 0,
     /** */
-    SPI_STATUS_ERROR =
-#define SPI_STATUS_ERROR (-1)
-        SPI_STATUS_ERROR,
-
+    SPI_STATUS_ERROR = -1,
     /** */
-    SPI_STATUS_TIMEOUT =
-#define SPI_STATUS_TIMEOUT (-2)
-        SPI_STATUS_TIMEOUT,
+    SPI_STATUS_TIMEOUT = -2,
 } spi_status_t;
 
 #define SPI_TIMEOUT_IMMEDIATE (0)

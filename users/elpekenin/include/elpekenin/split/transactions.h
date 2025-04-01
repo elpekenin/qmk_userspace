@@ -13,7 +13,7 @@ void transactions_init(void);
 void reset_ee_slave(void);
 void build_info_sync_keymap_callback(void);
 
-#if defined(XAP_ENABLE)
+#if defined(XAP_ENABLE) || defined(__SPHINX__)
 void xap_execute_slave(const void *data);
 
 typedef struct PACKED {

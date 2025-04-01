@@ -144,6 +144,7 @@ def cleanup_args(args: list[str], *, userspace: Path, qmk: Path) -> list[str]:
         # `#include "generated/..."` would fail due to the redirection of paths here
         # need to look for these files on build folder, they dont exist in repository
         f"-I{qmk / 'users' / 'elpekenin'}",
+        "-D__SPHINX__",  # to process code that is usually gated away by #if
     ]
 
 

@@ -20,7 +20,7 @@ void set_uptime_device(painter_device_t device);
 void set_heap_stats_device(painter_device_t device);
 void set_layer_device(painter_device_t device);
 
-#if defined(KEYLOG_ENABLE)
+#if defined(KEYLOG_ENABLE) || defined(__SPHINX__)
 void set_keylog_device(painter_device_t device);
 #endif
 
