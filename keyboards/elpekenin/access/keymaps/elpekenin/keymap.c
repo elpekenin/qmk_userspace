@@ -24,6 +24,8 @@
 #    include <platforms/chibios/drivers/analog.h>
 
 #    include "elpekenin/rng.h"
+#else
+#    error "This code depends on 'elpekenin/rng' to work"
 #endif
 
 #if defined(QUANTUM_PAINTER_ENABLE)

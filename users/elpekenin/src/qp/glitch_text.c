@@ -7,17 +7,15 @@
 
 #if defined(COMMUNITY_MODULE_RNG_ENABLE)
 #    include "elpekenin/rng.h"
+#else
+#    error "This code depends on 'elpekenin/rng' to work"
 #endif
 
 static uint16_t gen_random_pos(uint16_t max, uint64_t *mask) {
     uint16_t pos = 0;
 
     do { // dont mess already-done char
-#if defined(COMMUNITY_MODULE_RNG_ENABLE)
         pos = rng_min_max(0, max);
-#else
-        pos += 1;
-#endif
     } while ((*mask & (1 << pos)));
 
     *mask |= (1 << pos);
@@ -47,11 +45,7 @@ uint32_t glitch_text_callback(uint32_t trigger_time, void *cb_arg) {
 
     char chr = '\0';
     do { // dont want a terminator mid-string
-#if defined(COMMUNITY_MODULE_RNG_ENABLE)
         chr = rng_min_max('!', '~');
-#else
-        chr = '!';
-#endif
     } while (chr == '\0');
 
     // all bits that should be set are set, change state

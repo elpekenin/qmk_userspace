@@ -10,17 +10,9 @@ elpekenin/keylog.h
 ##################
 .. c:autodoc:: users/elpekenin/include/elpekenin/keylog.h
 
-elpekenin/memory.h
-##################
-.. c:autodoc:: users/elpekenin/include/elpekenin/memory.h
-
 elpekenin/ring_buffer.h
 #######################
 .. c:autodoc:: users/elpekenin/include/elpekenin/ring_buffer.h
-
-elpekenin/shortcuts.h
-#####################
-.. c:autodoc:: users/elpekenin/include/elpekenin/shortcuts.h
 
 elpekenin/sipo.h
 ################

@@ -8,7 +8,6 @@
 #include "elpekenin/keycodes.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/memory.h"
-#include "elpekenin/shortcuts.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/string.h"
 #include "generated/keycode_str.h"
@@ -82,7 +81,7 @@ bool keylog_enabled = true;
 #endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    string_t str = new_string(15);
+    string_t str = str_new(15);
 
 #if defined(KEYLOG_ENABLE)
     if (keylog_enabled) {
@@ -101,8 +100,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             logging(LOG_INFO, "Used %s", get_keycode_name(keycode));
         }
 
-        bool ret;
-        WITHOUT_DEBUG(ret = process_rgb_matrix(keycode, record););
+        // no debugging here, noise in logs
+        bool old            = debug_config.enable;
+        debug_config.enable = false;
+
+        bool ret = process_rgb_matrix(keycode, record);
+
+        debug_config.enable = old;
+
         return ret;
     }
 #endif
@@ -164,8 +169,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         case PK_SIZE:
             if (pressed) {
-                int len = pretty_bytes(&str, get_flash_size());
-                logging(LOG_INFO, "Binary takes %s", str.ptr - len);
+                pretty_bytes(&str, get_flash_size());
+                logging(LOG_INFO, "Binary takes %s", str_get(str));
             }
             return false;
 

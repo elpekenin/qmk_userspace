@@ -34,6 +34,5 @@ include $(MK_PATH)/logging.mk
 include $(MK_PATH)/painter.mk
 include $(MK_PATH)/rgb_matrix.mk
 include $(MK_PATH)/split.mk
-include $(MK_PATH)/utils.mk
 include $(MK_PATH)/xap.mk
 include $(MK_PATH)/mcu.mk

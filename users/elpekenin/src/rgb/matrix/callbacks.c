@@ -3,7 +3,6 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/shortcuts.h"
 #include "elpekenin/signatures.h"
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
@@ -18,16 +17,17 @@ bool led_update_user(led_t led_state) {
     // i dont really want debug here:
     //    - rgb matrix mode [NOEEPROM]: x
     //    - rgb matrix set hsv [NOEEPROM]: x, y, z
-    // clang-format off
-    WITHOUT_DEBUG(
-        if (led_state.caps_lock) {
-            rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-            rgb_matrix_sethsv_noeeprom(165, 255, rgb_matrix_get_val());
-        } else {
-            rgb_matrix_mode_noeeprom(RGB_MATRIX_CYCLE_LEFT_RIGHT);
-        }
-    );
-    // clang-format on
+    bool old            = debug_config.enable;
+    debug_config.enable = false;
+
+    if (led_state.caps_lock) {
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+        rgb_matrix_sethsv_noeeprom(165, 255, rgb_matrix_get_val());
+    } else {
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_CYCLE_LEFT_RIGHT);
+    }
+
+    debug_config.enable = old;
 
     return false;
 }

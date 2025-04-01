@@ -6,11 +6,8 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/qp/graphics.h"
+#include "elpekenin/qp/assets.h"
 #include "elpekenin/scrolling_text.h"
-#include "elpekenin/shortcuts.h"
-
-// *** Handlers ***
 
 bool xap_execute_qp_clear(xap_token_t token, xap_route_user_quantum_painter_clear_arg_t* arg) {
     xap_respond_success(token);
@@ -125,7 +122,7 @@ bool xap_execute_qp_get_geometry(xap_token_t token, xap_route_user_quantum_paint
 
     qp_get_geometry(qp_get_device_by_index(arg->device_id), &width, &height, &rotation, &offset_x, &offset_y);
 
-    uint8_t ret[9] = {U16_TO_U8(width), U16_TO_U8(height), rotation, U16_TO_U8(offset_x), U16_TO_U8(offset_y)};
+    uint8_t ret[9] = {width & 0x00FF, width & 0xFF00, height & 0x00FF, height & 0xFF00, rotation, offset_x & 0x00FF, offset_x & 0xFF00, offset_y & 0x00FF, offset_y & 0xFF00};
     xap_send(token, XAP_RESPONSE_FLAG_SUCCESS, (const void*)ret, sizeof(ret));
 
     return true;
@@ -177,7 +174,7 @@ bool xap_respond_qp_textwidth(xap_token_t token, const uint8_t* data, size_t dat
 
     int16_t width = qp_textwidth(qp_get_font_by_index(arg->font_id), (const char*)arg->text);
 
-    uint8_t ret[2] = {U16_TO_U8(width)};
+    uint8_t ret[2] = {width & 0x00FF, width & 0xFF00};
     xap_send(token, XAP_RESPONSE_FLAG_SUCCESS, (const void*)ret, sizeof(ret));
 
     return true;

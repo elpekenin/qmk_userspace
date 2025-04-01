@@ -6,8 +6,8 @@ Custom features exposed as Community Modules
 
 Refer to `QMK's documentation <https://docs.qmk.fm/features/community_modules>`_ for details on how to use this feature
 
-allocator.h
-###########
+allocator
+#########
 .. c:autodoc:: modules/elpekenin/allocator/elpekenin/allocator.h
 
 arm_math_m0
@@ -34,6 +34,10 @@ ledmap
 logging
 #######
 .. c:autodoc:: modules/elpekenin/logging/elpekenin/logging.h
+
+memory
+######
+.. c:autodoc:: modules/elpekenin/memory/elpekenin/memory.h
 
 micropython
 ###########
@@ -106,3 +110,7 @@ There are no hooks for user logic in this module because its only purpose is set
 scrolling_text
 ##############
 .. c:autodoc:: modules/elpekenin/scrolling_text/elpekenin/scrolling_text.h
+
+string
+######
+.. c:autodoc:: modules/elpekenin/string/elpekenin/string.h

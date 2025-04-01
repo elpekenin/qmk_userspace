@@ -45,23 +45,23 @@ void keyboard_pre_init_user(void) {
 }
 
 void keyboard_post_init_user(void) {
+#if defined(AUTOCORRECT_ENABLE)
+    autocorrect_enable();
+#endif
+
 #if defined(COMMUNITY_MODULE_CRASH_ENABLE)
     uint8_t      depth;
     const char  *msg;
     backtrace_t *call_stack = get_crash_call_stack(&depth, &msg);
 
     if (depth != 0) {
-        logging(LOG_WARN, "Crash (%s)", msg);
+        logging(LOG_WARN, "%s", msg);
         for (uint8_t i = 0; i < depth; ++i) {
             logging(LOG_ERROR, "%s (%p)", call_stack[i].name, call_stack[i].address);
         }
     } else {
         logging(LOG_WARN, "Previous run did not crash");
     }
-#endif
-
-#if defined(AUTOCORRECT_ENABLE)
-    autocorrect_enable();
 #endif
 
 #if defined(QUANTUM_PAINTER_ENABLE)

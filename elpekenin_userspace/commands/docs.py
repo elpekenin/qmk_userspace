@@ -56,6 +56,33 @@ def is_userspace(path: Path) -> bool:
     return compiledb.is_file() and docs.is_dir()
 
 
+def define_flags(args: list[str]) -> Generator[str]:
+    """From all args, filter the ones defining pre-processor macros."""
+    for arg in args:
+        # flags for pre-processor defines
+        if arg.startswith("-D") and not arg.startswith(
+            (
+                # but not the GCC-specific stuff (hawkmoth uses clang)
+                "-D__GCC",
+                "-D__GNU",
+                "-D__GXX",
+                # nor compiler-granted config
+                "-D__CHAR",
+                "-D__DBL",
+                "-D__DECIMAL",
+                "-D__FLT",
+                "-D__INT",
+                "-D__LDBL",
+                "-D__LONG",
+                "-D__PTR",
+                "-D__SIZE",
+                "-D__UINT",
+                "-D__WCHAR",
+            ),
+        ):
+            yield arg
+
+
 def fixed_path(raw: str, *, userspace: Path, qmk: Path) -> str:
     """Given a path, make it absolute by prepending source when needed.
 
@@ -100,11 +127,10 @@ def include_flags(args: list[str], *, userspace: Path, qmk: Path) -> Generator[s
             )
 
 
-def define_flags(args: list[str]) -> Generator[str]:
-    """From all args, filter the ones defining pre-processor macros."""
+def arch_flags(args: list[str]) -> Generator[str]:
+    """From all args, filter the ones adding architecture-specific flags."""
     for arg in args:
-        # define flags, but not the GCC-specific stuff... hawkmoth uses clang
-        if arg.startswith("-D") and not arg.startswith(("-D__GNU", "-D__GCC")):
+        if arg.startswith("-mcpu"):
             yield arg
 
 
@@ -114,6 +140,7 @@ def cleanup_args(args: list[str], *, userspace: Path, qmk: Path) -> list[str]:
         f"-I{qmk}",
         *define_flags(args),
         *include_flags(args, userspace=userspace, qmk=qmk),
+        *arch_flags(args),
         # `#include "generated/..."` would fail due to the redirection of paths here
         # need to look for these files on build folder, they dont exist in repository
         f"-I{qmk / 'users' / 'elpekenin'}",

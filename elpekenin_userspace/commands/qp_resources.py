@@ -80,22 +80,22 @@ def gen_c_file(file: Path, assets: AssetsDictT) -> None:
                 "\n",
                 f'#include "generated/{OUTPUT_NAME}.h"\n',
                 "\n",
-                '#include "elpekenin/qp/assets.h"',  # set_{font,image}_by_name
+                '#include "elpekenin/qp/assets.h"\n',  # set_{font,image}_by_name
                 "\n",
-                "void load_qp_resources(void) {\n",
+                "void load_qp_resources(void) {",
             ],
         )
 
         for key, paths in assets.items():
-            function = (
-                "qp_set_font_by_name" if key == "fonts" else "qp_set_image_by_name"
-            )
+            load = "qp_load_font_mem" if key == "fonts" else "qp_load_image_mem"
+            store = "qp_set_font_by_name" if key == "fonts" else "qp_set_image_by_name"
 
             f.writelines(
                 [
+                    "\n",
                     f"    // {key}\n",
                     *(
-                        f'    {function}("{name}", {name});\n'
+                        f'    {store}("{name}", (void *){load}({name}));\n'
                         for name in (asset_name(key, p) for p in paths)
                     ),
                 ],
@@ -117,15 +117,13 @@ def gen_mk_file(file: Path, assets: AssetsDictT) -> None:
         for key, paths in assets.items():
             f.writelines(
                 [
-                    f"# {key}\n",
+                    f"# {key}",
                     *(
-                        f"SRC += {full_path}\n" + f"VPATH += {full_path.parent}\n\n"
+                        f"\nSRC += {full_path}\nVPATH += {full_path.parent}\n"
                         for full_path in (p.with_suffix(".c").resolve() for p in paths)
                     ),
                 ],
             )
-
-        f.write("\n")
 
 
 class QpResources(CodegenCommand):

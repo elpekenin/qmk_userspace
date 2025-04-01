@@ -17,16 +17,18 @@
 #include "elpekenin/string.h"
 #include "elpekenin/time.h"
 
-#if defined(KEYLOG_ENABLE)
-#    include "elpekenin/keylog.h"
-#endif
-
 #if defined(COMMUNITY_MODULE_ALLOCATOR_ENABLE)
 #    include "elpekenin/allocator.h"
 #endif
 
 #if defined(COMMUNITY_MODULE_RNG_ENABLE)
 #    include "elpekenin/rng.h"
+#else
+#    error "This code depends on 'elpekenin/rng' to work"
+#endif
+
+#if defined(KEYLOG_ENABLE)
+#    include "elpekenin/keylog.h"
 #endif
 
 // logging task
@@ -93,11 +95,7 @@ static void draw_layer(void *cb_arg) {
     }
 
     // sat = 0 => white regardless of hue
-#if defined(COMMUNITY_MODULE_RNG_ENABLE)
     uint8_t hue = rng_min_max(0, 255); // random color
-#else
-    uint8_t hue = 170; // blue
-#endif
     uint8_t sat = state->running ? 255 : 0;
 
     qp_drawtext_recolor(args->device, args->x, args->y, args->font, state->curr, hue, sat, 255, HSV_BLACK);
@@ -165,23 +163,22 @@ static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
     last_used = used_heap;
 
     // on first go, draw the consumed flash
-    string_t str = new_string(100);
+    string_t str = str_new(100);
 
-    int len = lcpy(&str, "Flash: ");
-    len += pretty_bytes(&str, get_used_flash());
-    len += lcat(&str, "/");
-    len += pretty_bytes(&str, get_flash_size());
-    qp_drawtext(heap_stats_args.device, heap_stats_args.x, heap_stats_args.y - heap_stats_args.font->line_height + 2, heap_stats_args.font, str.ptr - len);
+    str_append(&str, "Flash: ");
+    pretty_bytes(&str, get_used_flash());
+    str_append(&str, "/");
+    pretty_bytes(&str, get_flash_size());
+    qp_drawtext(heap_stats_args.device, heap_stats_args.x, heap_stats_args.y - heap_stats_args.font->line_height + 2, heap_stats_args.font, str_get(str));
 
     // reset buffer
-    str.ptr -= len;
-    str.len += len;
+    str_reset(&str);
 
-    len = pretty_bytes(&str, used_heap);
-    len += lcat(&str, "/");
-    len += pretty_bytes(&str, get_heap_size());
+    pretty_bytes(&str, used_heap);
+    str_append(&str, "/");
+    pretty_bytes(&str, get_heap_size());
 
-    strlcpy(state->dest, str.ptr - len, sizeof(state->dest));
+    strlcpy(state->dest, str_get(str), sizeof(state->dest));
     state->running = true;
     state->mask    = 0;
     state->state   = FILLING;
