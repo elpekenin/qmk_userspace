@@ -155,17 +155,7 @@ void build_info_sync_keymap_callback(void) {
 }
 
 #if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
-// clang-format off
-static const char program[] =
-"import qmk\n"
-"\n"
-"color = (\n"
-"    qmk.rgb.RED if qmk.get_highest_active_layer() == 0\n"
-"    else qmk.rgb.GREEN\n"
-")\n"
-"qmk.rgb.set_color(0, color)\n"
-;
-// clang-format on
+#    include "py/rgb_effect.c"
 #endif
 
 #if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
@@ -229,7 +219,7 @@ bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
 #endif
 
 #if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
-    mp_embed_exec_str(program);
+    mp_embed_exec_str(rgb_effect);
 #endif
 
     return true;

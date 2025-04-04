@@ -12,12 +12,21 @@ repos:
     rev: v20.1.0
     hooks:
       - id: clang-format
-  - repo: https://github.com/elpekenin/qmk_userspace
-    rev: 4d192307bb987cc9b8dacde3f315fa06891eefb0
+  - repo: local
     hooks:
       - id: stubs
-        name: Generate stubs for C files
+        name: generate stubs
+        entry: elpekenin_userspace stubs
+        language: python
+        types: [c]
         files: micropython/user_c_modules/(.*)/(.*).c
+      - id: py2c
+        name: convert py into c
+        entry: elpekenin_userspace py2c
+        language: python
+        types: [python]
+        files: keyboards/elpekenin/access/keymaps/elpekenin/py
+        exclude: keyboards/elpekenin/access/keymaps/elpekenin/py/__init__.py
   - repo: https://github.com/asottile/add-trailing-comma
     rev: v3.1.0
     hooks:

@@ -122,7 +122,7 @@ class Stubs(BaseCommand):
         """Command-specific arguments."""
         parser.add_argument(
             "files",
-            help="the C file to generate stubs for",
+            help="the C files to generate stubs for",
             metavar="FILE",
             type=args.File(require_existence=True),
             nargs="*",
