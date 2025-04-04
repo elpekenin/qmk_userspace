@@ -75,6 +75,7 @@ def define_flags(args: list[str]) -> Generator[str]:
                 "-D__LDBL",
                 "-D__LONG",
                 "-D__PTR",
+                "-D__SCHAR",
                 "-D__SIZE",
                 "-D__UINT",
                 "-D__WCHAR",
@@ -131,7 +132,7 @@ def arch_flags(args: list[str]) -> Generator[str]:
     """From all args, filter the ones adding architecture-specific flags."""
     for arg in args:
         if arg.startswith("-mcpu"):
-            yield arg
+            yield arg  # ignored by clang
 
 
 def cleanup_args(args: list[str], *, userspace: Path, qmk: Path) -> list[str]:
@@ -144,7 +145,7 @@ def cleanup_args(args: list[str], *, userspace: Path, qmk: Path) -> list[str]:
         # `#include "generated/..."` would fail due to the redirection of paths here
         # need to look for these files on build folder, they dont exist in repository
         f"-I{qmk / 'users' / 'elpekenin'}",
-        "-D__SPHINX__",  # to process code that is usually gated away by #if
+        "-D__SPHINX__",  # to process my own code that is usually gated away by #if
     ]
 
 
