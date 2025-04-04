@@ -37,8 +37,6 @@ void keyboard_pre_init_user(void) {
     // then, keymap-level setup
     sendchar_init();
 
-    set_logging_level(LOG_INFO);
-
     build_info_init();
 
     keyboard_pre_init_keymap();

@@ -74,8 +74,6 @@ static uint32_t slave_log_sync_task(uint32_t trigger_time, void* cb_arg) {
     return 3000;
 }
 
-// *** Exposed to other places ***
-
 void reset_ee_slave(void) {
     if (!is_keyboard_master()) {
         return;

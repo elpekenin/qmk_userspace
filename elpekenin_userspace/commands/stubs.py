@@ -104,10 +104,7 @@ def generate_pyi_file(input_file: Path) -> None:
     if content is not None:
         code += content
 
-    output_directory = input_file.parent / "stubs"
-    output_directory.mkdir(exist_ok=True)
-
-    output_file = output_directory / (input_file.stem + ".pyi")
+    output_file = input_file.with_suffix(".pyi")
     output_file.write_text(
         lines(
             PY_HEADER,

@@ -19,10 +19,6 @@
 #define MATRIX_COLS 8
 #define ROWS_PER_HAND (MATRIX_ROWS / 2)
 
-// Debugging
-// #define DEBUG_MATRIX_SCAN_RATE
-// #define QUANTUM_PAINTER_DEBUG
-
 // SPI
 #define SCREENS_SPI_DRIVER SPID1
 #define SCREENS_SCK_PIN GP10

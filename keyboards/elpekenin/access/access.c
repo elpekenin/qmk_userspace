@@ -57,13 +57,11 @@ void keyboard_post_init_kb(void) {
     (void)ret; // compiler warns "unused" when features are disabled
 
 #if defined(QUANTUM_PAINTER_ENABLE)
-    // *** SIPO ***
-
+    // SIPO
     gpio_set_pin_output(SIPO_CS_PIN);
     gpio_write_pin_high(SIPO_CS_PIN);
 
-    // *** QP ***
-
+    // QP
     wait_ms(150); // Let screens draw some power
 
 #    if IS_LEFT_HAND
@@ -101,8 +99,6 @@ void keyboard_post_init_kb(void) {
         logging(LOG_INFO, "Touch setup");
     }
 #endif
-
-    // *** User ***
 
     keyboard_post_init_user();
 }

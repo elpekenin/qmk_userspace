@@ -19,33 +19,39 @@
 
 #include "elpekenin/spi_custom.h"
 
-#include "elpekenin/logging.h"
+#include <quantum/util.h> // ARRAY_SIZE
 
-static pin_t slave_pins[] = {[0 ... SPI_COUNT - 1] = NO_PIN};
+#ifdef SPI_CUSTOM_DEBUG
+#    include "quantum/logging/debug.h"
+#    define spi_custom_dprintf dprintf
+#else
+#    define spi_custom_dprintf(...)
+#endif
 
-static pin_t spi_sck_pins[]  = SPI_SCK_PINS;
-static pin_t spi_mosi_pins[] = SPI_MOSI_PINS;
-static pin_t spi_miso_pins[] = SPI_MISO_PINS;
-_Static_assert(ARRAY_SIZE(spi_sck_pins) == SPI_COUNT, "SPI_SCK_PINS has to match size with SPI_DRIVERS");
-_Static_assert(ARRAY_SIZE(spi_mosi_pins) == SPI_COUNT, "SPI_MOSI_PINS has to match size with SPI_DRIVERS");
-_Static_assert(ARRAY_SIZE(spi_miso_pins) == SPI_COUNT, "SPI_MISO_PINS has to match size with SPI_DRIVERS");
+static SPIDriver *drivers[] = SPI_DRIVERS;
+#define SPI_COUNT ARRAY_SIZE(drivers)
 
-SPIDriver *drivers[] = SPI_DRIVERS;
+static pin_t spi_sck_pins[SPI_COUNT]   = SPI_SCK_PINS;
+static pin_t spi_mosi_pins[SPI_COUNT]  = SPI_MOSI_PINS;
+static pin_t spi_miso_pins[SPI_COUNT]  = SPI_MISO_PINS;
+static pin_t spi_slave_pins[SPI_COUNT] = {[0 ... SPI_COUNT - 1] = NO_PIN};
 
 static SPIConfig spi_configs[SPI_COUNT];
 
-bool is_initialised[] = {[0 ... SPI_COUNT - 1] = false};
+static bool is_initialised[SPI_COUNT] = {[0 ... SPI_COUNT - 1] = false};
 
-static MUTEX_DECL(spi_mutex);
+// elements in this array are created during `spi_custom_init`
+static mutex_t spi_mutexes[SPI_COUNT];
 
 __attribute__((weak)) void spi_custom_init(uint8_t n) {
     if (n >= SPI_COUNT) {
-        logging(LOG_ERROR, "n==%d invalid", n);
+        spi_custom_dprintf("[ERROR] %s: n==%d invalid\n", __func__, n);
         return;
     }
 
     if (!is_initialised[n]) {
         is_initialised[n] = true;
+        spi_mutexes[n]    = (mutex_t)__MUTEX_DATA(spi_mutexes[n]);
 
 #if defined(K20x) || defined(KL2x) || defined(RP2040)
         spi_configs[n] = (SPIConfig){NULL, 0, 0, 0};
@@ -69,21 +75,23 @@ __attribute__((weak)) void spi_custom_init(uint8_t n) {
         palSetPadMode(PAL_PORT(spi_miso_pins[n]), PAL_PAD(spi_miso_pins[n]), SPI_MISO_FLAGS);
 #endif
         spiStop(drivers[n]);
-        slave_pins[n] = NO_PIN;
+        spi_slave_pins[n] = NO_PIN;
     }
 }
 
 bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divisor, uint8_t n) {
     if (n >= SPI_COUNT) {
-        logging(LOG_ERROR, "n==%d invalid", n);
+        spi_custom_dprintf("[ERROR] %s: n==%d invalid\n", __func__, n);
         return false;
     }
 
-    if (slave_pins[n] != NO_PIN || slavePin == NO_PIN) {
+    if (spi_slave_pins[n] != NO_PIN || slavePin == NO_PIN) {
+        spi_custom_dprintf("[ERROR] %s: invalid CS settings\n", __func__);
         return false;
     }
 
-    if (!chMtxTryLock(&spi_mutex)) {
+    if (!chMtxTryLock(&spi_mutexes[n])) {
+        spi_custom_dprintf("[ERROR] %s: could not lock\n", __func__);
         return false;
     }
 
@@ -94,6 +102,7 @@ bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divi
     }
 
     if (roundedDivisor < 2 || roundedDivisor > 256) {
+        spi_custom_dprintf("[ERROR] %s: invalid divisor %d\n", __func__, divisor);
         goto err;
     }
 #endif
@@ -203,6 +212,7 @@ bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divi
 #elif defined(MCU_RP)
     if (lsbFirst) {
         osalDbgAssert(lsbFirst == false, "RP2040s PrimeCell SPI implementation does not support sending LSB first.");
+        spi_custom_dprintf("[ERROR] %s: invalid LSB\n", __func__);
     }
 
     // Motorola frame format and 8bit transfer data size.
@@ -278,7 +288,7 @@ bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divi
     }
 #endif
 
-    slave_pins[n]         = slavePin;
+    spi_slave_pins[n]     = slavePin;
     spi_configs[n].ssport = PAL_PORT(slavePin);
     spi_configs[n].sspad  = PAL_PAD(slavePin);
 
@@ -289,13 +299,13 @@ bool spi_custom_start(pin_t slavePin, bool lsbFirst, uint8_t mode, uint16_t divi
     return true;
 
 err:
-    chMtxUnlock(&spi_mutex);
+    chMtxUnlock(&spi_mutexes[n]);
     return false;
 }
 
 spi_status_t spi_custom_write(uint8_t data, uint8_t n) {
     if (n >= SPI_COUNT) {
-        logging(LOG_ERROR, "n==%d invalid", n);
+        spi_custom_dprintf("[ERROR] %s: n==%d invalid\n", __func__, n);
         return SPI_STATUS_ERROR;
     }
 
@@ -307,7 +317,7 @@ spi_status_t spi_custom_write(uint8_t data, uint8_t n) {
 
 spi_status_t spi_custom_read(uint8_t n) {
     if (n >= SPI_COUNT) {
-        logging(LOG_ERROR, "n==%d invalid", n);
+        spi_custom_dprintf("[ERROR] %s: n==%d invalid\n", __func__, n);
         return SPI_STATUS_ERROR;
     }
 
@@ -319,7 +329,7 @@ spi_status_t spi_custom_read(uint8_t n) {
 
 spi_status_t spi_custom_transmit(const uint8_t *data, uint16_t length, uint8_t n) {
     if (n >= SPI_COUNT) {
-        logging(LOG_ERROR, "n==%d invalid", n);
+        spi_custom_dprintf("[ERROR] %s: n==%d invalid\n", __func__, n);
         return SPI_STATUS_ERROR;
     }
 
@@ -329,7 +339,7 @@ spi_status_t spi_custom_transmit(const uint8_t *data, uint16_t length, uint8_t n
 
 spi_status_t spi_custom_receive(uint8_t *data, uint16_t length, uint8_t n) {
     if (n >= SPI_COUNT) {
-        logging(LOG_ERROR, "n==%d invalid", n);
+        spi_custom_dprintf("[ERROR] %s: n==%d invalid\n", __func__, n);
         return SPI_STATUS_ERROR;
     }
 
@@ -339,15 +349,15 @@ spi_status_t spi_custom_receive(uint8_t *data, uint16_t length, uint8_t n) {
 
 void spi_custom_stop(uint8_t n) {
     if (n >= SPI_COUNT) {
-        logging(LOG_ERROR, "n==%d invalid", n);
+        spi_custom_dprintf("[ERROR] %s: n==%d invalid\n", __func__, n);
         return;
     }
 
-    if (slave_pins[n] != NO_PIN) {
+    if (spi_slave_pins[n] != NO_PIN) {
         spiUnselect(drivers[n]);
         spiStop(drivers[n]);
-        slave_pins[n] = NO_PIN;
+        spi_slave_pins[n] = NO_PIN;
     }
 
-    chMtxUnlock(&spi_mutex);
+    chMtxUnlock(&spi_mutexes[n]);
 }

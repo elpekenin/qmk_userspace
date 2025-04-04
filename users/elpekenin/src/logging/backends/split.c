@@ -3,28 +3,27 @@
 
 #include <ctype.h>
 #include <quantum/quantum.h>
+#include <quantum/split_common/transactions.h>
+#include <quantum/util.h>
 
 #include "elpekenin/logging.h"
 #include "elpekenin/ring_buffer.h"
-#include "elpekenin/split/transactions.h"
-
-// *** Split data ***
 
 typedef struct PACKED {
     bool    flush;
     uint8_t bytes;
 } split_logging_header_t;
 
+#define PAYLOAD_SIZE RPC_S2M_BUFFER_SIZE - sizeof(split_logging_header_t)
+
 typedef struct PACKED {
     split_logging_header_t header;
-
-    char buff[RPC_S2M_BUFFER_SIZE - sizeof(split_logging_header_t)];
+    char                   buff[PAYLOAD_SIZE];
 } split_logging_t;
 _Static_assert(sizeof(split_logging_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
 
-// *** Slave ***
-
-static new_rbuf(char, 200, slave_rbuf);
+// slave will write on its copy of this variable, master will copy (over split) onto its own
+static new_rbuf(char, 200, ring_buffer);
 
 int8_t sendchar_split(uint8_t c) {
     // on master, this does nothing
@@ -33,7 +32,7 @@ int8_t sendchar_split(uint8_t c) {
     }
 
     if (isprint(c) || c == '\n') {
-        rbuf_push(slave_rbuf, c);
+        rbuf_push(ring_buffer, c);
     }
 
     return 0;
@@ -42,7 +41,7 @@ int8_t sendchar_split(uint8_t c) {
 void user_logging_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
     split_logging_t data = {0};
 
-    size_t size = rbuf_pop(slave_rbuf, ARRAY_SIZE(data.buff), data.buff);
+    size_t size = rbuf_pop(ring_buffer, ARRAY_SIZE(data.buff), data.buff);
 
     data.header.bytes = size;
 
@@ -59,13 +58,10 @@ void user_logging_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8
     memcpy(s2m_buffer, &data, sizeof(split_logging_t));
 }
 
-// *** Master ***
-
-static new_rbuf(char, 200, master_rbuf);
-
+// master
 void user_logging_master_poll(void) {
     split_logging_t data = {0};
-    transaction_rpc_recv(RPC_ID_USER_LOGGING, sizeof(data), &data);
+    transaction_rpc_recv(RPC_ID_USER_LOGGING, sizeof(split_logging_t), &data);
 
     size_t size = data.header.bytes;
     if (size == 0) {
@@ -74,20 +70,16 @@ void user_logging_master_poll(void) {
 
     // copy received
     for (size_t i = 0; i < size; ++i) {
-        rbuf_push(master_rbuf, data.buff[i]);
+        rbuf_push(ring_buffer, data.buff[i]);
     }
 
     // flush if asked to
-    if (data.header.flush || rbuf_full(master_rbuf)) {
-        char   buff[100];
-        size_t size = rbuf_pop(master_rbuf, sizeof(buff), buff);
+    if (data.header.flush || rbuf_full(ring_buffer)) {
+        char   buff[PAYLOAD_SIZE];
+        size_t size = rbuf_pop(ring_buffer, PAYLOAD_SIZE, buff);
         buff[size]  = '\0';
 
-        // keep retrying until we get to write it
-        while (true) {
-            if (logging(LOG_DEBUG, "*****\n%s*****\n", buff) == 0) {
-                break;
-            }
-        }
+        // write it
+        logging(LOG_DEBUG, "*****\n%s*****\n", buff);
     }
 }

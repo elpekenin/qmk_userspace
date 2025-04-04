@@ -241,8 +241,6 @@ void set_keylog_device(painter_device_t device) {
 }
 #endif
 
-// *** Build info ***
-
 void draw_commit(painter_device_t device) {
     painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
     if (font == NULL) {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 /**
- * Driver to use Serial In - Parallel Out shift registers.
+ * Driver for 74HC595 Serial In - Parallel Out shift registers.
  */
 
 // -- barrier --

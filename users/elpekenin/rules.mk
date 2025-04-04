@@ -4,12 +4,6 @@ USER_INCLUDE = $(USER_PATH)/include
 
 VPATH += $(USER_INCLUDE)
 
-# do not error if an attribute is unknown
-CFLAGS += -Wno-attributes
-
-# include'd by compiler into every file, to workaround known issues
-CFLAGS += -include $(USER_INCLUDE)/elpekenin/issues.h
-
 SRC += \
     $(USER_SRC)/build_info.c \
     $(USER_SRC)/elpekenin.c \

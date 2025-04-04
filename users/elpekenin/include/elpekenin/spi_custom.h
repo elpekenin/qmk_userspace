@@ -46,8 +46,6 @@
 #    endif
 #endif
 
-#define SPI_COUNT (ARRAY_SIZE((SPIDriver *[])SPI_DRIVERS))
-
 #ifndef SPI_SCK_PINS
 #    if defined(SPI_SCK_PIN)
 #        define SPI_SCK_PINS {SPI_SCK_PIN}

@@ -6,6 +6,7 @@
 #include "elpekenin/spi_custom.h"
 
 #ifdef SIPO_DEBUG
+#    include "quantum/logging/debug.h"
 #    define sipo_dprintf dprintf
 #else
 #    define sipo_dprintf(...)
@@ -17,7 +18,7 @@ static uint8_t sipo_pin_state[SIPO_BYTES] = {0};
 static bool    sipo_state_changed         = true;
 
 static void print_sipo_status(void) {
-    sipo_dprintf("MCU |");
+    sipo_dprintf("MCU | ");
 
     for (uint8_t i = 0; i < SIPO_BYTES; ++i) {
         sipo_dprintf("%b ", sipo_pin_state[SIPO_BYTES - i - 1]);
@@ -58,7 +59,7 @@ void send_sipo_state(void) {
     spi_custom_init(REGISTERS_SPI_DRIVER_ID);
 
     if (!spi_custom_start(SIPO_CS_PIN, false, REGISTERS_SPI_MODE, REGISTERS_SPI_DIV, REGISTERS_SPI_DRIVER_ID)) {
-        sipo_dprintf("[ERROR] %s: (init SPI)", __func__);
+        sipo_dprintf("[ERROR] %s: (start SPI)\n", __func__);
         return;
     }
 

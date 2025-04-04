@@ -63,17 +63,17 @@ Available APIs are:
 
     .. tab:: ``qmk``
 
-        .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/stubs/__init__.pyi
+        .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/__init__.pyi
             :lines: 6-
 
     .. tab:: ``qmk.keycode``
 
-        .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/stubs/keycode.pyi
+        .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/keycode.pyi
             :lines: 6-
 
     .. tab:: ``qmk.rgb``
 
-        .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/stubs/rgb.pyi
+        .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/rgb.pyi
             :lines: 6-
 
 rng

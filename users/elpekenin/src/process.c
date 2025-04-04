@@ -28,8 +28,6 @@
 #    include "elpekenin/xap.h"
 #endif
 
-// *** Logic start ***
-
 #if defined(AUTOCORRECT_ENABLE)
 // dont mind me, just bodging my way in  :)
 static bool last_td_spc = false;
@@ -170,7 +168,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case PK_SIZE:
             if (pressed) {
                 pretty_bytes(&str, get_flash_size());
-                logging(LOG_INFO, "Binary takes %s", str_get(str));
+                logging(LOG_INFO, "Binary takes %.*s", str.used, str_get(str));
             }
             return false;
 

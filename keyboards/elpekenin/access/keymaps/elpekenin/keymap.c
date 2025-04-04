@@ -3,6 +3,8 @@
 
 #include QMK_KEYBOARD_H
 
+#include <stdlib.h> // div_t
+
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
@@ -26,6 +28,12 @@
 #    include "elpekenin/rng.h"
 #else
 #    error "This code depends on 'elpekenin/rng' to work"
+#endif
+
+#if defined(COMMUNITY_MODULE_STRING_ENABLE)
+#    include "elpekenin/string.h"
+#else
+#    error "This code depends on 'elpekenin/string' to work"
 #endif
 
 #if defined(QUANTUM_PAINTER_ENABLE)
@@ -80,7 +88,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
         PK_QCLR, AC_TOGG, XXXXXXX, XXXXXXX, PK_SIZE, XXXXXXX,        PK_KLOG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_RBT,
         _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-     // XXXXXXX, XXXXXXX, _______, XXXXXXX,     DB_TOGG,                 DB_TOGG,      _______, XXXXXXX, XXXXXXX, AC_DICT
         XXXXXXX, XXXXXXX, _______, _______,     DB_TOGG,                 DB_TOGG,      _______, XXXXXXX, XXXXXXX, XXXXXXX
     ),
 };
@@ -232,14 +239,9 @@ const char *log_time(void) {
     static char buff[15];
 
     div_t secs = div(timer_read32(), 1000);
-    snprintf(buff, sizeof(buff), "%d.%ds", secs.quot, secs.rem);
+
+    string_t str = str_from_buffer(buff);
+    str_printf(&str, "%d.%ds", secs.quot, secs.rem);
 
     return buff;
-}
-
-void housekeeping_task_keymap(void) {
-    static uint8_t cnt = 0;
-    if (++cnt == 0) {
-        logging(LOG_INFO, "Alive");
-    }
 }

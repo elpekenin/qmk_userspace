@@ -13,7 +13,7 @@
 
 #if defined(TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND
 #    include "elpekenin/touch.h"
-#endif // TOUCH_SCREEN_ENABLE && INIT_EE_HANDS_RIGHT
+#endif
 
 void matrix_init_custom(void) {
     gpio_set_pin_output(PISO_CS_PIN);
@@ -21,11 +21,10 @@ void matrix_init_custom(void) {
     spi_custom_init(REGISTERS_SPI_DRIVER_ID);
 }
 
-static matrix_row_t last_scan[ROWS_PER_HAND];
+static matrix_row_t scan[ROWS_PER_HAND];
 
-bool matrix_scan_custom(matrix_row_t *scan) {
+bool matrix_scan_custom(matrix_row_t *output) {
     if (!spi_custom_start(PISO_CS_PIN, false, REGISTERS_SPI_MODE, PISO_SPI_DIV, REGISTERS_SPI_DRIVER_ID)) {
-        // could not start SPI, quit
         return false;
     }
 
@@ -39,9 +38,9 @@ bool matrix_scan_custom(matrix_row_t *scan) {
         scan[4] ^= (1 << 0); // column 0
     }
 
-    bool changed = memcmp(scan, last_scan, ROWS_PER_HAND) != 0;
+    bool changed = memcmp(scan, output, ROWS_PER_HAND) != 0;
     if (changed) {
-        memcpy(last_scan, scan, ROWS_PER_HAND);
+        memcpy(output, scan, ROWS_PER_HAND);
     }
 
     return changed;

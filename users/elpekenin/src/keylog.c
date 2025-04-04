@@ -13,15 +13,11 @@
 #include "elpekenin/string.h"
 #include "generated/keycode_str.h"
 
-// *** Internal variables ***
-
 static bool keylog_dirty            = true;
 static char keylog[KEYLOG_SIZE + 1] = {
     [0 ... KEYLOG_SIZE - 1] = ' ',
     [KEYLOG_SIZE]           = '\0',
 }; // extra space for terminator
-
-// *** Replacements implementation ***
 
 typedef enum {
     NO_MODS,
@@ -91,8 +87,6 @@ static const replacements_t replacements[] = {
     replacement("VOLU",    "♪",   "♪",  NULL),
 };
 // clang-format on
-
-// *** Formatting helpers ***
 
 static void skip_prefix(const char **str) {
     char *prefixes[] = {"KC_", "RGB_", "QK_", "ES_", "TD_", "TL_"};
@@ -180,8 +174,6 @@ static void apply_casing(const char **str) {
     *str = lowercase_letters[**str - 'A'];
 }
 
-// *** Updating the log ***
-
 static void keylog_clear(void) {
     // spaces (not 0) so `qp_drawtext` actually renders something
     memset(keylog, ' ', KEYLOG_SIZE);
@@ -227,8 +219,6 @@ static void keylog_append(const char *str) {
         keylog[KEYLOG_SIZE - len + i] = str[i];
     }
 }
-
-// *** API ***
 
 bool is_keylog_dirty(void) {
     return keylog_dirty;

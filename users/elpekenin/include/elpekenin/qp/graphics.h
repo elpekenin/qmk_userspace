@@ -8,13 +8,11 @@
 
 void qp_tasks_init(void);
 
-// *** Show build info ***
-
+// show build info
 void draw_commit(painter_device_t device);
 void draw_features(painter_device_t device);
 
-// *** Callbacks ***
-
+// configure tasks
 void set_logging_device(painter_device_t device);
 void set_uptime_device(painter_device_t device);
 void set_heap_stats_device(painter_device_t device);

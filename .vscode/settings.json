@@ -1,4 +1,8 @@
 {
-    // TODO: TypedDict on operations, try and generate schema from them
-    "python.envFile": "${workspaceFolder}/.pythonenv"
+    "python.envFile": "${workspaceFolder}/.pythonenv",
+    "files.exclude": {
+        "*.log": false,
+        "compile_commands.json": false,
+        "TODO.md": false,
+    },
 }

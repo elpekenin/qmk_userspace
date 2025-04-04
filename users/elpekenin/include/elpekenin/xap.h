@@ -25,12 +25,9 @@
 #    include "elpekenin/touch.h"
 #endif
 
-// *** Max string length helper ***
-
 #define MAX_PAYLOAD (XAP_EPSIZE - sizeof(xap_broadcast_header_t))
 
-// *** Identifiers ***
-
+// identifiers
 typedef enum {
     _SCREEN_PRESSED,
     _SCREEN_RELEASED,
@@ -43,8 +40,6 @@ typedef enum {
  * Identifier for each type of message.
  */
 typedef uint8_t xap_msg_id_t;
-
-// *** Messages ***
 
 #if defined(TOUCH_SCREEN_ENABLE) || defined(__SPHINX__)
 /**
