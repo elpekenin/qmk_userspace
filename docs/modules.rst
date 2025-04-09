@@ -35,6 +35,20 @@ logging
 #######
 .. c:autodoc:: modules/elpekenin/logging/elpekenin/logging.h
 
+ls0xx
+#####
+Support for LS0XX displays (eg: nice!view), extracted from my (quite abandoned) PR.
+
+.. attention::
+    Might contain some bug that I haven't found yet.
+    Please report if you find something.
+
+    Since this driver is not part of QMK's codebase, some integrations won't work,
+    namely, the auto-flushing and the power on/off of (in)activity are not applied
+    to this device.
+
+.. c:autodoc:: modules/elpekenin/ls0xx/ls0xx.h
+
 memory
 ######
 .. c:autodoc:: modules/elpekenin/memory/elpekenin/memory.h
@@ -114,3 +128,9 @@ scrolling_text
 string
 ######
 .. c:autodoc:: modules/elpekenin/string/elpekenin/string.h
+
+version
+#######
+Adds ``QMK_MAJOR``, ``QMK_MINOR`` and ``QMK_PATCH`` macros to check for the version of QMK in which you are building.
+
+These are available under ``#include "qmk_version.h"``.

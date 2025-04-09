@@ -154,10 +154,6 @@ void build_info_sync_keymap_callback(void) {
 #endif
 }
 
-#if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
-#    include "py/rgb_effect.c"
-#endif
-
 #if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
 // clang-format off
 const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -219,6 +215,7 @@ bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
 #endif
 
 #if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
+#    include "py/rgb_effect.c"
     mp_embed_exec_str(rgb_effect);
 #endif
 

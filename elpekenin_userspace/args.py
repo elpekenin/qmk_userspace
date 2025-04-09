@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-class _Common:
+class PathArg:
     """Shared logic between files and directories."""
 
     def __init__(
@@ -39,7 +39,7 @@ class _Common:
         return path.resolve()
 
 
-class File(_Common):
+class File(PathArg):
     """Represent a file argument."""
 
     def __call__(self, raw: str) -> Path:
@@ -53,7 +53,7 @@ class File(_Common):
         return path.resolve()
 
 
-class Directory(_Common):
+class Directory(PathArg):
     """Represent a directory argument."""
 
     def __call__(self, raw: str) -> Path:

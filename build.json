@@ -4,6 +4,11 @@
     "path": "$QMK_HOME",
     "operations": [
         {
+            "operation": "exec",
+            "display": "convert Python source to C strings",
+            "cmd": "elpekenin_userspace py2c keyboards/elpekenin/access/keymaps/elpekenin/py"
+        },
+        {
             "operation": "cp",
             "src": "keyboards/elpekenin/access",
             "dst": "$QMK_HOME/keyboards/elpekenin/access"

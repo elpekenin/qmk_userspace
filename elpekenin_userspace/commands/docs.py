@@ -25,6 +25,7 @@ except ImportError:
 
 from elpekenin_userspace import args
 from elpekenin_userspace.commands import BaseCommand
+from elpekenin_userspace.result import Err, Ok, Result, is_err
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -41,7 +42,7 @@ if TYPE_CHECKING:
 COMPILEDB = "compile_commands.json"
 
 
-def is_userspace(path: Path) -> bool:
+def check_userspace(path: Path) -> Result[None, str]:
     """Validate if the folder argument is actually an userspace.
 
     So far the this checks for the existence of
@@ -52,8 +53,14 @@ def is_userspace(path: Path) -> bool:
     No further constraints in case anyone ever wants to use this tool
     """
     compiledb = path / COMPILEDB
+    if not compiledb.is_file():
+        return Err("Missing compilation database")
+
     docs = path / "docs"
-    return compiledb.is_file() and docs.is_dir()
+    if not docs.is_dir():
+        return Err("Missing docs folder")
+
+    return Ok(None)
 
 
 def define_flags(args: list[str]) -> Generator[str]:
@@ -265,8 +272,9 @@ class Docs(BaseCommand):
 
     def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
-        if not is_userspace(arguments.userspace):
-            sys.stderr.write("Unexpected folder structure\n")
+        result = check_userspace(arguments.userspace)
+        if is_err(result):
+            sys.stderr.write(result.err() + "\n")
             return 1
 
         actions = {

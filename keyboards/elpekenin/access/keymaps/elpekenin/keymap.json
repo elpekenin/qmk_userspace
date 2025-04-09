@@ -7,10 +7,11 @@
         "elpekenin/ledmap",
         "elpekenin/logging",
         "elpekenin/memory",
-        // "elpekenin/micropython",
+        "elpekenin/micropython",
         "elpekenin/rng",
         "elpekenin/rp_sdk_wrappers",
         "elpekenin/scrolling_text",
+        "elpekenin/version",
         "elpekenin/string"
     ]
 }

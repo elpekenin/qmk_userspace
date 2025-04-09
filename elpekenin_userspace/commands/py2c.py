@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from elpekenin_userspace import args
+from elpekenin_userspace import args, error
 from elpekenin_userspace.commands import BaseCommand
 
 if TYPE_CHECKING:
@@ -21,6 +21,10 @@ def generate_c_file(file: Path) -> None:
     """Convert a single file."""
     assert file.is_file()  # noqa: S101  # defensive programming
 
+    # skip .gitignore and whatnot
+    if file.suffix != ".py":
+        return
+
     code = file.read_text()
     for old, new in REPLACEMENTS:
         code = code.replace(old, new)
@@ -31,6 +35,17 @@ def generate_c_file(file: Path) -> None:
     )
 
 
+def convert(path: Path) -> None:
+    """Convert a file/folder."""
+    if path.is_file():
+        generate_c_file(path)
+    elif path.is_dir():
+        for file in path.iterdir():
+            convert(file)
+    else:
+        error.abort(f"Unsupported path type: '{path}'")
+
+
 class Py2C(BaseCommand):
     """Generate C-string equivalent of a .py file."""
 
@@ -38,22 +53,22 @@ class Py2C(BaseCommand):
     def add_args(cls, parser: ArgumentParser) -> None:
         """Command-specific arguments."""
         parser.add_argument(
-            "files",
-            help="the Python files to be converted",
-            metavar="FILE",
-            type=args.File(require_existence=True),
+            "paths",
+            help="files/directories to be converted (non-python files ignored)",
+            metavar="PATH",
+            type=args.PathArg(require_existence=True),
             nargs="*",
         )
         return super().add_args(parser)
 
     def run(self, arguments: Namespace) -> int:
         """Entrypoint."""
-        files: list[Path] = arguments.files
-        if not files:
-            msg = "No file(s) provided."
+        paths: list[Path] = arguments.paths
+        if not paths:
+            msg = "No path(s) provided."
             raise RuntimeError(msg)
 
-        for file in files:
-            generate_c_file(file)
+        for path in paths:
+            convert(path)
 
         return 0

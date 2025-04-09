@@ -169,7 +169,7 @@ static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
     pretty_bytes(&str, get_used_flash());
     str_append(&str, "/");
     pretty_bytes(&str, get_flash_size());
-    qp_drawtext(heap_stats_args.device, heap_stats_args.x, heap_stats_args.y - heap_stats_args.font->line_height + 2, heap_stats_args.font, str_get(str));
+    qp_drawtext(heap_stats_args.device, heap_stats_args.x, heap_stats_args.y - heap_stats_args.font->line_height + 2, heap_stats_args.font, str.ptr);
 
     // reset buffer
     str_reset(&str);
@@ -178,7 +178,7 @@ static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
     str_append(&str, "/");
     pretty_bytes(&str, get_heap_size());
 
-    strlcpy(state->dest, str_get(str), sizeof(state->dest));
+    strlcpy(state->dest, str.ptr, sizeof(state->dest));
     state->running = true;
     state->mask    = 0;
     state->state   = FILLING;
