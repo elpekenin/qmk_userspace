@@ -84,8 +84,6 @@ class Pyi:
 
 def generate_pyi_file(input_file: Path) -> None:
     """Create contents for PYI file."""
-    assert input_file.is_file()  # noqa: S101  # defensive programming
-
     pyi = Pyi()
     with input_file.open() as f:
         for line in f.readlines():
