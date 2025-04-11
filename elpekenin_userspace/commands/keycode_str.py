@@ -12,10 +12,14 @@ from typing import TYPE_CHECKING
 from elpekenin_userspace import args
 from elpekenin_userspace.codegen import C_HEADER, H_HEADER, lines
 from elpekenin_userspace.commands import CodegenCommand
+from elpekenin_userspace.result import Ok
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
     from pathlib import Path
+
+    from elpekenin_userspace.result import Result
+
 
 OUTPUT_NAME = "keycode_str"
 
@@ -173,11 +177,11 @@ class KeycodeStr(CodegenCommand):
         )
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> int:
+    def run(self, arguments: Namespace) -> Result[None, str]:
         """Entrypoint."""
         output_directory: Path = arguments.output_directory
 
         gen_h_file(output_directory / f"{OUTPUT_NAME}.h")
         gen_c_file(output_directory / f"{OUTPUT_NAME}.c", arguments.keymap)
 
-        return 0
+        return Ok(None)

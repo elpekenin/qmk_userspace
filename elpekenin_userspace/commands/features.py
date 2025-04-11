@@ -6,10 +6,13 @@ from typing import TYPE_CHECKING
 
 from elpekenin_userspace.codegen import C_HEADER, H_HEADER, lines
 from elpekenin_userspace.commands import CodegenCommand
+from elpekenin_userspace.result import Err, Ok, is_err
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
     from pathlib import Path
+
+    from elpekenin_userspace.result import Result
 
 OUTPUT_NAME = "features"
 
@@ -41,18 +44,17 @@ ALIASES = {
 """Shorter names."""
 
 
-def get_type(features: set[str]) -> str:
+def get_type(features: set[str]) -> Result[str, str]:
     """Compute <stdint.h> type to use based on the amount of features."""
     bits = len(features)
     for size in (8, 16, 32, 64):
         if bits <= size:
-            return f"uint{size}_t"
+            return Ok(f"uint{size}_t")
 
-    msg = "Too many features specified, unsupported"
-    raise RuntimeError(msg)
+    return Err("Too many features specified, unsupported")
 
 
-def gen_h_file(file: Path, features: set[str]) -> None:
+def gen_h_file(file: Path, features: set[str], type_: str) -> None:
     """Create contents for H file."""
     width = max(map(len, features))
 
@@ -76,7 +78,7 @@ def gen_h_file(file: Path, features: set[str]) -> None:
             "",
             "enabled_features_t get_enabled_features(void);",
             "",
-        ).format(type=get_type(features), code=code),
+        ).format(type=type_, code=code),
     )
 
 
@@ -204,15 +206,19 @@ class Features(CodegenCommand):
 
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> int:
+    def run(self, arguments: Namespace) -> Result[None, str]:
         """Entrypoint."""
         output_directory: Path = arguments.output_directory
 
         features_list: list[str] = arguments.features
         features = {feature.upper() for feature in features_list}
 
-        gen_h_file(output_directory / f"{OUTPUT_NAME}.h", features)
+        res = get_type(features)
+        if is_err(res):
+            return res
+
+        gen_h_file(output_directory / f"{OUTPUT_NAME}.h", features, res.ok())
         gen_c_file(output_directory / f"{OUTPUT_NAME}.c", features)
         gen_draw_file(output_directory / f"{OUTPUT_NAME}_draw.c", features)
 
-        return 0
+        return Ok(None)

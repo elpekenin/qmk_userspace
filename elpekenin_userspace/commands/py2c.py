@@ -7,12 +7,16 @@ from __future__ import annotations
 import ast
 from typing import TYPE_CHECKING, cast
 
-from elpekenin_userspace import args, error
+from elpekenin_userspace import args
 from elpekenin_userspace.commands import BaseCommand
+from elpekenin_userspace.result import Err, Ok
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
     from pathlib import Path
+
+    from elpekenin_userspace.result import Result
+
 
 REPLACEMENTS: tuple[tuple[str, str], ...] = (
     ('"', '\\"'),
@@ -99,15 +103,19 @@ def convert_file(file: Path) -> None:
     )
 
 
-def convert(path: Path) -> None:
+def convert(path: Path) -> Result[None, str]:
     """Convert a file/folder."""
     if path.is_file():
         convert_file(path)
-    elif path.is_dir():
+        return Ok(None)
+
+    if path.is_dir():
         for file in path.iterdir():
             convert(file)
-    else:
-        error.abort(f"Unsupported path type: '{path}'")
+
+        return Ok(None)
+
+    return Err(f"Unsupported path type: '{path}'")
 
 
 class Py2C(BaseCommand):
@@ -125,14 +133,13 @@ class Py2C(BaseCommand):
         )
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> int:
+    def run(self, arguments: Namespace) -> Result[None, str]:
         """Entrypoint."""
         paths: list[Path] = arguments.paths
         if not paths:
-            msg = "No path(s) provided."
-            raise RuntimeError(msg)
+            return Err("No path(s) provided.")
 
         for path in paths:
             convert(path)
 
-        return 0
+        return Ok(None)

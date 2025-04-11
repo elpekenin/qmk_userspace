@@ -7,10 +7,14 @@ from typing import TYPE_CHECKING
 from elpekenin_userspace import args
 from elpekenin_userspace.codegen import PY_HEADER, lines
 from elpekenin_userspace.commands import BaseCommand
+from elpekenin_userspace.result import Ok
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
     from pathlib import Path
+
+    from elpekenin_userspace.result import Result
+
 
 DOCSTRING = "//!"
 CONTENT = "//|"
@@ -127,7 +131,7 @@ class Stubs(BaseCommand):
         )
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> int:
+    def run(self, arguments: Namespace) -> Result[None, str]:
         """Entrypoint."""
         files: list[Path] = arguments.files
         if not files:
@@ -137,4 +141,4 @@ class Stubs(BaseCommand):
         for file in files:
             generate_pyi_file(file)
 
-        return 0
+        return Ok(None)

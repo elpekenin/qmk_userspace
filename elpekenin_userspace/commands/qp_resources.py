@@ -7,10 +7,13 @@ from typing import TYPE_CHECKING
 from elpekenin_userspace import args
 from elpekenin_userspace.codegen import C_HEADER, H_HEADER, MK_HEADER
 from elpekenin_userspace.commands import CodegenCommand
+from elpekenin_userspace.result import Ok
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
     from pathlib import Path
+
+    from elpekenin_userspace.result import Result
 
     AssetsDictT = dict[str, list[Path]]
 
@@ -141,7 +144,7 @@ class QpResources(CodegenCommand):
         )
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> int:
+    def run(self, arguments: Namespace) -> Result[None, str]:
         """Entrypoint."""
         output_directory: Path = arguments.output_directory
         assets = find_assets(arguments.directories)
@@ -150,4 +153,4 @@ class QpResources(CodegenCommand):
         gen_c_file(output_directory / f"{OUTPUT_NAME}.c", assets)
         gen_mk_file(output_directory / f"{OUTPUT_NAME}.mk", assets)
 
-        return 0
+        return Ok(None)

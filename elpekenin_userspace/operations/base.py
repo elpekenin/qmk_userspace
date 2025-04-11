@@ -6,36 +6,44 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing_extensions import Self
+
     from elpekenin_userspace.build import Recipe
     from elpekenin_userspace.operations import Args
+    from elpekenin_userspace.result import Result
+
+
+class BaseOperation(ABC):
+    """Represent every operation."""
+
+    @abstractmethod
+    def run(self) -> Result[None, str]:
+        """Logic of operation."""
+        raise NotImplementedError
 
 
 class SetupOperation(ABC):
     """Represent a setup operation, out of user control."""
 
+    @classmethod
     @abstractmethod
-    def __init__(
-        self,
+    def init_from(
+        cls,
         recipe: Recipe,
-    ) -> None:
+    ) -> Result[Self, str]:
         """Initialize an instance."""
-
-    @abstractmethod
-    def run(self) -> int:
-        """Logic of operation."""
+        raise NotImplementedError
 
 
-class BaseOperation(ABC):
+class Operation(ABC):
     """Represent an operation available over JSON."""
 
+    @classmethod
     @abstractmethod
-    def __init__(
-        self,
+    def init_from(
+        cls,
         recipe: Recipe,
         entry: Args,
-    ) -> None:
+    ) -> Result[Self, str]:
         """Initialize an instance."""
-
-    @abstractmethod
-    def run(self) -> int:
-        """Logic of operation."""
+        raise NotImplementedError

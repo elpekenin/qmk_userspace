@@ -11,35 +11,45 @@ from tqdm import tqdm
 from elpekenin_userspace import args
 from elpekenin_userspace.build import Recipe
 from elpekenin_userspace.commands import BaseCommand
+from elpekenin_userspace.result import Ok, is_err
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
 
+    from elpekenin_userspace.result import Result
 
-def display(recipe: Recipe) -> None:
+
+def display(recipe: Recipe) -> Result[None, str]:
     """Show the steps in this build recipe."""
-    for operation in recipe.get_all_operations():
+    res = recipe.get_all_operations()
+    if is_err(res):
+        return res
+
+    for operation in res.ok():
         sys.stdout.write(f"{operation}\n")
 
+    return Ok(None)
 
-def build(recipe: Recipe) -> int:
+
+def build(recipe: Recipe) -> Result[None, str]:
     """Perform the build."""
-    # consume generator so that tqdm can display progress
-    operations = list(recipe.get_all_operations())
+    operations = recipe.get_all_operations()
+    if is_err(operations):
+        return operations
 
     with tqdm(
-        operations,
+        operations.ok(),
         desc="Building",
         bar_format="[{n_fmt}/{total_fmt}] {desc}{bar}",
     ) as progress:
         for operation in progress:
             progress.set_description(str(operation))
 
-            ret = operation.run()
-            if ret != 0:
-                return ret
+            res = operation.run()
+            if is_err(res):
+                return res
 
-    return 0
+    return Ok(None)
 
 
 class Build(BaseCommand):
@@ -65,12 +75,15 @@ class Build(BaseCommand):
 
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> int:
+    def run(self, arguments: Namespace) -> Result[None, str]:
         """Entrypoint."""
-        recipe = Recipe.from_file(arguments.file)
+        res = Recipe.from_file(arguments.file)
+        if is_err(res):
+            return res
+
+        recipe = res.ok()
 
         if arguments.dry_run:
-            display(recipe)
-            return 0
+            return display(recipe)
 
         return build(recipe)

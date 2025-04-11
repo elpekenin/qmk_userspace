@@ -2,18 +2,21 @@
 
 from __future__ import annotations
 
-import sys
 from typing import TYPE_CHECKING, TypedDict
 
-from elpekenin_userspace.operations.base import BaseOperation
+from elpekenin_userspace.operations.base import Operation
+from elpekenin_userspace.result import Err, Ok
 
 if TYPE_CHECKING:
     from typing import Literal
 
+    from typing_extensions import Self
+
     from elpekenin_userspace.build import Recipe
+    from elpekenin_userspace.result import Result
 
 
-class Stop(BaseOperation):
+class Stop(Operation):
     """Stop execution."""
 
     class Args(TypedDict):
@@ -21,18 +24,19 @@ class Stop(BaseOperation):
 
         operation: Literal["stop"]
 
-    def __init__(
-        self,
+    @classmethod
+    def init_from(
+        cls,
         _r: Recipe,
-        _e: Args,
-    ) -> None:
+        _a: Args,  # type: ignore[override]  # is not the Union of them all
+    ) -> Result[Self, str]:
         """Initialize an instance."""
+        return Ok(cls())
 
     def __str__(self) -> str:
         """Display this operation."""
         return "stop"
 
-    def run(self) -> int:
+    def run(self) -> Result[None, str]:
         """Entrypoint."""
-        sys.stderr.write("Stopping...\n")
-        return 1
+        return Err("Stopping...")

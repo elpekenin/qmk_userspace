@@ -199,6 +199,46 @@ def build_dir(maybe_dir: Path | None) -> Generator[str]:
             yield directory
 
 
+def remove_docs(host: str, path: str) -> None:
+    """Remove old docs from server."""
+    ssh = shutil.which("ssh")
+    if ssh is None:
+        msg = "ssh not found"
+        raise RuntimeError(msg)
+
+    subprocess.run(  # noqa: S603  # out of attacker control
+        [
+            ssh,
+            host,
+            "rm",
+            # -f in case it doesn't exist
+            "-rf",
+            path,
+        ],
+        check=True,
+    )
+
+
+def deploy_docs(src: str, host: str, dst: str) -> None:
+    """Copy new docs into server."""
+    scp = shutil.which("scp")
+    if scp is None:
+        msg = "scp not found"
+        raise RuntimeError(msg)
+
+    html = str(Path(src) / "html")
+    subprocess.run(  # noqa: S603  # out of attacker control
+        [
+            scp,
+            "-prq",
+            # dot makes scp copy the contents instead of the folder itself
+            html,
+            f"{host}:{dst}",
+        ],
+        check=True,
+    )
+
+
 class Docs(BaseCommand):
     """Generate or deploy documentation."""
 
@@ -270,12 +310,11 @@ class Docs(BaseCommand):
 
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> int:
+    def run(self, arguments: Namespace) -> Result[None, str]:
         """Entrypoint."""
-        result = check_userspace(arguments.userspace)
-        if is_err(result):
-            sys.stderr.write(result.err() + "\n")
-            return 1
+        res = check_userspace(arguments.userspace)
+        if is_err(res):
+            return res
 
         actions = {
             "build": self.do_build,
@@ -287,7 +326,7 @@ class Docs(BaseCommand):
         with build_dir(arguments.output) as build:
             return action(build, arguments)
 
-    def do_build(self, build: str, arguments: Namespace) -> int:
+    def do_build(self, build: str, arguments: Namespace) -> Result[None, str]:
         """Build documentation."""
         add_conf_environment(arguments.userspace)
 
@@ -305,35 +344,30 @@ class Docs(BaseCommand):
             sphinx_args.append("--silent")
 
         if sphinx_build is None:
-            sys.stderr.write(
-                "Dependencies missing, run `pip install .[docs]`\n",
-            )
-            return 1
+            return Err("Dependencies missing, run `pip install .[docs]`")
 
-        return sphinx_build(sphinx_args)
+        res = sphinx_build(sphinx_args)
+        if res != 0:
+            return Err("Sphinx build failed")
 
-    def do_preview(self, build: str, arguments: Namespace) -> int:
+        return Ok(None)
+
+    def do_preview(self, build: str, arguments: Namespace) -> Result[None, str]:
         """Build documentation and spawn HTTP server to read it."""
-        ret = self.do_build(build, arguments)
-        if ret != 0:
-            return ret
+        res = self.do_build(build, arguments)
+        if is_err(res):
+            return res
 
         listen: str = arguments.listen
         try:
             address, port_str = listen.split(":", maxsplit=1)
         except ValueError:
-            sys.stderr.write(
-                "Invalid interface specified. Use ADDRESS:PORT syntax\n",
-            )
-            return 1
+            return Err("Invalid interface specified. Use ADDRESS:PORT syntax")
 
         try:
             port = int(port_str)
         except ValueError:
-            sys.stderr.write(
-                "Invalid interface specified. Port has to be a number\n",
-            )
-            return 1
+            return Err("Invalid interface specified. Port has to be a number")
 
         httpd = HTTPServer(
             (address, port),
@@ -347,57 +381,20 @@ class Docs(BaseCommand):
         httpd.serve_forever()
 
         # unreachable (?), does server exit?
-        return 0
+        return Ok(None)
 
-    def remove_docs(self, host: str, path: str) -> None:
-        """Remove old docs from server."""
-        ssh = shutil.which("ssh")
-        if ssh is None:
-            msg = "ssh not found"
-            raise RuntimeError(msg)
-
-        subprocess.run(  # noqa: S603  # out of attacker control
-            [
-                ssh,
-                host,
-                "rm",
-                # -f in case it doesn't exist
-                "-rf",
-                path,
-            ],
-            check=True,
-        )
-
-    def deploy_docs(self, src: str, host: str, dst: str) -> None:
-        """Copy new docs into server."""
-        scp = shutil.which("scp")
-        if scp is None:
-            msg = "scp not found"
-            raise RuntimeError(msg)
-
-        html = str(Path(src) / "html")
-        subprocess.run(  # noqa: S603  # out of attacker control
-            [
-                scp,
-                "-prq",
-                # dot makes scp copy the contents instead of the folder itself
-                html,
-                f"{host}:{dst}",
-            ],
-            check=True,
-        )
-
-    def do_deploy(self, build: str, arguments: Namespace) -> int:
+    def do_deploy(self, build: str, arguments: Namespace) -> Result[None, str]:
         """Build documentation and deploy to a host with NGINX to serve it."""
-        ret = self.do_build(build, arguments)
-        if ret != 0:
-            return ret
+        res = self.do_build(build, arguments)
+        if is_err(res):
+            return res
+
         sys.stdout.write("Documentation built\n")
 
-        self.remove_docs(arguments.host, arguments.path)
+        remove_docs(arguments.host, arguments.path)
         sys.stdout.write("Removed previous documentation\n")
 
-        self.deploy_docs(build, arguments.host, arguments.path)
+        deploy_docs(build, arguments.host, arguments.path)
         sys.stdout.write("Deployed new documentation\n")
 
-        return 0
+        return Ok(None)

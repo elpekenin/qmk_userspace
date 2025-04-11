@@ -10,6 +10,8 @@ from elpekenin_userspace import args
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
 
+    from elpekenin_userspace.result import Result
+
 
 class BaseCommand(ABC):
     """Represent a command."""
@@ -30,7 +32,7 @@ class BaseCommand(ABC):
         _ = parser  # by default: no-op
 
     @abstractmethod
-    def run(self, arguments: Namespace) -> int:
+    def run(self, arguments: Namespace) -> Result[None, str]:
         """Logic of command, returns exitcode."""
 
 

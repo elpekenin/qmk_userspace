@@ -12,7 +12,7 @@ from elpekenin_userspace.operations.stop import Stop
 if TYPE_CHECKING:
     from typing import Union
 
-    from elpekenin_userspace.operations.base import BaseOperation
+    from elpekenin_userspace.operations.base import Operation
 
     Args = Union[
         Checkout.Args,
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
         Stop.Args,
     ]
 
-OPERATIONS: dict[str, type[BaseOperation]] = {
+OPERATIONS: dict[str, type[Operation]] = {
     "checkout": Checkout,
     "cp": Cp,
     "diff": Diff,

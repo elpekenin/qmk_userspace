@@ -3,7 +3,6 @@
 
 #include "elpekenin/qp/graphics.h"
 
-#include <errno.h>
 #include <quantum/color.h>
 #include <quantum/quantum.h>
 
@@ -13,12 +12,17 @@
 #include "elpekenin/logging/backends/qp.h"
 #include "elpekenin/memory.h"
 #include "elpekenin/qp/assets.h"
-#include "elpekenin/qp/glitch_text.h"
 #include "elpekenin/string.h"
 #include "elpekenin/time.h"
 
 #if defined(COMMUNITY_MODULE_ALLOCATOR_ENABLE)
 #    include "elpekenin/allocator.h"
+#endif
+
+#if defined(COMMUNITY_MODULE_GLITCH_TEXT_ENABLE)
+#    include "elpekenin/glitch_text.h"
+#else
+#    error "This code depends on 'elpekenin/glitch_text' to work"
 #endif
 
 #if defined(COMMUNITY_MODULE_RNG_ENABLE)
@@ -82,13 +86,13 @@ void set_uptime_device(painter_device_t device) {
 }
 
 // layer task
-static deferred_token      layer_token = INVALID_DEFERRED_TOKEN;
-static qp_callback_args_t  layer_args  = {0};
-static glitch_text_state_t layer_extra = {0};
+static bool               layer_running = false;
+static deferred_token     layer_token   = INVALID_DEFERRED_TOKEN;
+static qp_callback_args_t layer_args    = {0};
 
-static void draw_layer(void *cb_arg) {
-    qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
-    glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
+static void draw_layer(const char *text, bool last_frame) {
+    // TODO: do not hardcode access to global
+    qp_callback_args_t *args = &layer_args;
 
     if (args->device == NULL || args->font == NULL) {
         return;
@@ -96,31 +100,31 @@ static void draw_layer(void *cb_arg) {
 
     // sat = 0 => white regardless of hue
     uint8_t hue = rng_min_max(0, 255); // random color
-    uint8_t sat = state->running ? 255 : 0;
+    uint8_t sat = 255;                 // state->running ? 255 : 0;
 
-    qp_drawtext_recolor(args->device, args->x, args->y, args->font, state->curr, hue, sat, 255, HSV_BLACK);
+    qp_drawtext_recolor(args->device, args->x, args->y, args->font, text, hue, sat, 255, HSV_BLACK);
+
+    if (last_frame) {
+        layer_running = false;
+    }
 }
 
 static uint32_t layer_task_callback(uint32_t trigger_time, void *cb_arg) {
-    qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
-    glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
+    qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
     static uint8_t last_layer = UINT8_MAX;
 
     const uint8_t layer = get_highest_layer(layer_state | default_layer_state);
 
-    if (args->device == NULL || args->font == NULL || last_layer == layer || state->running) {
+    if (args->device == NULL || args->font == NULL || last_layer == layer || layer_running) {
         return 100;
     }
 
-    last_layer     = layer;
-    state->running = true;
+    last_layer    = layer;
+    layer_running = true;
 
     // start the animation
-    strlcpy(state->dest, get_layer_name(layer), sizeof(state->dest));
-    state->mask  = 0;
-    state->state = FILLING;
-    defer_exec(10, glitch_text_callback, args);
+    glitch_text_start(get_layer_name(layer), draw_layer);
 
     return 100;
 }
@@ -132,13 +136,13 @@ void set_layer_device(painter_device_t device) {
 }
 
 #if defined(COMMUNITY_MODULE_ALLOCATOR_ENABLE)
-static deferred_token      heap_stats_token = INVALID_DEFERRED_TOKEN;
-static qp_callback_args_t  heap_stats_args  = {0};
-static glitch_text_state_t heap_stats_extra = {0};
+static bool               heap_stats_running = false;
+static deferred_token     heap_stats_token   = INVALID_DEFERRED_TOKEN;
+static qp_callback_args_t heap_stats_args    = {0};
 
-static void draw_heap(void *cb_arg) {
-    qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
-    glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
+static void draw_heap(const char *text, bool last_frame) {
+    // TODO
+    qp_callback_args_t *args = &heap_stats_args;
 
     if (args->device == NULL || args->font == NULL) {
         return;
@@ -147,20 +151,21 @@ static void draw_heap(void *cb_arg) {
     // heading space to align the ":" with flash
     int16_t width = qp_drawtext(args->device, args->x, args->y, args->font, " Heap: ");
 
-    qp_drawtext(args->device, args->x + width, args->y, args->font, state->curr);
+    qp_drawtext(args->device, args->x + width, args->y, args->font, text);
 }
 
 static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
-    qp_callback_args_t  *args  = (qp_callback_args_t *)cb_arg;
-    glitch_text_state_t *state = (glitch_text_state_t *)args->extra;
+    qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
     static size_t last_used = 0;
     const size_t  used_heap = get_used_heap();
 
-    if (args->device == NULL || args->font == NULL || last_used == used_heap || state->running) {
+    if (args->device == NULL || args->font == NULL || last_used == used_heap || heap_stats_running) {
         return 1000;
     }
-    last_used = used_heap;
+
+    last_used          = used_heap;
+    heap_stats_running = true;
 
     // on first go, draw the consumed flash
     string_t str = str_new(100);
@@ -178,11 +183,7 @@ static uint32_t heap_stats_task_callback(uint32_t trigger_time, void *cb_arg) {
     str_append(&str, "/");
     pretty_bytes(&str, get_heap_size());
 
-    strlcpy(state->dest, str.ptr, sizeof(state->dest));
-    state->running = true;
-    state->mask    = 0;
-    state->state   = FILLING;
-    defer_exec(10, glitch_text_callback, args);
+    glitch_text_start(str.ptr, draw_heap);
 
     return 1000;
 }
@@ -291,20 +292,16 @@ void qp_tasks_init(void) {
     y += spacing;
 
 #if defined(COMMUNITY_MODULE_ALLOCATOR_ENABLE)
-    heap_stats_args.font      = font;
-    heap_stats_args.x         = 50;
-    heap_stats_args.y         = y;
-    heap_stats_extra.callback = draw_heap;
-    heap_stats_args.extra     = &heap_stats_extra;
+    heap_stats_args.font = font;
+    heap_stats_args.x    = 50;
+    heap_stats_args.y    = y;
 
     y += spacing;
 #endif
 
-    layer_args.font      = font;
-    layer_args.x         = 70;
-    layer_args.y         = y;
-    layer_extra.callback = draw_layer;
-    layer_args.extra     = &layer_extra;
+    layer_args.font = font;
+    layer_args.x    = 70;
+    layer_args.y    = y;
 
 #if defined(KEYLOG_ENABLE)
     keylog_args.font = font;

@@ -24,6 +24,7 @@ from elpekenin_userspace.commands.keycode_str import KeycodeStr
 from elpekenin_userspace.commands.py2c import Py2C
 from elpekenin_userspace.commands.qp_resources import QpResources
 from elpekenin_userspace.commands.stubs import Stubs
+from elpekenin_userspace.result import is_err
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -101,7 +102,7 @@ def main() -> int:
     subcommand = SUBCOMMANDS[subcommand_name]
 
     try:
-        return subcommand().run(arguments)
+        res = subcommand().run(arguments)
     except Exception as e:
         t = type(e).__name__
         sys.stdout.write(
@@ -111,6 +112,12 @@ def main() -> int:
     except KeyboardInterrupt:
         sys.stdout.write("\n")
         return 0
+
+    if is_err(res):
+        sys.stdout.write(res.err() + "\n")
+        return 1
+
+    return 0
 
 
 if __name__ == "__main__":

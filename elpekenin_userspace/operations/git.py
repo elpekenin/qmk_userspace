@@ -7,15 +7,18 @@ from typing import TYPE_CHECKING, TypedDict
 from git import Repo
 
 import elpekenin_userspace.path
-from elpekenin_userspace import constants, error
-from elpekenin_userspace.operations.base import BaseOperation, SetupOperation
+from elpekenin_userspace import constants
+from elpekenin_userspace.operations.base import Operation, SetupOperation
+from elpekenin_userspace.result import Ok, missing
 
 if TYPE_CHECKING:
+    from pathlib import Path
     from typing import Literal
 
-    from typing_extensions import NotRequired
+    from typing_extensions import NotRequired, Self
 
     from elpekenin_userspace.build import Recipe
+    from elpekenin_userspace.result import Result
 
 
 def name_for(remote_url: str) -> str:
@@ -53,41 +56,49 @@ def fetch(repo: Repo, remote_url: str, branch: str | None = None) -> str:
 class Branch(SetupOperation):
     """Swap into desired branch."""
 
-    def __init__(self, recipe: Recipe) -> None:
+    def __init__(self, url: str, branch: str, dst: Path) -> None:
         """Initialize an instance."""
-        self.url = recipe.repo
-        self.branch = recipe.branch
-        self.dst = recipe.path
+        self.url = url
+        self.branch = branch
+        self.dst = dst
+
+    @classmethod
+    def init_from(cls, recipe: Recipe) -> Result[Self, str]:
+        """Initialize an instance."""
+        return Ok(cls(recipe.repo, recipe.branch, recipe.path))
 
     def __str__(self) -> str:
         """Display this operation."""
         return f"Swapping to '{self.branch}'"
 
-    def run(self) -> int:
+    def run(self) -> Result[None, str]:
         """Entrypoint."""
         repo = Repo(self.dst)
         name = fetch(repo, self.url)
         repo.git.checkout(f"{name}/{self.branch}")
-        return 0
+        return Ok(None)
 
 
 class Clean(SetupOperation):
-    """Clear an existing repository."""
+    """Clean existing repository."""
 
-    def __init__(self, recipe: Recipe) -> None:
+    def __init__(self, dst: Path) -> None:
         """Initialize an instance."""
-        self.dst = recipe.path
+        self.dst = dst
+
+    @classmethod
+    def init_from(cls, recipe: Recipe) -> Result[Self, str]:
+        """Initialize an instance."""
+        return Ok(cls(recipe.path))
 
     def __str__(self) -> str:
         """Display this operation."""
         return "Cleaning repository"
 
-    def run(self) -> int:
+    def run(self) -> Result[None, str]:
         """Entrypoint."""
-        repo = Repo(self.dst)
-        repo.git.reset("--hard")
-        repo.git.clean("-dxf")
-        return 0
+        Repo(self.dst).git.clean("-dxf")
+        return Ok(None)
 
 
 class Clone(SetupOperation):
@@ -102,33 +113,38 @@ class Clone(SetupOperation):
         """Display this operation."""
         return f"Cloning {self.url}"
 
-    def run(self) -> int:
+    def run(self) -> Result[None, str]:
         """Entrypoint."""
         Repo.clone_from(self.url, self.dst)
-        return 0
+        return Ok(None)
 
 
 class Submodules(SetupOperation):
     """Synchronize submodules."""
 
-    def __init__(self, recipe: Recipe) -> None:
+    def __init__(self, dst: Path) -> None:
         """Initialize an instance."""
-        self.dst = recipe.path
+        self.dst = dst
+
+    @classmethod
+    def init_from(cls, recipe: Recipe) -> Result[Self, str]:
+        """Initialize an instance."""
+        return Ok(cls(recipe.path))
 
     def __str__(self) -> str:
         """Display this operation."""
         return "Synchronizing submodules"
 
-    def run(self) -> int:
+    def run(self) -> Result[None, str]:
         """Entrypoint."""
         repo = Repo(self.dst)
         repo.git.submodule("sync", "--recursive")
         repo.git.submodule("update", "--init", "--recursive", "--progress")
-        return 0
+        return Ok(None)
 
 
 # operations available over JSON file
-class Checkout(BaseOperation):
+class Checkout(Operation):
     """Grab some files from another branch."""
 
     class Args(TypedDict):
@@ -141,28 +157,53 @@ class Checkout(BaseOperation):
 
     def __init__(
         self,
-        recipe: Recipe,
-        entry: Args,
+        workdir: Path,
+        remote: str,
+        branch: str,
+        files: list[str],
     ) -> None:
         """Initialize an instance."""
-        self.workdir = recipe.path
-        self.remote = entry.get("repo") or error.missing("repo")
-        self.branch = entry.get("branch") or error.missing("branch")
-        self.files = entry.get("files") or error.missing("files")
+        self.workdir = workdir
+        self.remote = remote
+        self.branch = branch
+        self.files = files
+
+    @classmethod
+    def init_from(
+        cls,
+        recipe: Recipe,
+        entry: Args,  # type: ignore[override]  # is not the Union of them all
+    ) -> Result[Self, str]:
+        """Initialize an instance."""
+        workdir = recipe.path
+
+        remote = entry.get("repo")
+        if remote is None:
+            return missing("repo")
+
+        branch = entry.get("branch")
+        if branch is None:
+            return missing("branch")
+
+        files = entry.get("files")
+        if files is None:
+            return missing("files")
+
+        return Ok(cls(workdir, remote, branch, files))
 
     def __str__(self) -> str:
         """Display this operation."""
         return f"Checking out '{self.branch}'"
 
-    def run(self) -> int:
+    def run(self) -> Result[None, str]:
         """Entrypoint."""
         repo = Repo(self.workdir)
         remote = fetch(repo, self.remote, self.branch)
         repo.git.checkout(f"{remote}/{self.branch}", "--", *self.files)
-        return 0
+        return Ok(None)
 
 
-class Diff(BaseOperation):
+class Diff(Operation):
     """Apply a patch."""
 
     class Args(TypedDict):
@@ -173,26 +214,40 @@ class Diff(BaseOperation):
 
     def __init__(
         self,
-        recipe: Recipe,
-        entry: Args,
+        workdir: Path,
+        file: Path,
     ) -> None:
         """Initialize an instance."""
-        self.workdir = recipe.path
-        file = entry.get("file") or error.missing("file")
-        self.file = elpekenin_userspace.path.resolve(file)
+        self.workdir = workdir
+        self.file = file
+
+    @classmethod
+    def init_from(
+        cls,
+        recipe: Recipe,
+        entry: Args,  # type: ignore[override]  # is not the Union of them all
+    ) -> Result[Self, str]:
+        """Initialize an instance."""
+        workdir = recipe.path
+
+        file = entry.get("file")
+        if file is None:
+            return missing("file")
+
+        return Ok(cls(workdir, elpekenin_userspace.path.resolve(file)))
 
     def __str__(self) -> str:
         """Display this operation."""
         return f"Applying '{self.file.name}'"
 
-    def run(self) -> int:
+    def run(self) -> Result[None, str]:
         """Entrypoint."""
         repo = Repo(self.workdir)
         repo.git.apply("--reject", "--whitespace=fix", self.file)
-        return 0
+        return Ok(None)
 
 
-class Merge(BaseOperation):
+class Merge(Operation):
     """Fetch changes from another branch."""
 
     class Args(TypedDict):
@@ -204,27 +259,47 @@ class Merge(BaseOperation):
 
     def __init__(
         self,
-        recipe: Recipe,
-        entry: Args,
+        workdir: Path,
+        remote: str,
+        branch: str,
     ) -> None:
         """Initialize an instance."""
-        self.workdir = recipe.path
-        self.remote = entry.get("repo") or error.missing("repo")
-        self.branch = entry.get("branch") or error.missing("branch")
+        self.workdir = workdir
+        self.remote = remote
+        self.branch = branch
+
+    @classmethod
+    def init_from(
+        cls,
+        recipe: Recipe,
+        entry: Args,  # type: ignore[override]  # is not the Union of them all
+    ) -> Result[Self, str]:
+        """Initialize an instance."""
+        workdir = recipe.path
+
+        remote = entry.get("repo")
+        if remote is None:
+            return missing("repo")
+
+        branch = entry.get("branch")
+        if branch is None:
+            return missing("branch")
+
+        return Ok(cls(workdir, remote, branch))
 
     def __str__(self) -> str:
         """Display this operation."""
         return f"Merging '{self.branch}'"
 
-    def run(self) -> int:
+    def run(self) -> Result[None, str]:
         """Entrypoint."""
         repo = Repo(self.workdir)
         remote = fetch(repo, self.remote, self.branch)
         repo.git.merge(f"{remote}/{self.branch}")
-        return 0
+        return Ok(None)
 
 
-class Pr(BaseOperation):
+class Pr(Operation):
     """Fetch changes from a PR."""
 
     class Args(TypedDict):
@@ -236,19 +311,37 @@ class Pr(BaseOperation):
 
     def __init__(
         self,
-        recipe: Recipe,
-        entry: Args,
+        workdir: Path,
+        remote: str,
+        id_: int,
     ) -> None:
         """Initialize an instance."""
-        self.workdir = recipe.path
-        self.remote = entry.get("repo") or constants.QMK
-        self.id_ = entry.get("id") or error.missing("id")
+        self.workdir = workdir
+        self.remote = remote
+        self.id_ = id_
+
+    @classmethod
+    def init_from(
+        cls,
+        recipe: Recipe,
+        entry: Args,  # type: ignore[override]  # is not the Union of them all
+    ) -> Result[Self, str]:
+        """Initialize an instance."""
+        workdir = recipe.path
+
+        remote = entry.get("repo") or constants.QMK
+
+        id_ = entry.get("id")
+        if id_ is None:
+            return missing("id")
+
+        return Ok(cls(workdir, remote, id_))
 
     def __str__(self) -> str:
         """Display this operation."""
         return f"PR {self.id_}"
 
-    def run(self) -> int:
+    def run(self) -> Result[None, str]:
         """Entrypoint."""
         repo = Repo(self.workdir)
 
@@ -258,4 +351,26 @@ class Pr(BaseOperation):
 
         repo.git.merge(local_branch)
 
-        return 0
+        return Ok(None)
+
+
+class Reset(SetupOperation):
+    """Reset existing repository."""
+
+    def __init__(self, dst: Path) -> None:
+        """Initialize an instance."""
+        self.dst = dst
+
+    @classmethod
+    def init_from(cls, recipe: Recipe) -> Result[Self, str]:
+        """Initialize an instance."""
+        return Ok(cls(recipe.path))
+
+    def __str__(self) -> str:
+        """Display this operation."""
+        return "Resetting repository"
+
+    def run(self) -> Result[None, str]:
+        """Entrypoint."""
+        Repo(self.dst).git.reset("--hard")
+        return Ok(None)

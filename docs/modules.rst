@@ -23,6 +23,10 @@ dual_rp
 #######
 .. c:autodoc:: modules/elpekenin/dual_rp/elpekenin/dual_rp.h
 
+glitch_text
+###########
+.. c:autodoc:: modules/elpekenin/glitch_text/elpekenin/glitch_text.h
+
 indicators
 ##########
 .. c:autodoc:: modules/elpekenin/indicators/elpekenin/indicators.h

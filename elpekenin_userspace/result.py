@@ -83,3 +83,8 @@ def is_err(val: Result[T, E]) -> TypeIs[Err[E]]:
 
 
 Result: TypeAlias = Union[Ok[T], Err[E]]
+
+
+def missing(key: str) -> Err[str]:
+    """Shortcut for missing key."""
+    return Err(f"Missing required key '{key}'")
