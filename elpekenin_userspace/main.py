@@ -14,20 +14,18 @@ try:
 except ImportError:
     argcomplete = None
 
-import qmk_cli.helpers  # type: ignore[import-untyped]
-
 from elpekenin_userspace import args
 from elpekenin_userspace.commands.build import Build
 from elpekenin_userspace.commands.docs import Docs
 from elpekenin_userspace.commands.features import Features
 from elpekenin_userspace.commands.keycode_str import KeycodeStr
+from elpekenin_userspace.commands.micropython import Micropython
 from elpekenin_userspace.commands.py2c import Py2C
 from elpekenin_userspace.commands.qp_resources import QpResources
 from elpekenin_userspace.commands.stubs import Stubs
 from elpekenin_userspace.result import is_err
 
 if TYPE_CHECKING:
-    from pathlib import Path
     from types import ModuleType
 
     from elpekenin_userspace.commands import BaseCommand
@@ -38,19 +36,11 @@ SUBCOMMANDS: dict[str, type[BaseCommand]] = {
     "docs": Docs,
     "features": Features,
     "keycode_str": KeycodeStr,
+    "micropython": Micropython,
     "qp_resources": QpResources,
     "py2c": Py2C,
     "stubs": Stubs,
 }
-
-
-def find_qmk(arg: Path | None) -> Path | None:
-    """Return argument if received, otherwise try and find QMK."""
-    ret = arg or qmk_cli.helpers.find_qmk_firmware()
-    if not qmk_cli.helpers.is_qmk_firmware(ret):
-        return None
-
-    return ret
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -64,8 +54,9 @@ def get_parser() -> argparse.ArgumentParser:
         "--qmk",
         help="path to your qmk_firmware (needed to make `import qmk` work)",
         metavar="DIR",
-        type=args.Directory(require_existence=True),
+        type=args.qmk,
         required=False,
+        default=args.qmk(None),
     )
 
     # script-specific args
@@ -90,13 +81,12 @@ def main() -> int:
         parser.print_help()
         return 1
 
-    qmk = find_qmk(arguments.qmk)
-    if qmk is not None:
-        lib = qmk / "lib" / "python"
+    if arguments.qmk is not None:
+        lib = arguments.qmk / "lib" / "python"
         sys.path.append(str(lib))
     else:
         sys.stdout.write(
-            "Could not find QMK's home, code importing `qmk` will fail\n",
+            "[WARN] Could not find QMK's home, code importing `qmk` will fail\n",
         )
 
     subcommand = SUBCOMMANDS[subcommand_name]

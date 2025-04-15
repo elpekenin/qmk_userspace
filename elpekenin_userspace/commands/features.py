@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from elpekenin_userspace.codegen import C_HEADER, H_HEADER, lines
+from elpekenin_userspace.codegen import C_HEADER, H_HEADER
 from elpekenin_userspace.commands import CodegenCommand
 from elpekenin_userspace.result import Err, Ok, is_err
 
@@ -58,123 +58,132 @@ def gen_h_file(file: Path, features: set[str], type_: str) -> None:
     """Create contents for H file."""
     width = max(map(len, features))
 
-    code = ""
-    for feature in features:
-        code += f"        bool {feature.lower().ljust(width)}: 1;\n"
+    with file.open("w") as f:
+        f.writelines(
+            [
+                H_HEADER + "\n",
+                "\n",
+                "#include <stdbool.h>\n",
+                "#include <stdint.h>\n",
+                "\n",
+                "typedef union {\n",
+                f"    {type_} raw;\n",
+                "    struct {\n",
+            ],
+        )
 
-    file.write_text(
-        lines(
-            H_HEADER,
-            "",
-            "#include <stdbool.h>",
-            "#include <stdint.h>",
-            "",
-            "typedef union {{",
-            "    {type} raw;",
-            "    struct {{",
-            "{code}"  # intentional lack of comma
-            "    }};",
-            "}} enabled_features_t;",
-            "",
-            "enabled_features_t get_enabled_features(void);",
-            "",
-        ).format(type=type_, code=code),
-    )
+        for feature in features:
+            f.write(f"        bool {feature.lower().ljust(width)}: 1;\n")
+
+        f.writelines(
+            [
+                "    };\n",
+                "} enabled_features_t;\n",
+                "\n",
+                "enabled_features_t get_enabled_features(void);\n",
+            ],
+        )
 
 
 def gen_c_file(file: Path, features: set[str]) -> None:
     """Create contents for C file."""
-    code = ""
-    for feature in features:
-        code += lines(
-            f"    #if defined({feature.upper()}_ENABLE)",
-            f"        features.{feature.lower()} = true;",
-            "    #endif",
-            "",
-            "",
+    with file.open("w") as f:
+        f.writelines(
+            [
+                C_HEADER + "\n",
+                "\n",
+                f'#include "{OUTPUT_NAME}.h"\n',
+                "\n",
+                "enabled_features_t get_enabled_features(void) {\n",
+                "    enabled_features_t features;\n",
+                "\n",
+                "    features.raw = 0;\n",
+                "\n",
+            ],
         )
 
-    file.write_text(
-        lines(
-            C_HEADER,
-            "",
-            f'#include "{OUTPUT_NAME}.h"',
-            "",
-            "enabled_features_t get_enabled_features(void) {{",
-            "    enabled_features_t features;",
-            "",
-            "    features.raw = 0;",
-            "",
-            "{code}"  # intentional lack of comma
-            "    return features;",
-            "}}",
-            "",
-        ).format(code=code),
-    )
+        for feature in features:
+            f.writelines(
+                [
+                    f"    #if defined({feature.upper()}_ENABLE)\n",
+                    f"        features.{feature.lower()} = true;\n",
+                    "    #endif\n",
+                    "\n",
+                ],
+            )
+
+        f.writelines(
+            [
+                "    return features;\n",
+                "}\n",
+            ],
+        )
 
 
 def gen_draw_file(file: Path, features: set[str]) -> None:
     """Create contents for C file."""
-    code = ""
-    for feature in features:
-        # get alias or keep as is
-        short_name = ALIASES.get(feature, feature)
-        name = short_name.replace("_", " ").title()
-
-        code += lines(
-            f'    qp_drawtext_recolor(device, x, y, font, features.{feature.lower()} ? "{name}: On " : "{name}: Off", {DEFAULT_FG}, {DEFAULT_BG});',  # noqa: E501
-            #                         intentional space so it overwrites previous "Off"         ^^^  # noqa: E501
-            "    y += font_height;",
-            "    // next text does not fit vertically",
-            "    if ((y + font_height) > height) {",
-            "        // shift half the screen to the right, if not done already",
-            "        if (!shifted) {",
-            "            shifted = true;",
-            "            x = width / 2;",
-            "            y = 0;",
-            "        } else {",
-            '           logging(LOG_WARN, "Can\'t fit more features");',
-            "           return;",
-            "        }",
-            "    }",
-            "",
-            "",
+    with file.open("w") as f:
+        f.writelines(
+            [
+                C_HEADER + "\n",
+                "",
+                f'#include "{OUTPUT_NAME}.h"',
+                "\n",
+                "#include <quantum/quantum.h>\n",
+                "#include <quantum/color.h>\n",
+                "\n",
+                '#include "elpekenin/qp/assets.h"\n',
+                '#include "elpekenin/build_info.h"\n',
+                '#include "elpekenin/logging.h"\n',
+                "\n",
+                "void draw_features(painter_device_t device) {\n",
+                '    painter_font_handle_t font = qp_get_font_by_name("font_fira_code");\n',  # noqa: E501
+                "    if (font == NULL) {\n",
+                '        logging(LOG_ERROR, "Font was NULL");\n',
+                "        return;\n",
+                "    }\n",
+                "\n",
+                "    enabled_features_t features    = get_build_info().features;\n",
+                "    uint8_t            font_height = font->line_height;\n",
+                "    uint8_t            x           = 0;\n",
+                "    uint8_t            y           = 0;\n",
+                "\n",
+                "    uint16_t width  = qp_get_width(device);\n",
+                "    uint16_t height = qp_get_height(device);\n",
+                "\n",
+                "    bool shifted = false;\n",
+                "\n",
+            ],
         )
 
-    file.write_text(
-        lines(
-            C_HEADER,
-            "",
-            f'#include "{OUTPUT_NAME}.h"',
-            "",
-            "#include <quantum/quantum.h>",
-            "#include <quantum/color.h>",
-            "",
-            '#include "elpekenin/qp/assets.h"',
-            '#include "elpekenin/build_info.h"',
-            '#include "elpekenin/logging.h"',
-            "",
-            "void draw_features(painter_device_t device) {{",
-            '    painter_font_handle_t font = qp_get_font_by_name("font_fira_code");',
-            "    if (font == NULL) {{",
-            '        logging(LOG_ERROR, "Font was NULL");',
-            "        return;",
-            "    }}",
-            "",
-            "    enabled_features_t features    = get_build_info().features;",
-            "    uint8_t            font_height = font->line_height;",
-            "    uint8_t            x           = 0;",
-            "    uint8_t            y           = 0;",
-            "",
-            "    uint16_t width  = qp_get_width(device);",
-            "    uint16_t height = qp_get_height(device);",
-            "",
-            "    bool shifted = false;",
-            "",
-            "{code}"  # no comma here intentionally
-            "}}",
-        ).format(code=code),
-    )
+        for feature in features:
+            # get alias or keep as is
+            short_name = ALIASES.get(feature, feature)
+            name = short_name.replace("_", " ").title()
+
+            f.writelines(
+                [
+                    f'    qp_drawtext_recolor(device, x, y, font, features.{feature.lower()} ? "{name}: On " : "{name}: Off", {DEFAULT_FG}, {DEFAULT_BG});\n',  # noqa: E501
+                    #                         intentional space so it overwrites previous "Off"         ^^^  # noqa: E501
+                    "    y += font_height;\n",
+                    "    // next text does not fit vertically\n",
+                    "    if ((y + font_height) > height) {\n",
+                    "        // shift right by half screen, if not done already\n",
+                    "        if (!shifted) {\n",
+                    "            shifted = true;\n",
+                    "            x = width / 2;\n",
+                    "            y = 0;\n",
+                    "        } else {\n",
+                    '           logging(LOG_WARN, "Can\'t fit more features");\n',
+                    "           return;\n",
+                    "        }\n",
+                    "    }\n",
+                    "\n",
+                    "\n",
+                ],
+            )
+
+        f.write("}\n")
 
 
 class Features(CodegenCommand):

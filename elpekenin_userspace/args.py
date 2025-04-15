@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from argparse import ArgumentTypeError
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
+
+import qmk_cli.helpers  # type: ignore[import-untyped]
 
 import elpekenin_userspace.path
 
@@ -57,7 +59,7 @@ class Directory(PathArg):
     """Represent a directory argument."""
 
     def __call__(self, raw: str) -> Path:
-        """Conversion function for an argument expected to be a file."""
+        """Conversion function for an argument expected to be a directory."""
         path = super().__call__(raw)
 
         if not path.is_dir():
@@ -65,3 +67,16 @@ class Directory(PathArg):
             raise ArgumentTypeError(msg)
 
         return path.resolve()
+
+
+def qmk(raw: str | None) -> Path | None:
+    """Represent a directory argument, which is a copy of QMK."""
+    if raw is None:
+        value = cast("Path", qmk_cli.helpers.find_qmk_firmware())
+    else:
+        value = elpekenin_userspace.path.resolve(raw)
+
+    if not qmk_cli.helpers.is_qmk_firmware(value):
+        return None
+
+    return value

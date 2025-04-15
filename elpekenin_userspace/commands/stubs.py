@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from elpekenin_userspace import args
-from elpekenin_userspace.codegen import PY_HEADER, lines
+from elpekenin_userspace.codegen import PY_HEADER
 from elpekenin_userspace.commands import BaseCommand
 from elpekenin_userspace.result import Ok
 
@@ -33,18 +33,14 @@ class Pyi:
         if not self.docstring:
             return None
 
-        if len(self.docstring) == 1:
-            return self.docstring[0]
-
-        # trailing newline to make formatter happy
-        return lines(*self.docstring) + "\n"
+        return "\n".join(self.docstring)
 
     def get_content(self) -> str | None:
         """Get the processed contents."""
         if not self.content:
             return None
 
-        return lines(*self.content)
+        return "\n".join(self.content)
 
     def is_empty(self) -> bool:
         """Whether C file contained any special comment."""
@@ -107,13 +103,13 @@ def generate_pyi_file(input_file: Path) -> None:
         code += content
 
     output_file = input_file.with_suffix(".pyi")
-    output_file.write_text(
-        lines(
-            PY_HEADER,
-            "",
-            f"{code}",
-        ).format(code=code),
-    )
+    with output_file.open("w") as f:
+        f.writelines(
+            [
+                PY_HEADER + "\n",
+                code,
+            ],
+        )
 
 
 class Stubs(BaseCommand):
