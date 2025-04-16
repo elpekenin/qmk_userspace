@@ -104,10 +104,15 @@ class Clean(SetupOperation):
 class Clone(SetupOperation):
     """Clone a repository in the given path."""
 
-    def __init__(self, recipe: Recipe) -> None:
+    def __init__(self, url: str, dst: Path) -> None:
         """Initialize an instance."""
-        self.url = recipe.repo
-        self.dst = recipe.path
+        self.url = url
+        self.dst = dst
+
+    @classmethod
+    def init_from(cls, recipe: Recipe) -> Result[Self, str]:
+        """Initialize an instance."""
+        return Ok(cls(recipe.repo, recipe.path))
 
     def __str__(self) -> str:
         """Display this operation."""
