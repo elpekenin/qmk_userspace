@@ -66,6 +66,14 @@ Since that's not very useful by itself, a module is provided to hook into QMK AP
 
 To execute some code, store it as a string and feed it into the ``mp_embed_exec_str`` function
 
+.. tip::
+    Writing a C-string directly is not convenient (eg: no IntelliSense for suggestions/typo detection)
+
+    To circumvent that, you can write a regular ``.py`` file, and then use ``elpekenin_userspace py2c <file.py>`` to generate
+    the equivalent string in a standalone file, which you can later ``#include``
+
+    You could also point your editor at the ``qmk`` folder, and get auto-completion thanks to the ``.pyi`` files in it
+
 .. important::
     In the future, I plan to integrate ``import ...`` with QMK filesystem API (not a thing yet)
 
