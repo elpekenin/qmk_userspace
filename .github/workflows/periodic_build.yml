@@ -50,3 +50,9 @@ jobs:
         run: |
           pip install .
           elpekenin_userspace build
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+        path: *.log
