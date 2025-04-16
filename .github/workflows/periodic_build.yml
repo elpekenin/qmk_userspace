@@ -55,4 +55,4 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          path: ${{ env.QMK_HOME }}/users/elpekeninlogs/
+          path: *.log
