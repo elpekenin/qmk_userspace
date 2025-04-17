@@ -7,9 +7,17 @@
 from __future__ import annotations
 
 import builtins
+import functools
 import os
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from sphinx.application import Sphinx
+
 
 ROOT = Path(os.environ["CONF_ROOT"])
 USERSPACE = ROOT / "users" / "elpekenin"
@@ -129,3 +137,33 @@ hawkmoth_source_uri = UriGenerator()
 builtins.__dict__["UriGenerator"] = UriGenerator
 
 hawkmoth_napoleon_transform = None  # apply napoleon transform to every docstring
+
+
+def extend(func: Callable[[str], str]) -> Callable[[str], str]:
+    """Add type 'normalization' for `Result(T, E)`."""
+
+    @staticmethod  # type: ignore[misc]  # this will be a method
+    @functools.wraps(func)
+    def wrapper(type_str: str) -> str:
+        """Enhance hawkmoth's implementation."""
+        # this converts `_Bool` into `bool`
+        ret = func(type_str)
+
+        # convert `result___<T>___<E>` back into `Result(<T>, <E>)`
+        if "result___" in ret:
+            _, val, err = ret.split("___")
+            return f"Result({val}, {err})"
+
+        return ret
+
+    return wrapper
+
+
+def setup(_: Sphinx) -> None:
+    """Add extra configuration to sphinx's startup."""
+    from hawkmoth.doccursor import DocCursor  # type: ignore[import-untyped]
+
+    # accessing private member is needed here
+    DocCursor._normalize_type = extend(  # noqa: SLF001
+        DocCursor._normalize_type,  # noqa: SLF001
+    )
