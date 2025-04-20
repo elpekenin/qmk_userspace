@@ -9,9 +9,14 @@
 #include <string.h>
 #include <tmk_core/protocol/host.h> // keyboard_led_state
 
-#include "elpekenin/logging.h"
 #include "elpekenin/string.h"
 #include "generated/keycode_str.h"
+
+#if defined(COMMUNITY_MODULE_TYPES_ENABLE)
+#    include "elpekenin/types.h"
+#else
+#    error "This code depends on 'elpekenin/types' to work"
+#endif
 
 static bool keylog_dirty            = true;
 static char keylog[KEYLOG_SIZE + 1] = {
@@ -102,37 +107,44 @@ static void skip_prefix(const char **str) {
     }
 }
 
-static const replacements_t *find_replacement(const char *str) {
-    for (uint8_t i = 0; i < ARRAY_SIZE(replacements); ++i) {
-        const replacements_t *replacement = &replacements[i];
+OptionImpl(replacements_t);
 
-        if (strcmp(replacement->raw, str) == 0) {
-            return replacement;
+static const Option(replacements_t) find_replacement(const char *str) {
+    for (uint8_t i = 0; i < ARRAY_SIZE(replacements); ++i) {
+        const replacements_t replacement = replacements[i];
+
+        if (strcmp(replacement.raw, str) == 0) {
+            return Some(replacements_t, replacement);
         }
     }
 
-    return NULL;
+    return None(replacements_t);
 }
 
+OptionImpl(uintptr_t);
+
 static void maybe_symbol(const char **str) {
-    const replacements_t *replacement = find_replacement(*str);
-    if (replacement == NULL) {
+    const Option(replacements_t) option = find_replacement(*str);
+    if (!option.is_some) {
         return;
     }
 
-    const char *target;
+    replacements_t replacement = unwrap(option);
+
+    // can't use char* here, Option() would expand into invalid syntax
+    Option(uintptr_t) target = None(uintptr_t);
     switch (get_mods()) {
         case 0:
-            target = replacement->strings[NO_MODS];
+            target = Some(uintptr_t, (uintptr_t)replacement.strings[NO_MODS]); // clangd: ignore
             break;
 
         case MOD_BIT_LCTRL:
         case MOD_BIT_RCTRL:
-            target = replacement->strings[SHIFT];
+            target = Some(uintptr_t, (uintptr_t)replacement.strings[SHIFT]);
             break;
 
         case MOD_BIT_RALT:
-            target = replacement->strings[AL_GR];
+            target = Some(uintptr_t, (uintptr_t)replacement.strings[AL_GR]);
             break;
 
         default:
@@ -142,8 +154,9 @@ static void maybe_symbol(const char **str) {
 
     // we may get here with a combination with no replacement, eg shift+arrows
     // dont want to assign str to NULL
-    if (target != NULL) {
-        *str = target;
+    if (target.is_some) {
+        // convert uintptr_t back to char*
+        *str = (char *)unwrap(target);
     }
 }
 
