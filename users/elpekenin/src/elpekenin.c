@@ -48,17 +48,17 @@ void keyboard_post_init_user(void) {
 #endif
 
 #if defined(COMMUNITY_MODULE_CRASH_ENABLE)
-    uint8_t      depth;
-    const char  *msg;
-    backtrace_t *call_stack = get_crash_call_stack(&depth, &msg);
+    Option(crash_info_t) option = get_crash_call_stack();
 
-    if (depth != 0) {
-        logging(LOG_WARN, "%s", msg);
-        for (uint8_t i = 0; i < depth; ++i) {
-            logging(LOG_ERROR, "%s (%p)", call_stack[i].name, call_stack[i].address);
+    if (option.is_some) {
+        crash_info_t crash = unwrap(option);
+
+        logging(LOG_WARN, "%s", crash.msg);
+        for (uint8_t i = 0; i < crash.stack_depth; ++i) {
+            logging(LOG_ERROR, "%s (%p)", crash.call_stack[i].name, crash.call_stack[i].address);
         }
     } else {
-        logging(LOG_WARN, "Previous run did not crash");
+        logging(LOG_DEBUG, "Previous run did not crash");
     }
 #endif
 

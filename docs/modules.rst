@@ -102,10 +102,6 @@ Available APIs are:
         .. literalinclude:: ../modules/elpekenin/micropython/user_c_modules/qmk/rgb.pyi
             :lines: 6-
 
-result
-######
-.. c:autodoc:: modules/elpekenin/result/elpekenin/result.h
-
 rng
 ###
 .. c:autodoc:: modules/elpekenin/rng/elpekenin/rng.h
@@ -144,6 +140,10 @@ scrolling_text
 string
 ######
 .. c:autodoc:: modules/elpekenin/string/elpekenin/string.h
+
+types
+######
+.. c:autodoc:: modules/elpekenin/types/elpekenin/types.h
 
 version
 #######

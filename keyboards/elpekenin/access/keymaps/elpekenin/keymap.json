@@ -9,10 +9,10 @@
         "elpekenin/logging",
         "elpekenin/memory",
         // "elpekenin/micropython",
-        "elpekenin/result",
         "elpekenin/rng",
         "elpekenin/rp_sdk_wrappers",
         "elpekenin/scrolling_text",
+        "elpekenin/types",
         "elpekenin/version",
         "elpekenin/string"
     ]

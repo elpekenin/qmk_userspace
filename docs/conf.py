@@ -140,7 +140,8 @@ hawkmoth_napoleon_transform = None  # apply napoleon transform to every docstrin
 
 
 def extend(func: Callable[[str], str]) -> Callable[[str], str]:
-    """Add type 'normalization' for `Result(T, E)`."""
+    """Add type 'normalization' for custom types."""
+    sep = "___"
 
     @staticmethod  # type: ignore[misc]  # this will be a method
     @functools.wraps(func)
@@ -150,9 +151,14 @@ def extend(func: Callable[[str], str]) -> Callable[[str], str]:
         ret = func(type_str)
 
         # convert `result___<T>___<E>` back into `Result(<T>, <E>)`
-        if "result___" in ret:
-            _, val, err = ret.split("___")
+        if ret.startswith("result" + sep):
+            _, val, err = ret.split(sep)
             return f"Result({val}, {err})"
+
+        # convert `option___<T>` back into `Option(<T>)`
+        if ret.startswith("option" + sep):
+            _, val = ret.split(sep)
+            return f"Option({val})"
 
         return ret
 
