@@ -1,0 +1,179 @@
+{
+    "type": "object",
+    "properties": {
+        "repo": {
+            "type": "string"
+        },
+        "branch": {
+            "type": "string"
+        },
+        "clean": {
+            "type": "boolean"
+        },
+        "path": {
+            "type": "string"
+        },
+        "operations": {
+            "type": "array",
+            "items": {
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "properties": {
+                            "operation": {
+                                "enum": [
+                                    "checkout"
+                                ]
+                            },
+                            "repo": {
+                                "type": "string"
+                            },
+                            "branch": {
+                                "type": "string"
+                            },
+                            "files": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "required": [
+                            "operation",
+                            "repo",
+                            "branch",
+                            "files"
+                        ],
+                        "additionalProperties": false
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "operation": {
+                                "enum": [
+                                    "cp"
+                                ]
+                            },
+                            "src": {
+                                "type": "string"
+                            },
+                            "dst": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "operation",
+                            "src",
+                            "dst"
+                        ],
+                        "additionalProperties": false
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "operation": {
+                                "enum": [
+                                    "diff"
+                                ]
+                            },
+                            "file": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "operation",
+                            "file"
+                        ],
+                        "additionalProperties": false
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "operation": {
+                                "enum": [
+                                    "exec"
+                                ]
+                            },
+                            "cmd": {
+                                "type": "string"
+                            },
+                            "path": {
+                                "type": "string"
+                            },
+                            "display": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "operation",
+                            "cmd"
+                        ],
+                        "additionalProperties": false
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "operation": {
+                                "enum": [
+                                    "merge"
+                                ]
+                            },
+                            "repo": {
+                                "type": "string"
+                            },
+                            "branch": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "operation",
+                            "repo",
+                            "branch"
+                        ],
+                        "additionalProperties": false
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "operation": {
+                                "enum": [
+                                    "pr"
+                                ]
+                            },
+                            "repo": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "operation",
+                            "id"
+                        ],
+                        "additionalProperties": false
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "operation": {
+                                "enum": [
+                                    "stop"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "operation"
+                        ],
+                        "additionalProperties": false
+                    }
+                ]
+            }
+        }
+    },
+    "required": [
+        "path",
+        "operations"
+    ],
+    "additionalProperties": false
+}

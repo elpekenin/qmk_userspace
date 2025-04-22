@@ -20,13 +20,6 @@ repos:
         language: python
         types: [c]
         files: micropython/user_c_modules/(.*)/(.*).c
-      - id: py2c
-        name: convert py into c
-        entry: elpekenin_userspace py2c
-        language: python
-        types: [python]
-        files: keyboards/elpekenin/access/keymaps/elpekenin/py
-        exclude: keyboards/elpekenin/access/keymaps/elpekenin/py/__init__.py
   - repo: https://github.com/asottile/add-trailing-comma
     rev: v3.1.0
     hooks:
@@ -54,6 +47,20 @@ repos:
           types-tqdm,
           typing_extensions,
         ]
+  - repo: local
+    hooks:
+      - id: schema
+        name: generate jsonschema
+        entry: elpekenin_userspace jsonschema
+        language: python
+        types: [python]
+        files: |
+            (?x)^(
+                elpekenin_userspace/build.py
+                |elpekenin_userspace/commands/jsonschema.py
+                |elpekenin_userspace/operations/(.*)
+            )$
+        pass_filenames: false
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:

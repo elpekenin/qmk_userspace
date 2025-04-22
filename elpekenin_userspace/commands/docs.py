@@ -17,11 +17,11 @@ from typing import TYPE_CHECKING, TypedDict
 from git import Repo
 
 try:
-    # NOTE: function signature copied from sphinx's hints
-    sphinx_build: Callable[[Sequence[str]], int] | None
     from sphinx.cmd.build import main as sphinx_build
 except ImportError:
-    sphinx_build = None
+    HAS_SPHINX = False
+else:
+    HAS_SPHINX = True
 
 from elpekenin_userspace import args
 from elpekenin_userspace.commands import BaseCommand
@@ -29,7 +29,7 @@ from elpekenin_userspace.result import Err, Ok, Result, is_err
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
-    from collections.abc import Callable, Generator, Sequence
+    from collections.abc import Generator
 
     class CompilationDatabaseEntry(TypedDict):
         """Typing stub for data in `compile_commands.json`."""
@@ -257,7 +257,7 @@ class Docs(BaseCommand):
             help="where to find your userspace (default: cwd)",
             metavar="DIR",
             type=args.Directory(require_existence=True),
-            default=Path.cwd(),
+            default=".",
         )
         parser.add_argument(
             "--verbose",
@@ -343,7 +343,7 @@ class Docs(BaseCommand):
             # --quiet keeps warnings on stderr
             sphinx_args.append("--silent")
 
-        if sphinx_build is None:
+        if not HAS_SPHINX:
             return Err("Dependencies missing, run `pip install .[docs]`")
 
         res = sphinx_build(sphinx_args)

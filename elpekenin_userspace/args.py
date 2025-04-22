@@ -48,7 +48,7 @@ class File(PathArg):
         """Conversion function for an argument expected to be a file."""
         path = super().__call__(raw)
 
-        if not path.is_file():
+        if path.exists() and not path.is_file():
             msg = f"{path} is not a file"
             raise ArgumentTypeError(msg)
 
@@ -62,16 +62,16 @@ class Directory(PathArg):
         """Conversion function for an argument expected to be a directory."""
         path = super().__call__(raw)
 
-        if not path.is_dir():
+        if path.exists() and not path.is_dir():
             msg = f"{path} is not a directory"
             raise ArgumentTypeError(msg)
 
         return path.resolve()
 
 
-def qmk(raw: str | None) -> Path | None:
+def qmk(raw: str) -> Path | None:
     """Represent a directory argument, which is a copy of QMK."""
-    if raw is None:
+    if not raw:
         value = cast("Path", qmk_cli.helpers.find_qmk_firmware())
     else:
         value = elpekenin_userspace.path.resolve(raw)

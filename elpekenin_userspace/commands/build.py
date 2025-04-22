@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import sys
-from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from tqdm import tqdm
+try:
+    from tqdm import tqdm
+except ImportError:
+    HAS_TQDM = False
+else:
+    HAS_TQDM = True
 
-from elpekenin_userspace import args
+from elpekenin_userspace import args, constants
 from elpekenin_userspace.build import Recipe
 from elpekenin_userspace.commands import BaseCommand
 from elpekenin_userspace.result import Ok, is_err
@@ -33,21 +37,30 @@ def display(recipe: Recipe) -> Result[None, str]:
 
 def build(recipe: Recipe) -> Result[None, str]:
     """Perform the build."""
-    operations = recipe.get_all_operations()
-    if is_err(operations):
-        return operations
+    operations_result = recipe.get_all_operations()
+    if is_err(operations_result):
+        return operations_result
 
-    with tqdm(
-        operations.ok(),
-        desc="Building",
-        bar_format="[{n_fmt}/{total_fmt}] {desc}{bar}",
-    ) as progress:
-        for operation in progress:
-            progress.set_description(str(operation))
+    operations = operations_result.ok()
+    if HAS_TQDM:
+        progress: Any = tqdm(
+            operations,
+            desc="Building",
+            bar_format="[{n_fmt}/{total_fmt}] {desc}{bar}",
+        )
+    else:
+        progress = operations
 
-            res = operation.run()
-            if is_err(res):
-                return res
+    for operation in progress:
+        display = str(operation)
+        if HAS_TQDM:
+            progress.set_description(display)
+        else:
+            sys.stdout.write(display + "\n")
+
+        res = operation.run()
+        if is_err(res):
+            return res
 
     return Ok(None)
 
@@ -64,7 +77,7 @@ class Build(BaseCommand):
             metavar="FILE",
             type=args.File(require_existence=True),
             nargs="?",
-            default=Path("build.json"),
+            default=constants.JSON,
         )
 
         parser.add_argument(

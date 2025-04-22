@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
+import elpekenin_userspace.path
 from elpekenin_userspace.operations.base import Operation
 from elpekenin_userspace.result import Ok, missing
 
@@ -48,7 +49,7 @@ class Exec(Operation):
     ) -> Result[Self, str]:
         """Initialize an instance."""
         raw = entry.get("path")
-        path = Path.cwd() if raw is None else Path(raw)
+        path = Path.cwd() if raw is None else elpekenin_userspace.path.resolve(raw)
 
         cmd = entry.get("cmd")
         if cmd is None:

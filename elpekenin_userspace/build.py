@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
 from typing_extensions import Self
 
@@ -15,20 +15,22 @@ from elpekenin_userspace.result import Err, Ok, is_err, missing
 
 if TYPE_CHECKING:
     from pathlib import Path
-    from typing import TypedDict
+
+    from typing_extensions import NotRequired, Unpack
 
     from elpekenin_userspace.operations import Args
     from elpekenin_userspace.operations.base import BaseOperation, SetupOperation
     from elpekenin_userspace.result import Result
 
-    class Json(TypedDict, total=False):
-        """Expected contents of JSON file."""
 
-        repo: str
-        branch: str
-        clean: bool
-        path: str
-        operations: list[Args]
+class RecipeJson(TypedDict):
+    """Expected contents of JSON file."""
+
+    repo: NotRequired[str]
+    branch: NotRequired[str]
+    clean: NotRequired[bool]
+    path: str
+    operations: list[Args]
 
 
 class Recipe:
@@ -36,19 +38,14 @@ class Recipe:
 
     def __init__(
         self,
-        *,
-        repo: str,
-        branch: str,
-        clean: bool,
-        path: Path,
-        operations: list[Args],
+        **kwargs: Unpack[RecipeJson],
     ) -> None:
         """Initialize an instance."""
-        self.repo = repo
-        self.branch = branch
-        self.clean = clean
-        self.path = path
-        self.operations = operations
+        self.repo = kwargs["repo"]
+        self.branch = kwargs["branch"]
+        self.clean = kwargs["clean"]
+        self.path = elpekenin_userspace.path.resolve(kwargs["path"])
+        self.operations = kwargs["operations"]
 
     def get_setup_operations(self) -> Result[list[SetupOperation], str]:
         """Configure initial state of the repository."""
@@ -109,13 +106,7 @@ class Recipe:
     @classmethod
     def from_file(cls, file: Path) -> Result[Self, str]:
         """Create an instance by reading a file."""
-        if not file.is_file():
-            return Err(f"'{file}' is not a file")
-
-        if file.name != constants.JSON:
-            return Err(f"Build script should be named '{constants.JSON}'")
-
-        data: Json = json.loads(file.read_text())
+        data: RecipeJson = json.loads(file.read_text())
 
         # with defaults
         repo = data.get("repo") or constants.QMK
@@ -136,7 +127,7 @@ class Recipe:
                 repo=repo,
                 branch=branch,
                 clean=clean,
-                path=elpekenin_userspace.path.resolve(path),
+                path=path,
                 operations=operations,
             ),
         )

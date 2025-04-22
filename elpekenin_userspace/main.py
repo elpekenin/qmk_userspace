@@ -9,15 +9,17 @@ import sys
 from typing import TYPE_CHECKING
 
 try:
-    argcomplete: ModuleType | None
     import argcomplete
 except ImportError:
-    argcomplete = None
+    HAS_ARGCOMPLETE = False
+else:
+    HAS_ARGCOMPLETE = True
 
 from elpekenin_userspace import args
 from elpekenin_userspace.commands.build import Build
 from elpekenin_userspace.commands.docs import Docs
 from elpekenin_userspace.commands.features import Features
+from elpekenin_userspace.commands.jsonschema import Jsonschema
 from elpekenin_userspace.commands.keycode_str import KeycodeStr
 from elpekenin_userspace.commands.micropython import Micropython
 from elpekenin_userspace.commands.py2c import Py2C
@@ -26,8 +28,6 @@ from elpekenin_userspace.commands.stubs import Stubs
 from elpekenin_userspace.result import is_err
 
 if TYPE_CHECKING:
-    from types import ModuleType
-
     from elpekenin_userspace.commands import BaseCommand
 
 
@@ -35,6 +35,7 @@ SUBCOMMANDS: dict[str, type[BaseCommand]] = {
     "build": Build,
     "docs": Docs,
     "features": Features,
+    "jsonschema": Jsonschema,
     "keycode_str": KeycodeStr,
     "micropython": Micropython,
     "qp_resources": QpResources,
@@ -56,7 +57,7 @@ def get_parser() -> argparse.ArgumentParser:
         metavar="DIR",
         type=args.qmk,
         required=False,
-        default=args.qmk(None),
+        default="",
     )
 
     # script-specific args
@@ -71,7 +72,7 @@ def get_parser() -> argparse.ArgumentParser:
 def main() -> int:
     """Run a script's main logic, logging errors to file."""
     parser = get_parser()
-    if argcomplete is not None:
+    if HAS_ARGCOMPLETE:
         argcomplete.autocomplete(parser)
     arguments = parser.parse_args()
 
