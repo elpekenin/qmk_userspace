@@ -41,13 +41,14 @@ if t.TYPE_CHECKING:
     class Primitive(t.TypedDict):
         """Basic."""
 
-        type: t.Literal[
-            "boolean",
-            "integer",
-            "number",
-            "object",
-            "string",
-        ]
+        type: JsonPrimitiveTypeNames
+
+    JsonPrimitiveTypeNames = t.Literal[
+        "boolean",
+        "integer",
+        "number",
+        "string",
+    ]
 
     JsonType = t.Union[
         AnyOf,
@@ -72,6 +73,14 @@ LOCALNS = {
     "NotRequired": NotRequired,
 }
 
+# mypy infers this as `dict[Any, str]`, let's be more specific
+PY_TO_JS: dict[type, JsonPrimitiveTypeNames] = {
+    bool: "boolean",
+    float: "number",
+    int: "integer",
+    str: "string",
+}
+
 
 def is_literal_type(tp: type) -> bool:
     """Check if type is Literal[...]."""
@@ -88,12 +97,18 @@ def is_required_type(tp: type) -> bool:
     return t.get_origin(tp) is Required
 
 
-# ruff complains that this function is too complex, ignore it
-def python_type_to_jsonschema(py_type: type) -> JsonType:  # noqa: C901, PLR0911
+def python_type_to_jsonschema(py_type: type) -> JsonType:
     """Convert a Python type annotation to JSON Schema type."""
+    maybe_js = PY_TO_JS.get(py_type)
+    if maybe_js is not None:
+        return {"type": maybe_js}
+
     if is_literal_type(py_type):
         values = t.get_args(py_type)
         return {"enum": list(values)}
+
+    if is_typeddict(py_type):
+        return generate_schema(py_type)
 
     origin = t.get_origin(py_type)
     args = t.get_args(py_type)
@@ -119,25 +134,8 @@ def python_type_to_jsonschema(py_type: type) -> JsonType:  # noqa: C901, PLR0911
             "items": python_type_to_jsonschema(args[0]),
         }
 
-    if is_typeddict(py_type):
-        return generate_schema(py_type)
-
-    if py_type is bool:
-        return {"type": "boolean"}
-
-    if py_type is dict:
-        return {"type": "object"}
-
-    if py_type is float:
-        return {"type": "number"}
-
-    if py_type is int:
-        return {"type": "integer"}
-
-    if py_type is str:
-        return {"type": "string"}
-
-    return {"type": "string"}  # fallback
+    msg = f"Unsupported type: {py_type}"
+    raise TypeError(msg)
 
 
 def generate_schema(tp: type) -> JsonSchema:
