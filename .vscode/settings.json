@@ -5,4 +5,10 @@
         "compile_commands.json": false,
         "TODO.md": false,
     },
+    "json.schemas": [
+        {
+            "fileMatch": ["build.json"],
+            "url": "https://raw.githubusercontent.com/elpekenin/qmk_userspace/refs/heads/main/build.schema"
+        }
+    ]
 }
