@@ -107,10 +107,6 @@ typedef enum {
 #define SPI_TIMEOUT_IMMEDIATE (0)
 #define SPI_TIMEOUT_INFINITE (0xFFFF)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
  * Initialize the ``n``'th driver.
  */
@@ -155,6 +151,3 @@ spi_status_t spi_custom_receive(uint8_t *data, uint16_t length, uint8_t n);
  * Undo the settings performced by :c:func:`spi_custom_start`
  */
 void spi_custom_stop(uint8_t n);
-#ifdef __cplusplus
-}
-#endif

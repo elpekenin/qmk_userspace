@@ -2,7 +2,6 @@
     "modules": [
         // "elpekenin/allocator",
         "elpekenin/crash",
-        "elpekenin/dual_rp",
         "elpekenin/glitch_text",
         "elpekenin/indicators",
         "elpekenin/ledmap",
@@ -10,10 +9,10 @@
         "elpekenin/memory",
         // "elpekenin/micropython",
         "elpekenin/rng",
-        "elpekenin/rp_sdk_wrappers",
+        "elpekenin/sanitizer",
         "elpekenin/scrolling_text",
+        "elpekenin/string",
         "elpekenin/types",
-        "elpekenin/version",
-        "elpekenin/string"
+        "elpekenin/version"
     ]
 }

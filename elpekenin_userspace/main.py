@@ -94,12 +94,26 @@ def main() -> int:
 
     try:
         res = subcommand().run(arguments)
-    except Exception as e:
-        t = type(e).__name__
-        sys.stdout.write(
-            f"Something went wrong trying to run the command: {e} ({t})\n",
-        )
-        raise
+    except Exception as e:  # noqa: BLE001  # want to handle all errors
+        exc_type = type(e).__name__
+        sys.stdout.write(f"{exc_type}: {e}\n")
+
+        call_stack: list[str] = []
+
+        traceback = e.__traceback__
+        while True:
+            if traceback is None:
+                break
+
+            call_stack.append(
+                f"    {traceback.tb_frame.f_code.co_filename}:{traceback.tb_lineno}",
+            )
+            traceback = traceback.tb_next
+
+        for line in reversed(call_stack):
+            sys.stdout.write(line + "\n")
+
+        return 1
     except KeyboardInterrupt:
         sys.stdout.write("\n")
         return 0

@@ -27,13 +27,13 @@
 
 #    include "elpekenin/rng.h"
 #else
-#    error "This code depends on 'elpekenin/rng' to work"
+#    error Must enable 'elpekenin/rng'
 #endif
 
 #if defined(COMMUNITY_MODULE_STRING_ENABLE)
 #    include "elpekenin/string.h"
 #else
-#    error "This code depends on 'elpekenin/string' to work"
+#    error Must enable 'elpekenin/string'
 #endif
 
 #if defined(QUANTUM_PAINTER_ENABLE)

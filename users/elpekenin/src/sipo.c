@@ -21,7 +21,14 @@ static void print_sipo_status(void) {
     sipo_dprintf("MCU | ");
 
     for (uint8_t i = 0; i < SIPO_BYTES; ++i) {
+// some GCC versions error due to %b but others don't (?)
+// it is implemented in `printf`, so there's no problem
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+
         sipo_dprintf("%b ", sipo_pin_state[SIPO_BYTES - i - 1]);
+
+#pragma GCC diagnostic pop
     }
 
     sipo_dprintf("| END\n");

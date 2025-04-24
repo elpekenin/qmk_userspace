@@ -15,7 +15,7 @@
 #if defined(COMMUNITY_MODULE_TYPES_ENABLE)
 #    include "elpekenin/types.h"
 #else
-#    error "This code depends on 'elpekenin/types' to work"
+#    error Must enable 'elpekenin/types'
 #endif
 
 static bool keylog_dirty            = true;
@@ -124,12 +124,12 @@ static const Option(replacements_t) find_replacement(const char *str) {
 OptionImpl(uintptr_t);
 
 static void maybe_symbol(const char **str) {
-    const Option(replacements_t) option = find_replacement(*str);
-    if (!option.is_some) {
+    const Option(replacements_t) maybe_replacement = find_replacement(*str);
+    if (!maybe_replacement.is_some) {
         return;
     }
 
-    replacements_t replacement = unwrap(option);
+    replacements_t replacement = unwrap(maybe_replacement);
 
     // can't use char* here, Option() would expand into invalid syntax
     Option(uintptr_t) target = None(uintptr_t);

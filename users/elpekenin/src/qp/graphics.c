@@ -22,13 +22,13 @@
 #if defined(COMMUNITY_MODULE_GLITCH_TEXT_ENABLE)
 #    include "elpekenin/glitch_text.h"
 #else
-#    error "This code depends on 'elpekenin/glitch_text' to work"
+#    error Must enable 'elpekenin/glitch_text'
 #endif
 
 #if defined(COMMUNITY_MODULE_RNG_ENABLE)
 #    include "elpekenin/rng.h"
 #else
-#    error "This code depends on 'elpekenin/rng' to work"
+#    error Must enable 'elpekenin/rng'
 #endif
 
 #if defined(KEYLOG_ENABLE)

@@ -20,6 +20,7 @@
 #include "elpekenin/spi_custom.h"
 
 #include <quantum/util.h> // ARRAY_SIZE
+#include <sys/cdefs.h>
 
 #ifdef SPI_CUSTOM_DEBUG
 #    include "quantum/logging/debug.h"
@@ -43,7 +44,7 @@ static bool is_initialised[SPI_COUNT] = {[0 ... SPI_COUNT - 1] = false};
 // elements in this array are created during `spi_custom_init`
 static mutex_t spi_mutexes[SPI_COUNT];
 
-__attribute__((weak)) void spi_custom_init(uint8_t n) {
+__weak_symbol void spi_custom_init(uint8_t n) {
     if (n >= SPI_COUNT) {
         spi_custom_dprintf("[ERROR] %s: n==%d invalid\n", __func__, n);
         return;

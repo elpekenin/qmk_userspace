@@ -5,6 +5,7 @@
 
 #include <quantum/quantum.h>
 #include <quantum/util.h>
+#include <sys/cdefs.h>
 
 #include "elpekenin/logging.h"
 #include "generated/qp_resources.h"
@@ -73,9 +74,8 @@ static void set(asset_kind_t kind, const char *name, const void *ptr) {
             count.images += 1;
             break;
 
-        case EMPTY:
-            logging(LOG_ERROR, "%s: unreachable?", __func__);
-            break;
+        default:
+            __unreachable();
     }
 }
 

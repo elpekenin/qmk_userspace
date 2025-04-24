@@ -6,8 +6,6 @@
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backend.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/string.h"
-#include "generated/features.h"
 #include "generated/qp_resources.h"
 
 #if defined(COMMUNITY_MODULE_CRASH_ENABLE)
@@ -15,7 +13,6 @@
 #endif
 
 #if defined(QUANTUM_PAINTER_ENABLE)
-#    include "elpekenin/logging/backends/qp.h"
 #    include "elpekenin/qp/assets.h"
 #    include "elpekenin/qp/graphics.h"
 #endif
@@ -48,10 +45,10 @@ void keyboard_post_init_user(void) {
 #endif
 
 #if defined(COMMUNITY_MODULE_CRASH_ENABLE)
-    Option(crash_info_t) option = get_crash_call_stack();
+    Option(crash_info_t) maybe_crash = get_crash();
 
-    if (option.is_some) {
-        crash_info_t crash = unwrap(option);
+    if (maybe_crash.is_some) {
+        crash_info_t crash = unwrap(maybe_crash);
 
         logging(LOG_WARN, "%s", crash.msg);
         for (uint8_t i = 0; i < crash.stack_depth; ++i) {

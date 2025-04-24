@@ -55,4 +55,4 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          path: '*.log'
+          path: '$QMK_HOME/*.log'

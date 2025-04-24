@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shutil
+import sys
 from typing import TYPE_CHECKING, TypedDict
 
 import elpekenin_userspace.path
@@ -32,10 +33,6 @@ def copy(src: Path, dst: Path) -> Result[None, str]:
 
     # else, copy manually, skipping files that haven't changed
 
-    # dir -> file, error
-    if src.is_dir() and dst.is_file():
-        return Err("Can't copy directory to a file")
-
     # dir -> dir, copy children
     if src.is_dir() and dst.is_dir():
         for child in src.iterdir():
@@ -47,9 +44,22 @@ def copy(src: Path, dst: Path) -> Result[None, str]:
 
     # file -> file
     if src.is_file() and dst.is_file():
-        # file hasn't changed, skip copy
-        if src.stat().st_mtime > dst.stat().st_mtime:
-            shutil.copy(src, dst)
+        src_stat = src.stat()
+        dst_stat = dst.stat()
+
+        src_ts = src_stat.st_mtime
+        dst_ts = dst_stat.st_mtime
+
+        # if src is newer, copy it
+        if src_ts > dst_ts:
+            shutil.copy2(src, dst)
+
+        # shouldn't edit in build dir
+        elif src_ts < dst_ts:
+            if src_stat.st_size != dst_stat.st_size:
+                return Err(f"File '{src}' was changed in destination")
+
+            sys.stdout.write(f"'{src}' has newer mtime but same size, not copying it\n")
 
         return Ok(None)
 
