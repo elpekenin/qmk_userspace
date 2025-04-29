@@ -4,6 +4,8 @@
 #   - Layers with explicit numbering/naming
 #   - Numbering and LAYOUT on the same line
 
+# WARN: Superseded by `get_keycode_string` (aka QMK's #24787)
+
 from __future__ import annotations
 
 import re

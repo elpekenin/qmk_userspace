@@ -7,10 +7,12 @@
 
 #include "elpekenin/keycodes.h"
 #include "elpekenin/logging.h"
-#include "elpekenin/memory.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/string.h"
-#include "generated/keycode_str.h"
+
+#if defined(COMMUNITY_MODULE_MEMORY_ENABLE)
+#    include "elpekenin/memory.h"
+#endif
 
 #if defined(KEYLOG_ENABLE)
 #    include "elpekenin/keylog.h"
@@ -95,7 +97,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #if defined(RGB_MATRIX_ENABLE)
     if (IS_RGB_MATRIX_KEYCODE(keycode)) {
         if (record->event.pressed) {
-            logging(LOG_INFO, "Used %s", get_keycode_name(keycode));
+            logging(LOG_INFO, "Used %s", get_keycode_string(keycode));
         }
 
         // no debugging here, noise in logs
@@ -165,12 +167,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
+#if defined(COMMUNITY_MODULE_MEMORY_ENABLE)
         case PK_SIZE:
             if (pressed) {
                 pretty_bytes(&str, get_flash_size());
                 logging(LOG_INFO, "Binary takes %.*s", str.used, str.ptr);
             }
             return false;
+#endif
 
         default:
             break;

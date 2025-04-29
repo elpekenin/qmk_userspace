@@ -11,13 +11,7 @@ $(USER_GENERATED)/features.c: FORCE
 	$(shell $(USERSPACE_CLI) features $(CODEGEN_ARGS))
 SRC += $(USER_GENERATED)/features.c
 
-# create a char *keycode_names[] based on qmk.keycodes.load_spec and keymap.c
-#
-# NOTE: when both json and c keyamps exist, they are KEYMAP_C and OTHER_KEYMAP_C respectively, apparently
-# TODO: support C-only build
-$(USER_GENERATED)/keycode_str.c: FORCE
-	$(shell $(USERSPACE_CLI) keycode_str $(CODEGEN_ARGS) $(OTHER_KEYMAP_C))
-SRC += $(USER_GENERATED)/keycode_str.c
+# NOTE: keycode_str uses core now
 
 # QP assets
 ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)

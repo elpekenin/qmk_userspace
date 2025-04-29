@@ -10,7 +10,6 @@
 #include <tmk_core/protocol/host.h> // keyboard_led_state
 
 #include "elpekenin/string.h"
-#include "generated/keycode_str.h"
 
 #if defined(COMMUNITY_MODULE_TYPES_ENABLE)
 #    include "elpekenin/types.h"
@@ -271,7 +270,7 @@ void keylog_process(uint16_t keycode, keyrecord_t *record) {
 
     keylog_dirty = true;
 
-    const char *str = get_keycode_name(keycode);
+    const char *str = get_keycode_string(keycode);
 
     uint8_t mods = get_mods();
     bool    ctrl = mods & MOD_MASK_CTRL;

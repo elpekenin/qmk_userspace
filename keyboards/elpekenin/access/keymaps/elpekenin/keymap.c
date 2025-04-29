@@ -26,8 +26,6 @@
 #    include <platforms/chibios/drivers/analog.h>
 
 #    include "elpekenin/rng.h"
-#else
-#    error Must enable 'elpekenin/rng'
 #endif
 
 #if defined(COMMUNITY_MODULE_STRING_ENABLE)

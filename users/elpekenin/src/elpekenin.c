@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "elpekenin/build_info.h"
+#include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backend.h"
 #include "elpekenin/signatures.h"
-#include "generated/qp_resources.h"
 
 #if defined(COMMUNITY_MODULE_CRASH_ENABLE)
 #    include "elpekenin/crash.h"
@@ -15,6 +15,7 @@
 #if defined(QUANTUM_PAINTER_ENABLE)
 #    include "elpekenin/qp/assets.h"
 #    include "elpekenin/qp/graphics.h"
+#    include "generated/qp_resources.h"
 #endif
 
 #if defined(SPLIT_KEYBOARD)
@@ -24,6 +25,15 @@
 #if defined(XAP_ENABLE)
 #    include "elpekenin/xap.h"
 #endif
+
+// clang-format off
+KEYCODE_STRING_NAMES_USER(
+    KEYCODE_STRING_NAME(PK_CPYR),
+    KEYCODE_STRING_NAME(PK_QCLR),
+    KEYCODE_STRING_NAME(PK_KLOG),
+    KEYCODE_STRING_NAME(PK_SIZE),
+);
+// clang-format on
 
 void housekeeping_task_user(void) {
     housekeeping_task_keymap();

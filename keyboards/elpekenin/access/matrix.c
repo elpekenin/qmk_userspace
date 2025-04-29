@@ -21,7 +21,7 @@ void matrix_init_custom(void) {
     spi_custom_init(REGISTERS_SPI_DRIVER_ID);
 }
 
-static matrix_row_t scan[ROWS_PER_HAND];
+static matrix_row_t scan[ROWS_PER_HAND] = {0};
 
 bool matrix_scan_custom(matrix_row_t *output) {
     if (!spi_custom_start(PISO_CS_PIN, false, REGISTERS_SPI_MODE, PISO_SPI_DIV, REGISTERS_SPI_DRIVER_ID)) {

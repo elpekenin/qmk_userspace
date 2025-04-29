@@ -27,9 +27,19 @@ MEMORY
     flash5 (rx) : org = 0x00000000, len = 0
     flash6 (rx) : org = 0x00000000, len = 0
     flash7 (rx) : org = 0x00000000, len = 0
-    ram0   (wx) : org = 0x20000000, len = 256k  /* SRAM0 striped        */
+
+    /**
+     * ram0 modified to round_down(8/9) of total RAM size
+     * ram1 seems wrong, should probably remove it or make it `len = 0`
+     * ram2 "created" after ram0, with round_up(1/9) of its length, as shadow memory for KASAN
+     *   - this is because rules_memory "consumes" ram0 to reserve space for heap
+     *   - however, we want our extra symbols and space on RAM, to track (un)usable addresses
+     *   - this solution was much simpler and cleaner than hacking/duplicating ChibiOS' file
+     */
+
+    ram0   (wx) : org = 0x20000000, len = 227k  /* SRAM0 striped        */
     ram1   (wx) : org = 0x00000000, len = 256k  /* SRAM0 non striped    */
-    ram2   (wx) : org = 0x00000000, len = 0
+    ram2   (wx) : org = 0x20038c00, len = 29k   /* End of SRAM0         */
     ram3   (wx) : org = 0x00000000, len = 0
     ram4   (wx) : org = 0x20040000, len = 4k    /* SRAM4                */
     ram5   (wx) : org = 0x20041000, len = 4k    /* SRAM5                */
@@ -91,15 +101,15 @@ REGION_ALIAS("HEAP_RAM", ram0);
 
 SECTIONS
 {
-   .flash_begin : {
-      __flash_binary_start = .;
-   } > flash1
+    .flash_begin : {
+        __flash_binary_start = .;
+    } > flash1
 
-   .boot2 : {
-      __boot2_start__ = .;
-      KEEP (*(.boot2))
-      __boot2_end__ = .;
-   } > flash1
+    .boot2 : {
+        __boot2_start__ = .;
+        KEEP (*(.boot2))
+        __boot2_end__ = .;
+    } > flash1
 }
 
 /* Generic rules inclusion.*/
@@ -110,20 +120,31 @@ INCLUDE RP2040_rules_data_with_timecrit.ld
 
 /* Keep pico SDK symbols */
 SECTIONS {
-   .preinit : ALIGN(4){
-      . = ALIGN(4);
-      /* preinit data */
-      __preinit_array_base__ = .;
-      KEEP(*(SORT(.preinit_array.*)))
-      KEEP(*(.preinit_array))
-      __preinit_array_end__ = .;
-   } > XTORS_FLASH AT > XTORS_FLASH_LMA
+    .preinit : ALIGN(4){
+        . = ALIGN(4);
+        /* preinit data */
+        __preinit_array_base__ = .;
+        KEEP(*(SORT(.preinit_array.*)))
+        KEEP(*(.preinit_array))
+        __preinit_array_end__ = .;
+    } > XTORS_FLASH AT > XTORS_FLASH_LMA
+}
+
+
+/* KASAN */
+SECTIONS {
+    .kasan_shadow : {
+        . = ALIGN(8);
+        __kasan_shadow_base__ = .;
+        . = ORIGIN(ram2) + LENGTH(ram2);
+        __kasan_shadow_end__ = .;
+    } > ram2
 }
 
 INCLUDE rules_memory.ld
 
 SECTIONS {
-   .flash_end : {
-      __flash_binary_end = .;
-   } > flash1
+    .flash_end : {
+        __flash_binary_end = .;
+    } > flash1
 }

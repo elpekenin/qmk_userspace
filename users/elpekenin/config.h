@@ -4,7 +4,7 @@
 #pragma once
 
 // misc
-#define MAX_DEFERRED_EXECUTORS 32
+#define MAX_DEFERRED_EXECUTORS 64
 #define LAYER_STATE_8BIT
 #define DYNAMIC_KEYMAP_LAYER_COUNT 5
 

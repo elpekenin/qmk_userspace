@@ -5,8 +5,6 @@
 
 #include <quantum/quantum.h>
 
-#include "generated/keycode_str.h"
-
 #if defined(TOUCH_SCREEN_ENABLE)
 void xap_screen_pressed(uint8_t screen_id, touch_report_t report) {
     screen_pressed_msg_t msg = {.msg_id = _SCREEN_PRESSED, .screen_id = screen_id, .x = report.x, .y = report.y};
@@ -41,7 +39,7 @@ void xap_keyevent(uint16_t keycode, keyrecord_t *record) {
             },
     };
 
-    const char *name = get_keycode_name(keycode);
+    const char *name = get_keycode_string(keycode);
     name             = (name == NULL) ? "XXX" : name;
     strncpy(msg.str, name, sizeof(msg.str));
 
