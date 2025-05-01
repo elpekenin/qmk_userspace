@@ -133,6 +133,11 @@ There are no hooks for user logic in this module because its only purpose is set
             } > XTORS_FLASH AT > XTORS_FLASH_LMA
         }
 
+sanitizer
+#########
+.. c:autodoc:: modules/elpekenin/sanitizer/elpekenin/sanitizer/kasan.h
+
+
 scrolling_text
 ##############
 .. c:autodoc:: modules/elpekenin/scrolling_text/elpekenin/scrolling_text.h
