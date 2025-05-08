@@ -7,7 +7,7 @@
 #include "elpekenin/logging.h"
 #include "elpekenin/touch.h"
 
-WEAK bool touch_spi_init(touch_device_t device) {
+__weak_symbol bool touch_spi_init(touch_device_t device) {
     touch_driver_t          *driver       = (touch_driver_t *)device;
     spi_touch_comms_config_t comms_config = driver->spi_config;
 
@@ -24,11 +24,11 @@ WEAK bool touch_spi_init(touch_device_t device) {
     return true;
 }
 
-WEAK bool touch_spi_start(spi_touch_comms_config_t comms_config) {
+__weak_symbol bool touch_spi_start(spi_touch_comms_config_t comms_config) {
     return spi_start(comms_config.chip_select_pin, comms_config.lsb_first, comms_config.mode, comms_config.divisor);
 }
 
-WEAK void touch_spi_stop(spi_touch_comms_config_t comms_config) {
+__weak_symbol void touch_spi_stop(spi_touch_comms_config_t comms_config) {
     spi_stop();
     gpio_write_pin_high(comms_config.chip_select_pin);
 }
@@ -90,7 +90,7 @@ void report_from(int16_t x, int16_t y, touch_driver_t *driver, touch_report_t *r
     logging(LOG_DEBUG, "Final: (%d, %d)", report->x, report->y);
 }
 
-WEAK touch_report_t get_spi_touch_report(touch_device_t device, bool check_irq) {
+__weak_symbol touch_report_t get_spi_touch_report(touch_device_t device, bool check_irq) {
     touch_driver_t          *driver       = (touch_driver_t *)device;
     spi_touch_comms_config_t comms_config = driver->spi_config;
 

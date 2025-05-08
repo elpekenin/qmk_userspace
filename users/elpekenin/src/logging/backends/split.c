@@ -14,7 +14,7 @@ typedef struct PACKED {
     uint8_t bytes;
 } split_logging_header_t;
 
-#define PAYLOAD_SIZE RPC_S2M_BUFFER_SIZE - sizeof(split_logging_header_t)
+#define PAYLOAD_SIZE (RPC_S2M_BUFFER_SIZE - sizeof(split_logging_header_t))
 
 typedef struct PACKED {
     split_logging_header_t header;
@@ -25,20 +25,20 @@ _Static_assert(sizeof(split_logging_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
 // slave will write on its copy of this variable, master will copy (over split) onto its own
 static new_rbuf(char, 200, ring_buffer);
 
-int8_t sendchar_split(uint8_t c) {
+int8_t sendchar_split(uint8_t chr) {
     // on master, this does nothing
     if (is_keyboard_master()) {
         return 0;
     }
 
-    if (isprint(c) || c == '\n') {
-        rbuf_push(ring_buffer, c);
+    if (isprint(chr) || chr == '\n') {
+        rbuf_push(ring_buffer, chr);
     }
 
     return 0;
 }
 
-void user_logging_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+void user_logging_slave_callback(__unused uint8_t m2s_size, __unused const void* m2s_buffer, __unused uint8_t s2m_size, void* s2m_buffer) {
     split_logging_t data = {0};
 
     size_t size = rbuf_pop(ring_buffer, ARRAY_SIZE(data.buff), data.buff);

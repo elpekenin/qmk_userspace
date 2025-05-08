@@ -3,6 +3,19 @@
 
 #pragma once
 
+// check for features at C (not pre-processor) level
+// based on https://hmijailblog.blogspot.com/2016/03/an-isdefined-c-macro-to-check-whether.html
+//
+// this is useful so that dead code is still analyzed by compiler and detect bugs (pre-processor would "comment" instead)
+//
+// WARN: relies on the macro's value (when present) having a different stringified name than the macro's name
+//
+// NOTE: does not incur extra binary size because conditionals like `if (IS_DEFINED(FEATURE)) { feature_function() };`
+//       will be stripped away thanks to compiler/linker identifying the function will never be used
+//       otherwise we'd get an 'undefined symbol' error when trying to resolve the function name (it was not compiled)
+#define STRINGIFY(x) "" #x
+#define IS_DEFINED(MACRO) (sizeof("" #MACRO) != sizeof(STRINGIFY(MACRO)))
+
 // misc
 #define MAX_DEFERRED_EXECUTORS 64
 #define LAYER_STATE_8BIT

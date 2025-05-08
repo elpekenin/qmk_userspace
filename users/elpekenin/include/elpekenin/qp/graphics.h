@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <quantum/quantum.h>
+#include <quantum/painter/qp.h>
 #include <quantum/util.h>
 
 void qp_tasks_init(void);
@@ -18,9 +18,7 @@ void set_uptime_device(painter_device_t device);
 void set_heap_stats_device(painter_device_t device);
 void set_layer_device(painter_device_t device);
 
-#if defined(KEYLOG_ENABLE) || defined(__SPHINX__)
 void set_keylog_device(painter_device_t device);
-#endif
 
 // exposed for logging/backend/qp.c
 typedef struct PACKED {

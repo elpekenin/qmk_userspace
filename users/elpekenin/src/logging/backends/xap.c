@@ -10,10 +10,10 @@
 
 static new_rbuf(char, 200, rbuf);
 
-int8_t sendchar_xap(uint8_t c) {
-    rbuf_push(rbuf, c);
+int8_t sendchar_xap(uint8_t chr) {
+    rbuf_push(rbuf, chr);
 
-    if (c == '\n' || rbuf_full(rbuf)) {
+    if (chr == '\n' || rbuf_full(rbuf)) {
         char   buff[MAX_PAYLOAD_SIZE];
         size_t size = rbuf_pop(rbuf, sizeof(buff) - 1, buff);
         buff[size]  = '\0';

@@ -4,11 +4,11 @@
 #pragma once
 
 typedef enum {
-    _QWERTY,
-    _FN1,
-    _FN2,
-    _FN3,
-    _RST,
+    QWERTY,
+    FN1,
+    FN2,
+    FN3,
+    RST,
 } layer_names_t;
 
 const char *get_layer_name(layer_names_t layer);

@@ -51,15 +51,24 @@
             "file": "patches/generic_rotation.diff"
         },
         {
+            "operation": "diff",
+            "file": "patches/wl.diff"
+        },
+        {
+            "operation": "cp",
+            "src": "patches/wear_leveling_drivers.h",
+            "dst": "$QMK_HOME/drivers/wear_leveling/wear_leveling_drivers.h"
+        },
+        {
             "operation": "exec",
             "display": "compiling left half",
-            "cmd": "qmk --no-color compile -kb elpekenin/access -km elpekenin -e TARGET=left -e MAKECMDGOALS=uf2-split-left > left.log 2>&1",
+            "cmd": "qmk --no-color compile -kb elpekenin/access -km elpekenin -e TARGET=left -e SIDE=left -e QMK_USERSPACE= > left.log 2>&1",
             "path": "$QMK_HOME"
         },
         {
             "operation": "exec",
             "display": "compiling right half",
-            "cmd": "qmk --no-color compile -kb elpekenin/access -km elpekenin -e TARGET=right -e MAKECMDGOALS=uf2-split-right --compiledb > right.log 2>&1",
+            "cmd": "qmk --no-color compile -kb elpekenin/access -km elpekenin -e TARGET=right -e SIDE=right -e QMK_USERSPACE= --compiledb > right.log 2>&1",
             "path": "$QMK_HOME"
         }
     ]

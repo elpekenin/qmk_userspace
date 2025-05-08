@@ -13,20 +13,20 @@ __weak_symbol layer_state_t layer_state_set_keymap(layer_state_t state) {
     return state;
 }
 
-__weak_symbol bool led_update_keymap(led_t led_state) {
+__weak_symbol bool led_update_keymap(__unused led_t led_state) {
     return true;
 }
 
-__weak_symbol bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
+__weak_symbol bool process_record_keymap(__unused uint16_t keycode, __unused keyrecord_t *record) {
     return true;
 }
-__weak_symbol bool shutdown_keymap(bool jump_to_bootloader) {
+__weak_symbol bool shutdown_keymap(__unused bool jump_to_bootloader) {
     return true;
 }
 __weak_symbol void suspend_power_down_keymap(void) {}
 __weak_symbol void suspend_wakeup_init_keymap(void) {}
 
-__weak_symbol bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
+__weak_symbol bool rgb_matrix_indicators_advanced_keymap(__unused uint8_t led_min, __unused uint8_t led_max) {
     return true;
 }
 

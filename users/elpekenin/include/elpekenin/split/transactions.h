@@ -13,11 +13,9 @@ void transactions_init(void);
 void reset_ee_slave(void);
 void build_info_sync_keymap_callback(void);
 
-#if defined(XAP_ENABLE) || defined(__SPHINX__)
 void xap_execute_slave(const void *data);
 
 typedef struct PACKED {
     uint8_t msg[XAP_EPSIZE];
 } xap_split_msg_t;
 _Static_assert(sizeof(xap_split_msg_t) == XAP_EPSIZE, "wrong size for xap_split_msg_t");
-#endif

@@ -5,22 +5,20 @@
 
 #include <quantum/quantum.h>
 
-#if defined(TOUCH_SCREEN_ENABLE)
 void xap_screen_pressed(uint8_t screen_id, touch_report_t report) {
-    screen_pressed_msg_t msg = {.msg_id = _SCREEN_PRESSED, .screen_id = screen_id, .x = report.x, .y = report.y};
+    screen_pressed_msg_t msg = {.msg_id = SCREEN_PRESSED, .screen_id = screen_id, .x = report.x, .y = report.y};
 
     xap_broadcast_user(&msg, sizeof(msg));
 }
 
 void xap_screen_released(uint8_t screen_id) {
-    screen_released_msg_t msg = {.msg_id = _SCREEN_RELEASED, .screen_id = screen_id};
+    screen_released_msg_t msg = {.msg_id = SCREEN_RELEASED, .screen_id = screen_id};
 
     xap_broadcast_user(&msg, sizeof(msg));
 }
-#endif
 
 void xap_layer(layer_state_t state) {
-    layer_change_msg_t msg = {.msg_id = _LAYER_CHANGE, .layer = get_highest_layer(state)};
+    layer_change_msg_t msg = {.msg_id = LAYER_CHANGE, .layer = get_highest_layer(state)};
 
     xap_broadcast_user(&msg, sizeof(msg));
 }
@@ -29,7 +27,7 @@ void xap_keyevent(uint16_t keycode, keyrecord_t *record) {
     keyevent_msg_t msg = {
         .base =
             {
-                .msg_id  = _KEYEVENT,
+                .msg_id  = KEYEVENT,
                 .keycode = keycode,
                 .pressed = record->event.pressed,
                 .layer   = get_highest_layer(layer_state),
@@ -55,7 +53,7 @@ void xap_shutdown(bool jump_to_bootloader) {
     }
 
     shutdown_msg_t msg = {
-        .msg_id     = _SHUTDOWN,
+        .msg_id     = SHUTDOWN,
         .bootloader = jump_to_bootloader,
     };
 

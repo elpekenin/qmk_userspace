@@ -26,8 +26,8 @@ void sendchar_qp_init(void) {
     qp_log_redraw = false;
 }
 
-int8_t sendchar_qp(uint8_t c) {
-    if (c == '\n') {
+int8_t sendchar_qp(uint8_t chr) {
+    if (chr == '\n') {
         // Add null pointer to current line
         qp_log_pointers[LOG_N_LINES - 1][qp_log_current_col] = 0;
 
@@ -47,7 +47,7 @@ int8_t sendchar_qp(uint8_t c) {
     } else if (qp_log_current_col >= LOG_N_CHARS) {
         return 0;
     } else {
-        qp_log_pointers[LOG_N_LINES - 1][qp_log_current_col++] = c;
+        qp_log_pointers[LOG_N_LINES - 1][qp_log_current_col++] = chr;
         qp_log_pointers[LOG_N_LINES - 1][qp_log_current_col]   = '\0';
         qp_log_levels[LOG_N_LINES - 1]                         = get_current_message_level();
         qp_log_redraw                                          = true;
@@ -74,9 +74,9 @@ static const hsv_t log_colors[] = {
 ASSERT_LEVELS(log_colors);
 
 void qp_logging_backend_render(qp_callback_args_t *args) {
-#if defined(QUANTUM_PAINTER_DEBUG)
-    return;
-#endif
+    if (IS_DEFINED(QUANTUM_PAINTER_DEBUG)) {
+        return;
+    }
 
     if (!qp_log_redraw || args->device == NULL) {
         return;
@@ -85,7 +85,7 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
     qp_log_redraw = false;
 
     // Clear space
-    qp_rect(args->device, args->x, args->y, qp_get_width(args->device), args->y + LOG_N_LINES * args->font->line_height, HSV_BLACK, true);
+    qp_rect(args->device, args->x, args->y, qp_get_width(args->device), args->y + (LOG_N_LINES * args->font->line_height), HSV_BLACK, true);
 
     uint16_t y = args->y;
     for (uint8_t i = 0; i < LOG_N_LINES; ++i) {

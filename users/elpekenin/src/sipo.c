@@ -20,7 +20,7 @@ static bool    sipo_state_changed         = true;
 static void print_sipo_status(void) {
     sipo_dprintf("MCU | ");
 
-    for (uint8_t i = 0; i < SIPO_BYTES; ++i) {
+    for (size_t i = 0; i < SIPO_BYTES; ++i) {
 // some GCC versions error due to %b but others don't (?)
 // it is implemented in `printf`, so there's no problem
 #pragma GCC diagnostic push
@@ -34,10 +34,10 @@ static void print_sipo_status(void) {
     sipo_dprintf("| END\n");
 }
 
-void set_sipo_pin(uint8_t position, bool state) {
+void set_sipo_pin(uint8_t pin, bool state) {
     // this change makes position 0 to be the closest to the MCU, instead of being the 1st bit of the last byte
-    uint8_t byte_offset = SIPO_BYTES - 1 - (position / 8);
-    uint8_t bit_offset  = position % 8;
+    uint8_t byte_offset = SIPO_BYTES - 1 - (pin / 8);
+    uint8_t bit_offset  = pin % 8;
 
     // Check if pin already had that state
     uint8_t curr_value = (sipo_pin_state[byte_offset] >> bit_offset) & 1;
@@ -48,11 +48,12 @@ void set_sipo_pin(uint8_t position, bool state) {
 
     sipo_state_changed = true;
 
-    if (state)
+    if (state) {
         // add data starting on the least significant bit
         sipo_pin_state[byte_offset] |= (1 << bit_offset);
-    else
+    } else {
         sipo_pin_state[byte_offset] &= ~(1 << bit_offset);
+    }
 }
 
 void send_sipo_state(void) {

@@ -46,7 +46,7 @@ static asset_t assets[ASSET_POOL_SIZE] = {
 };
 
 static void set(asset_kind_t kind, const char *name, const void *ptr) {
-    const uint8_t n = count.devices + count.fonts + count.images;
+    const uint16_t n = count.devices + count.fonts + count.images;
     if (n >= ASSET_POOL_SIZE) {
         logging(LOG_ERROR, "%s: too many assets", __func__);
         return;
@@ -81,10 +81,10 @@ static void set(asset_kind_t kind, const char *name, const void *ptr) {
 
 // (FONT, 3) is not 3rd element in pool, but the third *font* in pool
 static const void *get_by_index(asset_kind_t kind, uint8_t index) {
-    const uint8_t n = count.devices + count.fonts + count.images;
+    const uint16_t n = count.devices + count.fonts + count.images;
 
     uint8_t counter = 0;
-    for (uint8_t i = 0; i < n; ++i) {
+    for (uint16_t i = 0; i < n; ++i) {
         asset_t asset = assets[i];
 
         if (asset.kind == kind) {
@@ -103,9 +103,9 @@ static const void *get_by_index(asset_kind_t kind, uint8_t index) {
 }
 
 static const void *get_by_name(asset_kind_t kind, const char *name) {
-    const uint8_t n = count.devices + count.fonts + count.images;
+    const uint16_t n = count.devices + count.fonts + count.images;
 
-    for (uint8_t i = 0; i < n; ++i) {
+    for (uint16_t i = 0; i < n; ++i) {
         asset_t asset = assets[i];
 
         if (asset.kind == kind && asset.name != NULL && strcmp(asset.name, name) == 0) {

@@ -28,22 +28,22 @@ typedef enum {
     SHIFT,
     AL_GR,
     // ... implement more when needed
-    __N_MODS__,
+    N_MODS,
 } active_mods_t;
 
 typedef struct PACKED {
     const char *raw;
-    const char *strings[__N_MODS__];
+    const char *strings[N_MODS];
 } replacements_t;
 
-#define replacement(_raw, no_mods, shift, al_gr) \
-    (replacements_t) {                           \
-        .raw     = _raw,                         \
-        .strings = {                             \
-            [NO_MODS] = no_mods,                 \
-            [SHIFT]   = shift,                   \
-            [AL_GR]   = al_gr,                   \
-        },                                       \
+#define replacement(r, no_mods, shift, al_gr) \
+    (replacements_t) {                        \
+        .raw     = (r),                       \
+        .strings = {                          \
+            [NO_MODS] = (no_mods),            \
+            [SHIFT]   = (shift),              \
+            [AL_GR]   = (al_gr),              \
+        },                                    \
     }
 
 // clang-format off
@@ -95,7 +95,7 @@ static const replacements_t replacements[] = {
 static void skip_prefix(const char **str) {
     char *prefixes[] = {"KC_", "RGB_", "QK_", "ES_", "TD_", "TL_"};
 
-    for (uint8_t i = 0; i < ARRAY_SIZE(prefixes); ++i) {
+    for (size_t i = 0; i < ARRAY_SIZE(prefixes); ++i) {
         char   *prefix = prefixes[i];
         uint8_t len    = strlen(prefix);
 
@@ -108,8 +108,8 @@ static void skip_prefix(const char **str) {
 
 OptionImpl(replacements_t);
 
-static const Option(replacements_t) find_replacement(const char *str) {
-    for (uint8_t i = 0; i < ARRAY_SIZE(replacements); ++i) {
+static Option(replacements_t) find_replacement(const char *str) {
+    for (size_t i = 0; i < ARRAY_SIZE(replacements); ++i) {
         const replacements_t replacement = replacements[i];
 
         if (strcmp(replacement.raw, str) == 0) {
@@ -130,20 +130,19 @@ static void maybe_symbol(const char **str) {
 
     replacements_t replacement = unwrap(maybe_replacement);
 
-    // can't use char* here, Option() would expand into invalid syntax
-    Option(uintptr_t) target = None(uintptr_t);
+    const char *target = NULL;
     switch (get_mods()) {
         case 0:
-            target = Some(uintptr_t, (uintptr_t)replacement.strings[NO_MODS]); // clangd: ignore
+            target = replacement.strings[NO_MODS];
             break;
 
         case MOD_BIT_LCTRL:
         case MOD_BIT_RCTRL:
-            target = Some(uintptr_t, (uintptr_t)replacement.strings[SHIFT]);
+            target = replacement.strings[SHIFT];
             break;
 
         case MOD_BIT_RALT:
-            target = Some(uintptr_t, (uintptr_t)replacement.strings[AL_GR]);
+            target = replacement.strings[AL_GR];
             break;
 
         default:
@@ -153,9 +152,8 @@ static void maybe_symbol(const char **str) {
 
     // we may get here with a combination with no replacement, eg shift+arrows
     // dont want to assign str to NULL
-    if (target.is_some) {
-        // convert uintptr_t back to char*
-        *str = (char *)unwrap(target);
+    if (target != NULL) {
+        *str = target;
     }
 }
 
@@ -192,7 +190,7 @@ static void keylog_clear(void) {
     keylog[KEYLOG_SIZE] = '\0';
 }
 
-static void _keylog_shift_right_byte(void) {
+static void keylog_shift_right_one_byte(void) {
     for (uint8_t i = KEYLOG_SIZE - 1; i > 0; --i) {
         keylog[i] = keylog[i - 1];
     }
@@ -202,11 +200,11 @@ static void _keylog_shift_right_byte(void) {
 static void keylog_shift_right(void) {
     // pop all utf-continuation bytes
     while (is_utf8_continuation(keylog[KEYLOG_SIZE - 1])) {
-        _keylog_shift_right_byte();
+        keylog_shift_right_one_byte();
     }
 
     // this is either an ascii char or the heading byte of utf
-    _keylog_shift_right_byte();
+    keylog_shift_right_one_byte();
 }
 
 static void keylog_shift_left(uint8_t len) {
@@ -294,10 +292,10 @@ void keylog_process(uint16_t keycode, keyrecord_t *record) {
     }
 
     // convert string into symbols
-    keycode_repr((const char **)&str);
+    keycode_repr(&str);
 
     // casing is separate so that drawing keycodes on screen is always uppercase
-    apply_casing((const char **)&str);
+    apply_casing(&str);
 
     keylog_append(str);
 }

@@ -9,9 +9,12 @@
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backends/split.h"
 #include "elpekenin/signatures.h"
+#include "elpekenin/time.h"
+
+#define XAP_HEADER_SIZE (sizeof(xap_request_header_t))
 
 // slave-side callbacks
-static void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+static void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != sizeof(build_info_t)) {
         logging(LOG_ERROR, "%s size", __func__);
         return;
@@ -23,7 +26,7 @@ static void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, 
     build_info_sync_keymap_callback();
 }
 
-static void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+static void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != sizeof(bool)) {
         logging(LOG_ERROR, "%s size", __func__);
         return;
@@ -33,7 +36,7 @@ static void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffe
     shutdown_quantum(*(bool*)m2s_buffer);
 }
 
-static void user_ee_clr_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+static void user_ee_clr_callback(uint8_t m2s_size, __unused const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != 0) {
         logging(LOG_ERROR, "%s size", __func__);
         return;
@@ -42,8 +45,7 @@ static void user_ee_clr_callback(uint8_t m2s_size, const void* m2s_buffer, uint8
     eeconfig_init();
 }
 
-#if defined(XAP_ENABLE)
-void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != XAP_EPSIZE) {
         logging(LOG_ERROR, "%s size", __func__);
         return;
@@ -52,26 +54,25 @@ void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_siz
     extern void xap_receive_base(const void* data);
     xap_receive_base(m2s_buffer);
 }
-#endif
 
 // periodic tasks
-static uint32_t build_info_sync_task(uint32_t trigger_time, void* cb_arg) {
+static uint32_t build_info_sync_task(__unused uint32_t trigger_time, __unused void* cb_arg) {
     if (!is_keyboard_master()) {
         return 0;
     }
 
     build_info_t build_info = get_build_info();
     transaction_rpc_send(RPC_ID_BUILD_INFO, sizeof(build_info_t), &build_info);
-    return 30000;
+    return SECONDS(30);
 }
 
-static uint32_t slave_log_sync_task(uint32_t trigger_time, void* cb_arg) {
+static uint32_t slave_log_sync_task(__unused uint32_t trigger_time, __unused void* cb_arg) {
     if (!is_keyboard_master()) {
         return 0;
     }
 
     user_logging_master_poll();
-    return 3000;
+    return SECONDS(3);
 }
 
 void reset_ee_slave(void) {
@@ -82,18 +83,21 @@ void reset_ee_slave(void) {
     transaction_rpc_send(RPC_ID_USER_EE_CLR, 0, NULL);
 }
 
-#if defined(XAP_ENABLE)
 void xap_execute_slave(const void* data) {
     if (!is_keyboard_master()) {
         return;
     }
 
+    // compat: xap_request_header_t does not exist if XAP is not enabled (it's generated code)
+#if defined(XAP_ENABLE)
     xap_split_msg_t msg = {0};
-    // user, qp, operation = 3
-    memcpy(&msg, data - sizeof(xap_request_header_t) - 3, XAP_EPSIZE);
+    // { user, qp, operation } = 3 bytes to offset
+    memcpy(&msg, data - XAP_HEADER_SIZE - 3, XAP_EPSIZE);
     transaction_rpc_send(RPC_ID_XAP, XAP_EPSIZE, &msg);
-}
+#else
+    (void)data;
 #endif
+}
 
 // register message handlers and kick off tasks
 void transactions_init(void) {
@@ -102,12 +106,12 @@ void transactions_init(void) {
     transaction_register_rpc(RPC_ID_USER_LOGGING, user_logging_slave_callback);
     transaction_register_rpc(RPC_ID_USER_EE_CLR, user_ee_clr_callback);
 
-#if defined(XAP_ENABLE)
-    transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
-#endif
+    if (IS_DEFINED(XAP_ENABLE)) {
+        transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
+    }
 
     // wait a bit to prevent drawing on eInk right after flash, also ensures that
     // initialization has run, making sure `is_keyboard_master` returns correct value
-    defer_exec(5000, build_info_sync_task, NULL);
-    defer_exec(5000, slave_log_sync_task, NULL);
+    defer_exec(SECONDS(5), build_info_sync_task, NULL);
+    defer_exec(SECONDS(5), slave_log_sync_task, NULL);
 }

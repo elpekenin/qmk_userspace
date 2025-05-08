@@ -31,7 +31,7 @@ bool qp_comms_spi_start(painter_device_t device) {
     return spi_custom_start(DUMMY_PIN, comms_config->lsb_first, comms_config->mode, comms_config->divisor, SCREENS_SPI_DRIVER_ID);
 }
 
-uint32_t qp_comms_spi_send_data(painter_device_t device, const void *data, uint32_t byte_count) {
+uint32_t qp_comms_spi_send_data(__unused painter_device_t device, const void *data, uint32_t byte_count) {
     uint32_t       bytes_remaining = byte_count;
     const uint8_t *p               = (const uint8_t *)data;
     uint32_t       max_msg_length  = 1024;

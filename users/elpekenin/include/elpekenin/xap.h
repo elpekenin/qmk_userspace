@@ -21,27 +21,23 @@
 #include <quantum/util.h>
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
 
-#if defined(TOUCH_SCREEN_ENABLE) || defined(__SPHINX__)
-#    include "elpekenin/touch.h"
-#endif
+#include "elpekenin/touch.h"
 
 #define MAX_PAYLOAD (XAP_EPSIZE - sizeof(xap_broadcast_header_t))
-
-// identifiers
-typedef enum {
-    _SCREEN_PRESSED,
-    _SCREEN_RELEASED,
-    _LAYER_CHANGE,
-    _KEYEVENT,
-    _SHUTDOWN,
-} _xap_msg_id_t;
 
 /**
  * Identifier for each type of message.
  */
-typedef uint8_t xap_msg_id_t;
+typedef enum {
+    SCREEN_PRESSED,
+    SCREEN_RELEASED,
+    LAYER_CHANGE,
+    KEYEVENT,
+    SHUTDOWN,
+    N_XAP_MSGS,
+} xap_msg_id_t;
+_Static_assert(N_XAP_MSGS <= UINT8_MAX, "too many identifiers for a u8");
 
-#if defined(TOUCH_SCREEN_ENABLE) || defined(__SPHINX__)
 /**
  * Inform about a screen press event.
  */
@@ -91,7 +87,6 @@ typedef struct PACKED {
  * Send a message to PC's client about a screen release event.
  */
 void xap_screen_released(uint8_t screen_id);
-#endif
 
 /**
  * Information about a layer change event.
@@ -107,7 +102,7 @@ typedef struct PACKED {
      */
     layer_state_t layer;
 } layer_change_msg_t;
-_Static_assert(sizeof(layer_state_t) == 1, "Client code expects layer to be u8");
+_Static_assert(sizeof(layer_state_t) == sizeof(uint8_t), "Client code expects layer to be u8");
 
 /**
  * Send a message to PC's client about a layer change event.
@@ -123,7 +118,7 @@ typedef struct PACKED {
      *
      * Defined an inner struct instead of plain attributes to compute space left for the string.
      */
-    struct PACKED _base {
+    struct PACKED base {
         /**
          * Identify this message.
          */
@@ -160,17 +155,23 @@ typedef struct PACKED {
         uint8_t mods;
     } base;
 
+// compat: xap_broadcast_header_t does not exist if XAP is not enabled
+//         because it's generated code, which would make MAX_PAYLOAD error
+#if defined(XAP_ENABLE) || defined(__SPHINX__)
     /**
      * String representation of the keycode.
      */
-    char str[MAX_PAYLOAD - sizeof(struct _base) - 1];
+    char str[MAX_PAYLOAD - sizeof(struct base) - 1];
+#endif
 
     /**
      * Ensure we have a null terminator byte.
      */
     uint8_t null;
 } keyevent_msg_t;
+#if defined(XAP_ENABLE)
 _Static_assert(sizeof(keyevent_msg_t) == MAX_PAYLOAD, "wrong size for keyevent_msg_t");
+#endif
 
 /**
  * Send a message to PC's client about a key event.

@@ -6,31 +6,21 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/keycodes.h"
+#include "elpekenin/keylog.h"
 #include "elpekenin/logging.h"
+#include "elpekenin/logging/backends/qp.h"
 #include "elpekenin/signatures.h"
+#include "elpekenin/split/transactions.h"
 #include "elpekenin/string.h"
+#include "elpekenin/xap.h"
 
+// compat: function must exist
 #if defined(COMMUNITY_MODULE_MEMORY_ENABLE)
 #    include "elpekenin/memory.h"
+#else
+#    define get_flash_size() 0
 #endif
 
-#if defined(KEYLOG_ENABLE)
-#    include "elpekenin/keylog.h"
-#endif
-
-#if defined(QUANTUM_PAINTER_ENABLE)
-#    include "elpekenin/logging/backends/qp.h"
-#endif
-
-#if defined(SPLIT_KEYBOARD)
-#    include "elpekenin/split/transactions.h"
-#endif
-
-#if defined(XAP_ENABLE)
-#    include "elpekenin/xap.h"
-#endif
-
-#if defined(AUTOCORRECT_ENABLE)
 // dont mind me, just bodging my way in  :)
 static bool last_td_spc = false;
 
@@ -74,28 +64,22 @@ bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *t
     }
     return process_autocorrect_default_handler(keycode, record, typo_buffer_size, mods);
 }
-#endif
 
-#if defined(KEYLOG_ENABLE)
-bool keylog_enabled = true;
-#endif
+static bool keylog_active = true;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     string_t str = str_new(15);
 
-#if defined(KEYLOG_ENABLE)
-    if (keylog_enabled) {
+    if (IS_DEFINED(KEYLOG_ENABLE) && keylog_active) {
         keylog_process(keycode, record);
     }
-#endif
 
-#if defined(XAP_ENABLE)
     // log events over XAP
-    xap_keyevent(keycode, record);
-#endif
+    if (IS_DEFINED(XAP_ENABLE)) {
+        xap_keyevent(keycode, record);
+    }
 
-#if defined(RGB_MATRIX_ENABLE)
-    if (IS_RGB_MATRIX_KEYCODE(keycode)) {
+    if (IS_DEFINED(RGB_MATRIX_ENABLE) && IS_RGB_MATRIX_KEYCODE(keycode)) {
         if (record->event.pressed) {
             logging(LOG_INFO, "Used %s", get_keycode_string(keycode));
         }
@@ -110,7 +94,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         return ret;
     }
-#endif
 
     if (!process_record_keymap(keycode, record)) {
         return false;
@@ -121,13 +104,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     bool    l_sft   = mods & MOD_BIT(KC_LSFT);
 
     switch (keycode) {
-#if defined(SPLIT_KEYBOARD)
         case EE_CLR:
-            if (pressed) {
-                reset_ee_slave(); // reset on slave too
+            // reset on slave too
+            if (IS_DEFINED(SPLIT_KEYBOARD) && pressed) {
+                reset_ee_slave();
             }
             return true;
-#endif
 
         case PK_CPYR:
             // avoid messing up when i press GUI instead of TRI_LAYER for QK_RST
@@ -145,21 +127,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
-#if defined(QUANTUM_PAINTER_ENABLE)
         case PK_QCLR:
-            if (pressed) {
+            if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && pressed) {
                 qp_log_clear();
             }
             return false;
-#endif
 
-#if defined(KEYLOG_ENABLE)
         case PK_KLOG:
-            if (pressed) {
-                keylog_enabled = !keylog_enabled;
+            if (IS_DEFINED(KEYLOG_ENABLE) && pressed) {
+                keylog_active = !keylog_active;
             }
             return false;
-#endif
 
         case PK_LOG:
             if (pressed) {
@@ -167,14 +145,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
 
-#if defined(COMMUNITY_MODULE_MEMORY_ENABLE)
         case PK_SIZE:
-            if (pressed) {
+            if (IS_DEFINED(COMMUNITY_MODULE_MEMORY_ENABLE) && pressed) {
                 pretty_bytes(&str, get_flash_size());
                 logging(LOG_INFO, "Binary takes %.*s", str.used, str.ptr);
             }
             return false;
-#endif
 
         default:
             break;

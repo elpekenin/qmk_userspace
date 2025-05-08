@@ -3,21 +3,10 @@
 
 #include <quantum/quantum.h>
 
-#if defined(QUANTUM_PAINTER_ENABLE)
-#    include "elpekenin/logging/backends/qp.h"
-#endif
-
-#if defined(SPLIT_KEYBOARD)
-#    include "elpekenin/logging/backends/split.h"
-#endif
-
-#if defined(UART_ENABLE)
-#    include "elpekenin/logging/backends/uart.h"
-#endif
-
-#if defined(XAP_ENABLE)
-#    include "elpekenin/logging/backends/xap.h"
-#endif
+#include "elpekenin/logging/backends/qp.h"
+#include "elpekenin/logging/backends/split.h"
+#include "elpekenin/logging/backends/uart.h"
+#include "elpekenin/logging/backends/xap.h"
 
 typedef void (*init_func_t)(void);
 
@@ -54,20 +43,20 @@ static sendchar_func_t send_functions[] = {
 #endif
 };
 
-static int8_t user_sendchar(uint8_t c) {
-    for (uint8_t i = 0; i < ARRAY_SIZE(send_functions); ++i) {
+static int8_t user_sendchar(uint8_t chr) {
+    for (size_t i = 0; i < ARRAY_SIZE(send_functions); ++i) {
         sendchar_func_t function = send_functions[i];
 
         // TODO: make something with returned value?
         // my custom hooks return 0 (so far)
-        function(c);
+        function(chr);
     }
 
     return 0;
 }
 
 void sendchar_init(void) {
-    for (uint8_t i = 0; i < ARRAY_SIZE(init_functions); ++i) {
+    for (size_t i = 0; i < ARRAY_SIZE(init_functions); ++i) {
         init_func_t function = init_functions[i];
 
         function();

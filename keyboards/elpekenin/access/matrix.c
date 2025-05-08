@@ -10,10 +10,7 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/spi_custom.h"
-
-#if defined(TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND
-#    include "elpekenin/touch.h"
-#endif
+#include "elpekenin/touch.h"
 
 void matrix_init_custom(void) {
     gpio_set_pin_output(PISO_CS_PIN);
@@ -46,8 +43,6 @@ bool matrix_scan_custom(matrix_row_t *output) {
     return changed;
 }
 
-#if defined(QUANTUM_PAINTER_ENABLE) && defined(TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND
 bool is_ili9341_pressed(void) {
     return matrix_is_on(9, 0);
 }
-#endif

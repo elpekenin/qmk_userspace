@@ -4,8 +4,10 @@
 #include <drivers/uart.h>
 #include <quantum/quantum.h>
 
+#define BAUD_RATE 9600
+
 void sendchar_uart_init(void) {
-    uart_init(9600);
+    uart_init(BAUD_RATE);
 
     // clear PuTTY serial monitor
     const uint8_t clear[] = {27, '[', '2', 'J'};
@@ -15,15 +17,15 @@ void sendchar_uart_init(void) {
     uart_transmit(cursor_home, ARRAY_SIZE(cursor_home));
 }
 
-int8_t sendchar_uart(uint8_t c) {
+int8_t sendchar_uart(uint8_t chr) {
     // TODO: buffering?
 
     // make PuTTY correctly print next line
     // without this, it doesn't roll back to start of line
-    if (c == '\n') {
+    if (chr == '\n') {
         uart_write('\r');
     }
 
-    uart_write(c);
+    uart_write(chr);
     return 0;
 }

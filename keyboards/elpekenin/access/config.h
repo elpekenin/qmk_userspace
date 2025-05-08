@@ -3,18 +3,6 @@
 
 #pragma once
 
-#if !defined(INIT_EE_HANDS_LEFT) && !defined(INIT_EE_HANDS_RIGHT)
-#    error "You need to configure EE_HANDS"
-#endif
-
-#if defined(INIT_EE_HANDS_LEFT)
-#    define IS_LEFT_HAND 1
-#    define IS_RIGHT_HAND 0
-#else
-#    define IS_LEFT_HAND 0
-#    define IS_RIGHT_HAND 1
-#endif
-
 #define MATRIX_ROWS 10
 #define MATRIX_COLS 8
 #define ROWS_PER_HAND (MATRIX_ROWS / 2)

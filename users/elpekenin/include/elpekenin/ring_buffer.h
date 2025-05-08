@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <quantum/quantum.h>
-
 /**
  * Create a new ring buffer.
  *
@@ -26,18 +24,18 @@
         size_t next_in;            \
         size_t next_out;           \
         type   values[size];       \
-    } name = {0}
+    }(name) = {0}
 
 /**
  * Insert an element into a buffer.
  */
-#define rbuf_push(rbuf, value)                                                    \
-    do {                                                                          \
-        rbuf.values[rbuf.next_in] = value;                                        \
-        rbuf.next_in              = (rbuf.next_in + 1) % ARRAY_SIZE(rbuf.values); \
-        if (rbuf.next_in == rbuf.next_out) {                                      \
-            rbuf.next_out = (rbuf.next_out + 1) % ARRAY_SIZE(rbuf.values);        \
-        }                                                                         \
+#define rbuf_push(rbuf, value)                                                            \
+    do {                                                                                  \
+        (rbuf).values[(rbuf).next_in] = value;                                            \
+        (rbuf).next_in                = ((rbuf).next_in + 1) % ARRAY_SIZE((rbuf).values); \
+        if ((rbuf).next_in == (rbuf).next_out) {                                          \
+            (rbuf).next_out = ((rbuf).next_out + 1) % ARRAY_SIZE((rbuf).values);          \
+        }                                                                                 \
     } while (0)
 
 /**
@@ -51,17 +49,17 @@
  * Return:
  *     Number of bytes read.
  */
-#define rbuf_pop(rbuf, max, dest)                                          \
-    ({                                                                     \
-        size_t i = 0;                                                      \
-                                                                           \
-        size_t _max = (max == 0) ? rbuf_size(rbuf) : max;                  \
-        while (i < _max && rbuf.next_out != rbuf.next_in) {                \
-            dest[i++]     = rbuf.values[rbuf.next_out];                    \
-            rbuf.next_out = (rbuf.next_out + 1) % ARRAY_SIZE(rbuf.values); \
-        }                                                                  \
-        /* bytes extracted */                                              \
-        i;                                                                 \
+#define rbuf_pop(rbuf, max, dest)                                                \
+    ({                                                                           \
+        size_t count = 0;                                                        \
+                                                                                 \
+        size_t max_possible = ((max) == 0) ? rbuf_size(rbuf) : (max);            \
+        while (count < max_possible && (rbuf).next_out != (rbuf).next_in) {      \
+            (dest)[count++] = (rbuf).values[(rbuf).next_out];                    \
+            (rbuf).next_out = ((rbuf).next_out + 1) % ARRAY_SIZE((rbuf).values); \
+        }                                                                        \
+        /* bytes extracted */                                                    \
+        count;                                                                   \
     })
 
 /**
@@ -70,17 +68,17 @@
  * .. note::
  *   Does not zero out the memory.
  */
-#define rbuf_clear(rbuf)                  \
-    do {                                  \
-        rbuf.next_in = rbuf.next_out = 0; \
+#define rbuf_clear(rbuf)                      \
+    do {                                      \
+        (rbuf).next_in = (rbuf).next_out = 0; \
     } while (0)
 
 /**
  * Get the size of a buffer.
  */
-#define rbuf_size(rbuf) ARRAY_SIZE(rbuf.values)
+#define rbuf_size(rbuf) ARRAY_SIZE((rbuf).values)
 
 /**
  * Check if the buffer is completely filled.
  */
-#define rbuf_full(rbuf) rbuf.next_out == rbuf.next_in - 1
+#define rbuf_full(rbuf) ((rbuf).next_out == (rbuf).next_in - 1)

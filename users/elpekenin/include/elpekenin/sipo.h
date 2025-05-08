@@ -14,13 +14,8 @@
 
 /**
  * Configure a list of "pin" names, aka: identifiers for register(s) output.
- *
- * .. caution::
- *   You will get a build error if :c:macro:`N_SIPO_PINS` is not correctly set up.
  */
-#define configure_sipo_pins(pin_names...) \
-    enum { pin_names, __SIPO_PINS };      \
-    _Static_assert(__SIPO_PINS <= N_SIPO_PINS, "Defined more pin names than the amount configured")
+#define declare_sipo_pins(pin_names...) enum { pin_names }
 
 /**
  * Update the state of a pin in the internal buffer.

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <quantum/quantum.h>
+#include <quantum/painter/qp.h>
 
 /**
  * How big the array to store different assets will be.
@@ -14,7 +14,7 @@
 
 //
 
-void qp_set_device_by_name(const char *name, painter_device_t display);
+void qp_set_device_by_name(const char *name, painter_device_t device);
 
 painter_device_t qp_get_device_by_name(const char *name);
 
@@ -34,7 +34,7 @@ painter_font_handle_t qp_get_font_by_index(uint8_t index);
 
 //
 
-void qp_set_image_by_name(const char *name, const uint8_t *img);
+void qp_set_image_by_name(const char *name, const uint8_t *image);
 
 painter_image_handle_t qp_get_image_by_index(uint8_t index);
 

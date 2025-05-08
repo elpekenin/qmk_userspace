@@ -9,6 +9,14 @@
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/scrolling_text.h"
 
+static inline uint8_t lsb(uint16_t val) {
+    return val & 0xFF;
+}
+
+static inline uint8_t msb(uint16_t val) {
+    return (val >> 8) && 0xFF;
+}
+
 bool xap_execute_qp_clear(xap_token_t token, xap_route_user_quantum_painter_clear_arg_t* arg) {
     xap_respond_success(token);
 
@@ -90,25 +98,23 @@ bool xap_execute_qp_animate_recolor(xap_token_t token, xap_route_user_quantum_pa
 }
 
 bool xap_respond_qp_drawtext(xap_token_t token, const uint8_t* data, size_t data_len) {
-    xap_route_user_quantum_painter_drawtext_arg_t  __arg;
-    xap_route_user_quantum_painter_drawtext_arg_t* arg = &__arg;
-    memcpy(arg, data, data_len);
+    xap_route_user_quantum_painter_drawtext_arg_t arg;
+    memcpy(&arg, data, data_len);
 
     xap_respond_success(token);
 
-    qp_drawtext(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_font_by_index(arg->font_id), (const char*)arg->text);
+    qp_drawtext(qp_get_device_by_index(arg.device_id), arg.x, arg.y, qp_get_font_by_index(arg.font_id), (const char*)arg.text);
 
     return true;
 }
 
 bool xap_respond_qp_drawtext_recolor(xap_token_t token, const uint8_t* data, size_t data_len) {
-    xap_route_user_quantum_painter_drawtext_recolor_arg_t  __arg;
-    xap_route_user_quantum_painter_drawtext_recolor_arg_t* arg = &__arg;
-    memcpy(arg, data, data_len);
+    xap_route_user_quantum_painter_drawtext_recolor_arg_t arg;
+    memcpy(&arg, data, data_len);
 
     xap_respond_success(token);
 
-    qp_drawtext_recolor(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_font_by_index(arg->font_id), (const char*)arg->text, arg->hue_fg, arg->sat_fg, arg->val_fg, arg->hue_bg, arg->sat_bg, arg->val_bg);
+    qp_drawtext_recolor(qp_get_device_by_index(arg.device_id), arg.x, arg.y, qp_get_font_by_index(arg.font_id), (const char*)arg.text, arg.hue_fg, arg.sat_fg, arg.val_fg, arg.hue_bg, arg.sat_bg, arg.val_bg);
 
     return true;
 }
@@ -122,7 +128,7 @@ bool xap_execute_qp_get_geometry(xap_token_t token, xap_route_user_quantum_paint
 
     qp_get_geometry(qp_get_device_by_index(arg->device_id), &width, &height, &rotation, &offset_x, &offset_y);
 
-    uint8_t ret[9] = {width & 0x00FF, width & 0xFF00, height & 0x00FF, height & 0xFF00, rotation, offset_x & 0x00FF, offset_x & 0xFF00, offset_y & 0x00FF, offset_y & 0xFF00};
+    uint8_t ret[9] = {lsb(width), msb(width), lsb(height), msb(height), rotation, lsb(offset_x), msb(offset_x), lsb(offset_y), msb(offset_y)};
     xap_send(token, XAP_RESPONSE_FLAG_SUCCESS, (const void*)ret, sizeof(ret));
 
     return true;
@@ -145,9 +151,8 @@ bool xap_execute_qp_viewport(xap_token_t token, xap_route_user_quantum_painter_v
 }
 
 bool xap_respond_qp_pixdata(xap_token_t token, const uint8_t* data, size_t data_len) {
-    xap_route_user_quantum_painter_pixdata_arg_t  __arg;
-    xap_route_user_quantum_painter_pixdata_arg_t* arg = &__arg;
-    memcpy(arg, data, data_len);
+    xap_route_user_quantum_painter_pixdata_arg_t arg;
+    memcpy(&arg, data, data_len);
 
     // 64 bytes
     //    - 2 token
@@ -157,35 +162,34 @@ bool xap_respond_qp_pixdata(xap_token_t token, const uint8_t* data, size_t data_
     // ------
     //     57 bytes left -> 28 RGB565(2-byte) pixels
     uint16_t pixels[28] = {0};
-    uint8_t  n_pix      = (data_len - 1) / 2;
-    memcpy(pixels, arg->pixels, n_pix * 2);
+
+    uint8_t n_pix = (data_len - 1) / 2;
+    memcpy(pixels, arg.pixels, n_pix * 2);
 
     xap_respond_success(token);
 
-    qp_pixdata(qp_get_device_by_index(arg->device_id), (const void*)pixels, n_pix);
+    qp_pixdata(qp_get_device_by_index(arg.device_id), (const void*)pixels, n_pix);
 
     return true;
 }
 
 bool xap_respond_qp_textwidth(xap_token_t token, const uint8_t* data, size_t data_len) {
-    xap_route_user_quantum_painter_textwidth_arg_t  __arg;
-    xap_route_user_quantum_painter_textwidth_arg_t* arg = &__arg;
-    memcpy(arg, data, data_len);
+    xap_route_user_quantum_painter_textwidth_arg_t arg;
+    memcpy(&arg, data, data_len);
 
-    int16_t width = qp_textwidth(qp_get_font_by_index(arg->font_id), (const char*)arg->text);
+    int16_t width = qp_textwidth(qp_get_font_by_index(arg.font_id), (const char*)arg.text);
 
-    uint8_t ret[2] = {width & 0x00FF, width & 0xFF00};
+    uint8_t ret[2] = {lsb(width), msb(width)};
     xap_send(token, XAP_RESPONSE_FLAG_SUCCESS, (const void*)ret, sizeof(ret));
 
     return true;
 }
 
 bool xap_respond_draw_scrolling_text(xap_token_t token, const uint8_t* data, size_t data_len) {
-    xap_route_user_quantum_painter_scrolling_text_arg_t  __arg;
-    xap_route_user_quantum_painter_scrolling_text_arg_t* arg = &__arg;
-    memcpy(arg, data, data_len);
+    xap_route_user_quantum_painter_scrolling_text_arg_t arg;
+    memcpy(&arg, data, data_len);
 
-    deferred_token def_token = draw_scrolling_text(qp_get_device_by_index(arg->device_id), arg->x, arg->y, qp_get_font_by_index(arg->font_id), (const char*)arg->text, arg->n_chars, arg->delay);
+    deferred_token def_token = draw_scrolling_text(qp_get_device_by_index(arg.device_id), arg.x, arg.y, qp_get_font_by_index(arg.font_id), (const char*)arg.text, arg.n_chars, arg.delay);
 
     xap_send(token, XAP_RESPONSE_FLAG_SUCCESS, (const void*)&def_token, sizeof(def_token));
 
@@ -201,13 +205,12 @@ bool xap_respond_stop_scrolling_text(xap_token_t token, xap_route_user_quantum_p
 }
 
 bool xap_respond_extend_scrolling_text(xap_token_t token, const uint8_t* data, size_t data_len) {
-    xap_route_user_quantum_painter_extend_scrolling_text_arg_t  __arg;
-    xap_route_user_quantum_painter_extend_scrolling_text_arg_t* arg = &__arg;
-    memcpy(arg, data, data_len);
+    xap_route_user_quantum_painter_extend_scrolling_text_arg_t arg;
+    memcpy(&arg, data, data_len);
 
     xap_respond_success(token);
 
-    extend_scrolling_text(arg->token, (const char*)arg->text);
+    extend_scrolling_text(arg.token, (const char*)arg.text);
 
     return true;
 }

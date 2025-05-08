@@ -7,4 +7,4 @@
 
 void sendchar_uart_init(void);
 
-int8_t sendchar_uart(uint8_t c);
+int8_t sendchar_uart(uint8_t chr);

@@ -3,12 +3,16 @@
 
 #include QMK_KEYBOARD_H
 
-#include <stdlib.h> // div_t
+#include <stdlib.h>
 
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
+#include "elpekenin/qp/assets.h"
+#include "elpekenin/qp/graphics.h"
 #include "elpekenin/signatures.h"
+#include "elpekenin/time.h"
+#include "elpekenin/xap.h"
 
 #if defined(COMMUNITY_MODULE_INDICATORS_ENABLE)
 #    include "elpekenin/indicators.h"
@@ -34,18 +38,9 @@
 #    error Must enable 'elpekenin/string'
 #endif
 
-#if defined(QUANTUM_PAINTER_ENABLE)
-#    include "elpekenin/qp/assets.h"
-#    include "elpekenin/qp/graphics.h"
-#endif
-
-#if defined(XAP_ENABLE)
-#    include "elpekenin/xap.h"
-#endif
-
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_QWERTY] = LAYOUT(
+    [QWERTY] = LAYOUT(
         ESC,     N1,      N2,      N3,      N4,      N5,             N6,      N7,      N8,      N9,      N0,      BSPC,
         TAB,     Q,       W,       E,       R,       T,              Y,       U,       I,       O,       P,       PLUS,
         XXXXXXX, A,       S,       D,       F,       G,              H,       J,       K,       L,       TD_NTIL, XXXXXXX,
@@ -54,7 +49,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     // LOWER
-    [_FN1] = LAYOUT(
+    [FN1] = LAYOUT(
         XXXXXXX, PIPE,    AT,      HASH,    F4,      F5,             F6,      F7,      F8,      F9,      F10,     BSLS,
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, LBRC,    RBRC,    XXXXXXX,
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, LCBR,    RCBR,    PK_CPYR,
@@ -63,7 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     // UPPER
-    [_FN2] = LAYOUT(
+    [FN2] = LAYOUT(
         _______, _______, _______, _______, _______, _______,        _______, _______, _______, _______, _______, BSLS,
         ESC,     N1,      N2,      N3,      N4,      N5,             N6,      N7,      N8,      N9,      N0,      XXXXXXX,
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        LEFT,    DOWN,    UP,      RIGHT,   XXXXXXX, XXXXXXX,
@@ -72,7 +67,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     // Currently unused, and not accessible
-    // [_FN3] = LAYOUT(
+    // [FN3] = LAYOUT(
     //     XXXXXXX, PIPE,    AT,      HASH,    TILD,    EURO,           NOT,     XXXXXXX, XXXXXXX, XXXXXXX, QUOT,    BSLS,
     //     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, TD_GRV,  XXXXXXX,
     //     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, LCBR,    RCBR,    XXXXXXX,
@@ -81,7 +76,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ),
 
     // ADJUST
-    [_RST] = LAYOUT(
+    [RST] = LAYOUT(
         QK_BOOT, XXXXXXX, F2,      XXXXXXX, F4,      PK_LOG,         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, EE_CLR,
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
         PK_QCLR, AC_TOGG, XXXXXXX, XXXXXXX, PK_SIZE, XXXXXXX,        PK_KLOG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_RBT,
@@ -91,92 +86,90 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-#if defined(QUANTUM_PAINTER_ENABLE) && defined(TOUCH_SCREEN_ENABLE) && IS_RIGHT_HAND
 static uint32_t read_touch_callback(uint32_t trigger_time, void *cb_arg) {
+    if (!IS_DEFINED(TOUCH_SCREEN_ENABLE) || !IS_DEFINED(RIGHT_HAND)) {
+        return 0;
+    }
+
     uint32_t interval = TOUCH_MS;
 
-#    if defined(XAP_ENABLE)
-    if (!is_ili9341_pressed()) {
-        xap_screen_released(ILI9341_ID);
-        return interval;
+    if (IS_DEFINED(XAP_ENABLE)) {
+        if (!is_ili9341_pressed()) {
+            xap_screen_released(ILI9341_ID);
+            return interval;
+        }
     }
-#    endif
 
     // Make a read and send it to Tauri
     touch_report_t ili9341_touch_report = get_spi_touch_report(ili9341_touch, false);
-
-#    if defined(XAP_ENABLE)
-    xap_screen_pressed(ILI9341_ID, ili9341_touch_report);
-#    else
-    (void)ili9341_touch_report;
-#    endif
+    if (IS_DEFINED(XAP_ENABLE)) {
+        xap_screen_pressed(ILI9341_ID, ili9341_touch_report);
+    }
 
     return interval;
 }
-#endif
 
 void keyboard_post_init_keymap(void) {
-#if defined(QUANTUM_PAINTER_ENABLE)
-#    if IS_LEFT_HAND
-    qp_set_device_by_name("il91874", il91874);
-#    endif
+    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && IS_DEFINED(LEFT_HAND)) {
+        qp_set_device_by_name("il91874", il91874);
+    }
 
-#    if IS_RIGHT_HAND
-    qp_set_device_by_name("ili9163", ili9163);
-    qp_set_device_by_name("ili9341", ili9341);
+    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && IS_DEFINED(RIGHT_HAND)) {
+        qp_set_device_by_name("ili9163", ili9163);
+        qp_set_device_by_name("ili9341", ili9341);
 
-    // set_uptime_device(ili9341);
-    set_logging_device(ili9341);
-    // set_heap_stats_device(ili9341);
-    set_layer_device(ili9341);
-#        if defined(KEYLOG_ENABLE)
-    set_keylog_device(ili9341);
-#        endif
+        // FIXME:
+        // set_uptime_device(ili9341);
+        set_logging_device(ili9341);
+        // set_heap_stats_device(ili9341);
+        set_layer_device(ili9341);
 
-#        if defined(TOUCH_SCREEN_ENABLE)
-    defer_exec(10, read_touch_callback, NULL);
-#        endif
+        if (IS_DEFINED(KEYLOG_ENABLE)) {
+            set_keylog_device(ili9341);
+        }
 
-#    endif
-#endif
+        if (IS_DEFINED(TOUCH_SCREEN_ENABLE)) {
+            defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
+        }
+    }
 
-#if defined(COMMUNITY_MODULE_RNG_ENABLE)
+#if (COMMUNITY_MODULE_RNG_ENABLE)
     rng_set_seed(analogReadPin(GP28) * analogReadPin(GP28));
 #endif
 }
 
 void build_info_sync_keymap_callback(void) {
-#if IS_LEFT_HAND && defined(QUANTUM_PAINTER_ENABLE)
-    draw_commit(il91874);
-    draw_features(il91874);
-#endif
+    if (IS_DEFINED(LEFT_HAND) && IS_DEFINED(QUANTUM_PAINTER_ENABLE)) {
+        draw_commit(il91874);
+        draw_features(il91874);
+    }
 }
 
 #if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
 // clang-format off
 const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
-    [_QWERTY] = LAYOUT(
+    [QWERTY] = LAYOUT(
         RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
         RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
         RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
         RED,  RED,  RED,  RED,  RED,  RED,     RED,  RED,  RED,  RED,  RED,  RED,
         RED,  RED,  RED,  RED,    BLACK,         WHITE,    RED,  TRNS, RED,  RED
     ),
-    [_FN1] = LAYOUT(
+    [FN1] = LAYOUT(
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
         CYAN, CYAN, CYAN, CYAN, CYAN, CYAN,    CYAN, CYAN, CYAN, CYAN, CYAN, CYAN,
         BLUE, BLUE, BLUE, BLUE, BLUE, BLUE,    BLUE, BLUE, BLUE, BLUE, BLUE, BLUE,
         ROSE, ROSE, ROSE, ROSE, ROSE, ROSE,    ROSE, ROSE, ROSE, ROSE, ROSE, ROSE,
         WHITE,WHITE,BLACK,TRNS,    BLACK,         BLACK,   RED,  TRNS, WHITE,WHITE
     ),
-    [_FN2] = LAYOUT(
+    [FN2] = LAYOUT(
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
         TRNS, TRNS, TRNS, TRNS,    TRNS,          TRNS,    TRNS, TRNS, TRNS, TRNS
     ),
-    [_RST] = LAYOUT(
+    [RST] = LAYOUT(
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
@@ -189,29 +182,21 @@ const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #if defined(COMMUNITY_MODULE_INDICATORS_ENABLE)
 const indicator_t PROGMEM indicators[] = {
-    LAYER_INDICATOR(_RST, RGB_OFF),
+    LAYER_INDICATOR(RST, RGB_OFF),
 
     // QMK keycodes
-    KEYCODE_IN_LAYER_INDICATOR(QK_BOOT, _RST, RGB_RED),
-    KEYCODE_IN_LAYER_INDICATOR(QK_RBT, _RST, RGB_RED),
-    KEYCODE_IN_LAYER_INDICATOR(EE_CLR, _RST, RGB_RED),
-    KEYCODE_IN_LAYER_INDICATOR(DB_TOGG, _RST, RGB_RED),
-    // KEYCODE_IN_LAYER_INDICATOR(AC_DICT, _RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(QK_BOOT, RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(QK_RBT, RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(EE_CLR, RST, RGB_RED),
+    KEYCODE_IN_LAYER_INDICATOR(DB_TOGG, RST, RGB_RED),
+    // KEYCODE_IN_LAYER_INDICATOR(AC_DICT, RST, RGB_RED),
 
     // custom keycodes
-    CUSTOM_KEYCODE_IN_LAYER_INDICATOR(_RST, RGB_BLUE),
+    CUSTOM_KEYCODE_IN_LAYER_INDICATOR(RST, RGB_BLUE),
 };
 #endif
 
-bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
-#if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
-    draw_ledmap(led_min, led_max);
-#endif
-
-#if defined(COMMUNITY_MODULE_INDICATORS_ENABLE)
-    draw_indicators(led_min, led_max);
-#endif
-
+bool rgb_matrix_indicators_advanced_keymap(__unused uint8_t led_min, __unused uint8_t led_max) {
 #if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
 #    include "py/rgb_effect.c"
     mp_embed_exec_str(rgb_effect);
@@ -223,7 +208,7 @@ bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max) {
 const char *log_time(void) {
     static char buff[15];
 
-    div_t secs = div(timer_read32(), 1000);
+    div_t secs = div((int)timer_read32(), SECONDS(1));
 
     string_t str = str_from_buffer(buff);
     str_printf(&str, "%d.%ds", secs.quot, secs.rem);

@@ -1,29 +1,33 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <quantum/color.h>
+
 #include "elpekenin/build_info.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backend.h"
+#include "elpekenin/qp/assets.h"
+#include "elpekenin/qp/graphics.h"
 #include "elpekenin/signatures.h"
+#include "elpekenin/split/transactions.h"
+#include "elpekenin/xap.h"
 
-#if defined(COMMUNITY_MODULE_CRASH_ENABLE)
-#    include "elpekenin/crash.h"
+// compat: otherwise `Option()` is not defined
+#if !defined(COMMUNITY_MODULE_CRASH_ENABLE)
+#    error 'elpekenin/crash' must be enabled
 #endif
 
+#include "elpekenin/crash.h"
+
+// compat: QFF/QGF files have `#include <qp.h>`, which fails if feature is disabled
 #if defined(QUANTUM_PAINTER_ENABLE)
-#    include "elpekenin/qp/assets.h"
-#    include "elpekenin/qp/graphics.h"
 #    include "generated/qp_resources.h"
 #endif
 
-#if defined(SPLIT_KEYBOARD)
-#    include "elpekenin/split/transactions.h"
-#endif
-
-#if defined(XAP_ENABLE)
-#    include "elpekenin/xap.h"
+#if defined(RGB_MATRIX_ENABLE)
+#    include <quantum/rgb_matrix/rgb_matrix.h>
 #endif
 
 // clang-format off
@@ -50,39 +54,42 @@ void keyboard_pre_init_user(void) {
 }
 
 void keyboard_post_init_user(void) {
-#if defined(AUTOCORRECT_ENABLE)
-    autocorrect_enable();
-#endif
-
-#if defined(COMMUNITY_MODULE_CRASH_ENABLE)
-    Option(crash_info_t) maybe_crash = get_crash();
-
-    if (maybe_crash.is_some) {
-        crash_info_t crash = unwrap(maybe_crash);
-
-        logging(LOG_WARN, "%s", crash.msg);
-        for (uint8_t i = 0; i < crash.stack_depth; ++i) {
-            logging(LOG_ERROR, "%s (%p)", crash.call_stack[i].name, crash.call_stack[i].address);
-        }
-    } else {
-        logging(LOG_DEBUG, "Previous run did not crash");
+    if (IS_DEFINED(AUTOCORRECT_ENABLE)) {
+        autocorrect_enable();
     }
-#endif
 
+    if (IS_DEFINED(COMMUNITY_MODULE_CRASH_ENABLE)) {
+        Option(crash_info_t) maybe_crash = get_crash();
+
+        if (maybe_crash.is_some) {
+            crash_info_t crash = unwrap(maybe_crash);
+
+            logging(LOG_WARN, "%s", crash.msg);
+            for (uint8_t i = 0; i < crash.stack_depth; ++i) {
+                logging(LOG_ERROR, "%s (%p)", crash.call_stack[i].name, crash.call_stack[i].address);
+            }
+        } else {
+            logging(LOG_DEBUG, "Previous run did not crash");
+        }
+    }
+
+    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE)) {
+        // compat: not visible if feature is off
 #if defined(QUANTUM_PAINTER_ENABLE)
-    load_qp_resources();
-    qp_tasks_init();
+        load_qp_resources();
 #endif
+        qp_tasks_init();
+    }
 
-#if defined(SPLIT_KEYBOARD)
-    transactions_init();
-#endif
+    if (IS_DEFINED(SPLIT_KEYBOARD)) {
+        transactions_init();
+    }
 
-#if defined(TRI_LAYER_ENABLE)
-    set_tri_layer_lower_layer(_FN1);
-    set_tri_layer_upper_layer(_FN2);
-    set_tri_layer_adjust_layer(_RST);
-#endif
+    if (IS_DEFINED(TRI_LAYER_ENABLE)) {
+        set_tri_layer_lower_layer(FN1);
+        set_tri_layer_upper_layer(FN2);
+        set_tri_layer_adjust_layer(RST);
+    }
 
     keyboard_post_init_keymap();
 }
@@ -93,13 +100,14 @@ bool shutdown_user(bool jump_to_bootloader) {
     }
 
     // power off all screens
-#if defined(QUANTUM_PAINTER_ENABLE)
-    for (uint8_t i = 0; i < qp_get_num_devices(); ++i) {
-        painter_device_t device = qp_get_device_by_index(i);
-        qp_power(device, false);
+    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE)) {
+        for (uint8_t i = 0; i < qp_get_num_devices(); ++i) {
+            painter_device_t device = qp_get_device_by_index(i);
+            qp_power(device, false);
+        }
     }
-#endif
 
+    // compat: functions not visible if feature is off
 #if defined(RGB_MATRIX_ENABLE)
     if (jump_to_bootloader) {
         // off for bootloader
@@ -110,14 +118,13 @@ bool shutdown_user(bool jump_to_bootloader) {
     }
 
     // flush
-    void rgb_matrix_update_pwm_buffers(void);
     rgb_matrix_update_pwm_buffers();
 #endif
 
     // let host know
-#if defined(XAP_ENABLE)
-    xap_shutdown(jump_to_bootloader);
-#endif
+    if (IS_DEFINED(XAP_ENABLE)) {
+        xap_shutdown(jump_to_bootloader);
+    }
 
     return true;
 }
