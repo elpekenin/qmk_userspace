@@ -86,7 +86,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-static uint32_t read_touch_callback(uint32_t trigger_time, void *cb_arg) {
+static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused void *cb_arg) {
     if (!IS_DEFINED(TOUCH_SCREEN_ENABLE) || !IS_DEFINED(RIGHT_HAND)) {
         return 0;
     }
@@ -118,10 +118,9 @@ void keyboard_post_init_keymap(void) {
         qp_set_device_by_name("ili9163", ili9163);
         qp_set_device_by_name("ili9341", ili9341);
 
-        // FIXME:
-        // set_uptime_device(ili9341);
+        set_uptime_device(ili9341);
         set_logging_device(ili9341);
-        // set_heap_stats_device(ili9341);
+        set_heap_stats_device(ili9341);
         set_layer_device(ili9341);
 
         if (IS_DEFINED(KEYLOG_ENABLE)) {

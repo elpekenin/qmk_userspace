@@ -8,8 +8,9 @@ import ast
 from typing import TYPE_CHECKING, cast
 
 from elpekenin_userspace import args
+from elpekenin_userspace.codegen import C_HEADER
 from elpekenin_userspace.commands import BaseCommand
-from elpekenin_userspace.result import Err, Ok
+from elpekenin_userspace.result import Err, Ok, is_err
 
 if TYPE_CHECKING:
     from argparse import ArgumentParser, Namespace
@@ -98,9 +99,13 @@ def convert_file(file: Path) -> None:
         code = code.replace(old, new)
 
     py = file.with_suffix(".c")
-    py.write_text(
-        f'static const char {file.stem}[] = "{code}";\n',
-    )
+    with py.open("w") as f:
+        f.writelines(
+            [
+                C_HEADER + "\n",
+                f'static const char {file.stem}[] = "{code}";\n',
+            ],
+        )
 
 
 def convert(path: Path) -> Result[None, str]:
@@ -110,8 +115,10 @@ def convert(path: Path) -> Result[None, str]:
         return Ok(None)
 
     if path.is_dir():
-        for file in path.iterdir():
-            convert(file)
+        for child in path.iterdir():
+            res = convert(child)
+            if is_err(res):
+                return res
 
         return Ok(None)
 

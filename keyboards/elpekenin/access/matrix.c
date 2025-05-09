@@ -10,15 +10,17 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/spi_custom.h"
-#include "elpekenin/touch.h"
+
+#define SCREEN_IRQ_ROW 9
+#define SCREEN_IRQ_COL 0
+
+static matrix_row_t scan[ROWS_PER_HAND] = {0};
 
 void matrix_init_custom(void) {
     gpio_set_pin_output(PISO_CS_PIN);
     gpio_write_pin_high(PISO_CS_PIN);
     spi_custom_init(REGISTERS_SPI_DRIVER_ID);
 }
-
-static matrix_row_t scan[ROWS_PER_HAND] = {0};
 
 bool matrix_scan_custom(matrix_row_t *output) {
     if (!spi_custom_start(PISO_CS_PIN, false, REGISTERS_SPI_MODE, PISO_SPI_DIV, REGISTERS_SPI_DRIVER_ID)) {
@@ -44,5 +46,5 @@ bool matrix_scan_custom(matrix_row_t *output) {
 }
 
 bool is_ili9341_pressed(void) {
-    return matrix_is_on(9, 0);
+    return matrix_is_on(SCREEN_IRQ_ROW, SCREEN_IRQ_COL);
 }

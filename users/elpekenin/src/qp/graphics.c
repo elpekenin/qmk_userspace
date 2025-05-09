@@ -98,8 +98,8 @@ static void draw_layer(const char *text, bool last_frame) {
     }
 
     // sat = 0 => white regardless of hue
-    uint8_t hue = rng_min_max(0, UINT8_MAX); // random color
-    uint8_t sat = UINT8_MAX;                 // state->running ? 255 : 0;
+    const uint8_t hue = rng_min_max(0, UINT8_MAX);
+    const uint8_t sat = last_frame ? 0 : UINT8_MAX;
 
     qp_drawtext_recolor(args->device, args->x, args->y, args->font, text, hue, sat, UINT8_MAX, HSV_BLACK);
 
@@ -139,7 +139,7 @@ static deferred_token     heap_stats_token   = INVALID_DEFERRED_TOKEN;
 static qp_callback_args_t heap_stats_args    = {0};
 
 static void draw_heap(const char *text, __unused bool last_frame) {
-    // TODO
+    // FIXME:
     qp_callback_args_t *args = &heap_stats_args;
 
     if (args->device == NULL || args->font == NULL) {

@@ -18,10 +18,10 @@ EXTRALDFLAGS += -Wl,--defsym,FLASH_LEN=2048k  # not required (for now)
 QUANTUM_PAINTER_DRIVERS += il91874_spi  # left half
 QUANTUM_PAINTER_DRIVERS += ili9163_spi ili9341_spi surface  # right half
 
-ifeq ($(SIDE), left)
+ifeq ($(TARGET), left)
     OPT_DEFS += -DLEFT_HAND
-else ifeq ($(SIDE), right)
+else ifeq ($(TARGET), right)
     OPT_DEFS += -DRIGHT_HAND
 else
-    $(error Invalid value for SIDE environment variable)
+    $(error Invalid value for TARGET environment variable)
 endif

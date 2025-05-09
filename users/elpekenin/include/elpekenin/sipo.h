@@ -13,11 +13,6 @@
 #include <stdint.h>
 
 /**
- * Configure a list of "pin" names, aka: identifiers for register(s) output.
- */
-#define declare_sipo_pins(pin_names...) enum { pin_names }
-
-/**
  * Update the state of a pin in the internal buffer.
  *
  * .. hint::
