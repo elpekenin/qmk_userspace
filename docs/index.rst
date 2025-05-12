@@ -3,7 +3,7 @@ elpekenin QMK
 #############
 
 .. caution::
-  This is not an usual QMK external userspace. I use a custom script to compile (``elpekenin_userspace build``)
+  This is not an usual QMK external userspace. I use a custom script to compile (``euc build``)
 
   Motivation for this setup is to easily keep code out of tree, but in sync with QMK changes.
 

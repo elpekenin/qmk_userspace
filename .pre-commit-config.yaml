@@ -16,7 +16,7 @@ repos:
     hooks:
       - id: stubs
         name: generate stubs
-        entry: elpekenin_userspace stubs
+        entry: euc stubs
         language: python
         types: [c]
         files: micropython/user_c_modules/(.*)/(.*).c
@@ -51,7 +51,7 @@ repos:
     hooks:
       - id: schema
         name: generate jsonschema
-        entry: elpekenin_userspace jsonschema
+        entry: euc jsonschema
         language: python
         types: [python]
         files: |

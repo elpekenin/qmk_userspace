@@ -20,7 +20,7 @@ if t.TYPE_CHECKING:
 
     from elpekenin_userspace.result import Result
 
-    # NOTE: this hints are likely incomplete and/or wrong
+    # NOTE: these hints are likely incomplete and/or wrong
 
     class AnyOf(t.TypedDict):
         """Enum of types."""

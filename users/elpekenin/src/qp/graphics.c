@@ -241,7 +241,7 @@ void set_keylog_device(painter_device_t device) {
 }
 
 void draw_commit(painter_device_t device) {
-    painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
+    painter_font_handle_t font = qp_get_font_by_name("fira_code");
     if (font == NULL) {
         logging(LOG_ERROR, "%s: font == NULL", __func__);
         return;
@@ -267,7 +267,7 @@ void draw_commit(painter_device_t device) {
 }
 
 void qp_tasks_init(void) {
-    painter_font_handle_t font = qp_get_font_by_name("font_fira_code");
+    painter_font_handle_t font = qp_get_font_by_name("fira_code");
     if (font == NULL) {
         logging(LOG_ERROR, "%s: font == NULL", __func__);
         return;

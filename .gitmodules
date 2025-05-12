@@ -4,3 +4,6 @@
 [submodule "modules/drashna"]
 	path = modules/drashna
 	url = https://github.com/drashna/qmk_modules
+[submodule "modules/tzarc"]
+	path = modules/tzarc
+	url = https://github.com/tzarc/qmk_modules

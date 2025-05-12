@@ -1,6 +1,6 @@
 USER_GENERATED = $(USER_PATH)/generated
 
-USERSPACE_CLI = elpekenin_userspace
+USERSPACE_CLI = euc
 CODEGEN_ARGS = --output $(USER_GENERATED)
 
 # make sure folder exists

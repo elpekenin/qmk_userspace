@@ -69,7 +69,7 @@ To execute some code, store it as a string and feed it into the ``mp_embed_exec_
 .. tip::
     Writing a C-string directly is not convenient (eg: no IntelliSense for suggestions/typo detection)
 
-    To circumvent that, you can write a regular ``.py`` file, and then use ``elpekenin_userspace py2c <file.py>`` to generate
+    To circumvent that, you can write a regular ``.py`` file, and then use ``euc py2c <file.py>`` to generate
     the equivalent string in a standalone file, which you can later ``#include``
 
     You could also point your editor at the ``qmk`` folder, and get auto-completion thanks to the ``.pyi`` files in it

@@ -6,7 +6,7 @@
         {
             "operation": "exec",
             "display": "convert Python source to C strings",
-            "cmd": "elpekenin_userspace py2c keyboards/elpekenin/access/keymaps/elpekenin/py"
+            "cmd": "euc py2c keyboards/elpekenin/access/keymaps/elpekenin/py"
         },
         {
             "operation": "cp",
@@ -49,15 +49,6 @@
         {
             "operation": "diff",
             "file": "patches/generic_rotation.diff"
-        },
-        {
-            "operation": "diff",
-            "file": "patches/wl.diff"
-        },
-        {
-            "operation": "cp",
-            "src": "patches/wear_leveling_drivers.h",
-            "dst": "$QMK_HOME/drivers/wear_leveling/wear_leveling_drivers.h"
         },
         {
             "operation": "exec",

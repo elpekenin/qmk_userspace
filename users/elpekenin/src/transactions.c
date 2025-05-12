@@ -11,8 +11,6 @@
 #include "elpekenin/signatures.h"
 #include "elpekenin/time.h"
 
-#define XAP_HEADER_SIZE (sizeof(xap_request_header_t))
-
 // slave-side callbacks
 static void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != sizeof(build_info_t)) {
@@ -45,7 +43,7 @@ static void user_ee_clr_callback(uint8_t m2s_size, __unused const void* m2s_buff
     eeconfig_init();
 }
 
-void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
+static void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != XAP_EPSIZE) {
         logging(LOG_ERROR, "%s size", __func__);
         return;
@@ -88,15 +86,9 @@ void xap_execute_slave(const void* data) {
         return;
     }
 
-    // compat: xap_request_header_t does not exist if XAP is not enabled (it's generated code)
-#if defined(XAP_ENABLE)
     xap_split_msg_t msg = {0};
-    // { user, qp, operation } = 3 bytes to offset
-    memcpy(&msg, data - XAP_HEADER_SIZE - 3, XAP_EPSIZE);
+    memcpy(&msg.data, data, XAP_EPSIZE);
     transaction_rpc_send(RPC_ID_XAP, XAP_EPSIZE, &msg);
-#else
-    (void)data;
-#endif
 }
 
 // register message handlers and kick off tasks

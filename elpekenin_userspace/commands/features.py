@@ -95,26 +95,18 @@ def gen_c_file(file: Path, features: set[str]) -> None:
                 f'#include "{OUTPUT_NAME}.h"\n',
                 "\n",
                 "enabled_features_t get_enabled_features(void) {\n",
-                "    enabled_features_t features;\n",
-                "\n",
-                "    features.raw = 0;\n",
-                "\n",
+                "    return (enabled_features_t){\n",
             ],
         )
 
         for feature in features:
-            f.writelines(
-                [
-                    f"    #if defined({feature.upper()}_ENABLE)\n",
-                    f"        features.{feature.lower()} = true;\n",
-                    "    #endif\n",
-                    "\n",
-                ],
+            f.write(
+                f"        .{feature.lower()} = IS_DEFINED({feature}_ENABLE),\n",
             )
 
         f.writelines(
             [
-                "    return features;\n",
+                "    };\n",
                 "}\n",
             ],
         )
@@ -137,7 +129,7 @@ def gen_draw_file(file: Path, features: set[str]) -> None:
                 '#include "elpekenin/logging.h"\n',
                 "\n",
                 "void draw_features(painter_device_t device) {\n",
-                '    painter_font_handle_t font = qp_get_font_by_name("font_fira_code");\n',  # noqa: E501
+                '    painter_font_handle_t font = qp_get_font_by_name("fira_code");\n',
                 "    if (font == NULL) {\n",
                 '        logging(LOG_ERROR, "Font was NULL");\n',
                 "        return;\n",

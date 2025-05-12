@@ -93,7 +93,7 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
 
         bool text_fits = textwidth < (qp_get_width(args->device) - args->x);
 
-        stop_scrolling_text(qp_log_tokens[i]);
+        scrolling_text_stop(qp_log_tokens[i]);
         qp_log_tokens[i] = INVALID_DEFERRED_TOKEN;
 
         y += args->font->line_height;
@@ -104,7 +104,34 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
         if (text_fits) {
             qp_drawtext_recolor(args->device, args->x, y, args->font, (const char *)qp_log_pointers[i], fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
         } else {
-            qp_log_tokens[i] = draw_scrolling_text_recolor(args->device, args->x, y, args->font, (const char *)qp_log_pointers[i], args->scrolling_args.n_chars, args->scrolling_args.delay, fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
+            scrolling_text_config_t config = {
+                .device  = args->device,
+                .x       = args->x,
+                .y       = args->y,
+                .font    = args->font,
+                .str     = qp_log_pointers[i],
+                .n_chars = args->scrolling_args.n_chars,
+                .delay   = args->scrolling_args.delay,
+                .bg =
+                    {
+                        .hsv888 =
+                            {
+                                .h = bg.h,
+                                .s = bg.s,
+                                .v = bg.v,
+                            },
+                    },
+                .fg =
+                    {
+                        .hsv888 =
+                            {
+                                .h = fg.h,
+                                .s = fg.s,
+                                .v = fg.v,
+                            },
+                    },
+            };
+            qp_log_tokens[i] = scrolling_text_start(config);
         }
     }
 }

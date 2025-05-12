@@ -49,7 +49,7 @@ jobs:
       - name: Install and run build command
         run: |
           pip install .
-          elpekenin_userspace build
+          euc build
 
       - name: Upload logs
         if: failure()

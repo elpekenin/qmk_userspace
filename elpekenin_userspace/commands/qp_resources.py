@@ -97,12 +97,15 @@ def gen_c_file(file: Path, assets: AssetsDictT) -> None:
                 [
                     "\n",
                     f"    // {key}\n",
-                    *(
-                        f'    {store}("{name}", (void *){load}({name}));\n'
-                        for name in (asset_name(key, p) for p in paths)
-                    ),
                 ],
             )
+
+            for p in paths:
+                asset = asset_name(key, p)
+                name = asset.removeprefix("font_").removeprefix("gfx_")
+                f.write(
+                    f'    {store}("{name}", (void *){load}({asset}));\n',
+                )
 
         f.write("}\n")
 

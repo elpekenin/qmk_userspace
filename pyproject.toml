@@ -24,7 +24,7 @@ progress = [
 ]
 
 [project.scripts]
-elpekenin_userspace = "elpekenin_userspace.main:main"
+euc = "elpekenin_userspace.main:main"
 
 [build-system]
 requires = ["setuptools"]
