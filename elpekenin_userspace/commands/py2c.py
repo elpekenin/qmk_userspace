@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import argparse
 import ast
 from typing import TYPE_CHECKING, cast
 
@@ -13,7 +14,6 @@ from elpekenin_userspace.commands import BaseCommand
 from elpekenin_userspace.result import Err, Ok, is_err
 
 if TYPE_CHECKING:
-    from argparse import ArgumentParser, Namespace
     from pathlib import Path
 
     from elpekenin_userspace.result import Result
@@ -129,18 +129,19 @@ class Py2C(BaseCommand):
     """Generate C-string equivalent of a .py file."""
 
     @classmethod
-    def add_args(cls, parser: ArgumentParser) -> None:
+    def add_args(cls, parser: argparse.ArgumentParser) -> None:
         """Command-specific arguments."""
         parser.add_argument(
             "paths",
             help="files/directories to be converted (non-python files ignored)",
+            default=argparse.SUPPRESS,
             metavar="PATH",
             type=args.PathArg(require_existence=True),
             nargs="*",
         )
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> Result[None, str]:
+    def run(self, arguments: argparse.Namespace) -> Result[None, str]:
         """Entrypoint."""
         paths: list[Path] = arguments.paths
         if not paths:

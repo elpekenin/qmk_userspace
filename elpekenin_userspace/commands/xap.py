@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import os
 import shutil
 import subprocess
@@ -39,6 +40,7 @@ class Xap(BaseCommand):
             help="specification file",
             metavar="FILE",
             required=True,
+            default=argparse.SUPPRESS,
             type=args.File(
                 require_existence=True,
                 suffix=".hjson",

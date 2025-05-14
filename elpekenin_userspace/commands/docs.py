@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import shlex
@@ -28,7 +29,6 @@ from elpekenin_userspace.commands import BaseCommand
 from elpekenin_userspace.result import Err, Ok, Result, is_err
 
 if TYPE_CHECKING:
-    from argparse import ArgumentParser, Namespace
     from collections.abc import Generator
 
     class CompilationDatabaseEntry(TypedDict):
@@ -243,25 +243,27 @@ class Docs(BaseCommand):
     """Generate or deploy documentation."""
 
     @classmethod
-    def add_args(cls, parser: ArgumentParser) -> None:
+    def add_args(cls, parser: argparse.ArgumentParser) -> None:
         """Command-specific arguments."""
         # common args
         parser.add_argument(
             "--output",
-            help="where to write the docs (default: temporary directory)",
+            help="where to write the docs",
+            default=argparse.SUPPRESS,
             metavar="DIR",
             type=args.Directory(require_existence=True),
         )
         parser.add_argument(
             "--userspace",
-            help="where to find your userspace (default: cwd)",
+            help="where to find your userspace",
             metavar="DIR",
             type=args.Directory(require_existence=True),
             default=".",
         )
         parser.add_argument(
             "--verbose",
-            help="do not silence sphinx's output",
+            help="show sphinx's output",
+            default=argparse.SUPPRESS,
             action="store_true",
         )
 
@@ -310,7 +312,7 @@ class Docs(BaseCommand):
 
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> Result[None, str]:
+    def run(self, arguments: argparse.Namespace) -> Result[None, str]:
         """Entrypoint."""
         res = check_userspace(arguments.userspace)
         if is_err(res):
@@ -326,7 +328,7 @@ class Docs(BaseCommand):
         with build_dir(arguments.output) as build:
             return action(build, arguments)
 
-    def do_build(self, build: str, arguments: Namespace) -> Result[None, str]:
+    def do_build(self, build: str, arguments: argparse.Namespace) -> Result[None, str]:
         """Build documentation."""
         add_conf_environment(arguments.userspace)
 
@@ -352,7 +354,11 @@ class Docs(BaseCommand):
 
         return Ok(None)
 
-    def do_preview(self, build: str, arguments: Namespace) -> Result[None, str]:
+    def do_preview(
+        self,
+        build: str,
+        arguments: argparse.Namespace,
+    ) -> Result[None, str]:
         """Build documentation and spawn HTTP server to read it."""
         res = self.do_build(build, arguments)
         if is_err(res):
@@ -383,7 +389,7 @@ class Docs(BaseCommand):
         # unreachable (?), does server exit?
         return Ok(None)
 
-    def do_deploy(self, build: str, arguments: Namespace) -> Result[None, str]:
+    def do_deploy(self, build: str, arguments: argparse.Namespace) -> Result[None, str]:
         """Build documentation and deploy to a host with NGINX to serve it."""
         res = self.do_build(build, arguments)
         if is_err(res):

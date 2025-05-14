@@ -65,7 +65,11 @@ def get_parser() -> argparse.ArgumentParser:
     # script-specific args
     subparsers = parser.add_subparsers(dest="subcommand")
     for name, class_ in SUBCOMMANDS.items():
-        subparser = subparsers.add_parser(name, help=class_.help())
+        subparser = subparsers.add_parser(
+            name,
+            help=class_.help(),
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
         class_.add_args(subparser)
 
     return parser

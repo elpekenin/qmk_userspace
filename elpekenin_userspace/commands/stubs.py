@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 from typing import TYPE_CHECKING
 
 from elpekenin_userspace import args
@@ -10,7 +11,6 @@ from elpekenin_userspace.commands import BaseCommand
 from elpekenin_userspace.result import Ok
 
 if TYPE_CHECKING:
-    from argparse import ArgumentParser, Namespace
     from pathlib import Path
 
     from elpekenin_userspace.result import Result
@@ -116,18 +116,19 @@ class Stubs(BaseCommand):
     """Generate .pyi equivalent of a .c source file."""
 
     @classmethod
-    def add_args(cls, parser: ArgumentParser) -> None:
+    def add_args(cls, parser: argparse.ArgumentParser) -> None:
         """Command-specific arguments."""
         parser.add_argument(
             "files",
-            help="the C files to generate stubs for",
+            help="the C file(s) to generate stubs for",
+            default=argparse.SUPPRESS,
             metavar="FILE",
             type=args.File(require_existence=True),
             nargs="*",
         )
         return super().add_args(parser)
 
-    def run(self, arguments: Namespace) -> Result[None, str]:
+    def run(self, arguments: argparse.Namespace) -> Result[None, str]:
         """Entrypoint."""
         files: list[Path] = arguments.files
         if not files:
