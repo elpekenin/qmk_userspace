@@ -1,7 +1,7 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "elpekenin/qp/graphics.h"
+#include "elpekenin/qp/tasks.h"
 
 #include <quantum/color.h>
 #include <quantum/quantum.h>
@@ -36,6 +36,12 @@
 #    error Must enable 'elpekenin/rng'
 #endif
 
+#if defined(COMMUNITY_MODULE_QP_HELPERS_ENABLE)
+#    include "qp_helpers.h"
+#else
+#    define qp_draw_graph(...) ((void)0)
+#endif
+
 // logging task
 static deferred_token     logging_token = INVALID_DEFERRED_TOKEN;
 static qp_callback_args_t logging_args  = {0};
@@ -44,12 +50,6 @@ static uint32_t logging_task_callback(__unused uint32_t trigger_time, void *cb_a
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
     qp_logging_backend_render(args); // no-op if nothing to draw
     return MILLISECONDS(100);
-}
-
-void set_logging_device(painter_device_t device) {
-    logging_args.device = device;
-    cancel_deferred_exec(logging_token);
-    logging_token = defer_exec(MILLISECONDS(10), logging_task_callback, &logging_args);
 }
 
 // uptime task
@@ -76,12 +76,6 @@ static uint32_t uptime_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_drawtext(args->device, args->x, args->y, args->font, uptime_str);
 
     return SECONDS(1);
-}
-
-void set_uptime_device(painter_device_t device) {
-    uptime_args.device = device;
-    cancel_deferred_exec(uptime_token);
-    uptime_token = defer_exec(MILLISECONDS(10), uptime_task_callback, &uptime_args);
 }
 
 // layer task
@@ -128,12 +122,7 @@ static uint32_t layer_task_callback(__unused uint32_t trigger_time, void *cb_arg
     return MILLISECONDS(100);
 }
 
-void set_layer_device(painter_device_t device) {
-    layer_args.device = device;
-    cancel_deferred_exec(layer_token);
-    layer_token = defer_exec(MILLISECONDS(10), layer_task_callback, &layer_args);
-}
-
+// heap task
 static bool               heap_stats_running = false;
 static deferred_token     heap_stats_token   = INVALID_DEFERRED_TOKEN;
 static qp_callback_args_t heap_stats_args    = {0};
@@ -190,16 +179,15 @@ static uint32_t heap_stats_task_callback(__unused uint32_t trigger_time, void *c
     return SECONDS(1);
 }
 
-void set_heap_stats_device(painter_device_t device) {
-    heap_stats_args.device = device;
-    cancel_deferred_exec(heap_stats_token);
-    heap_stats_token = defer_exec(MILLISECONDS(10), heap_stats_task_callback, &heap_stats_args);
-}
-
+// keylog task
 static deferred_token     keylog_token = INVALID_DEFERRED_TOKEN;
 static qp_callback_args_t keylog_args  = {0};
 
 static uint32_t keylog_task_callback(__unused uint32_t trigger_time, void *cb_arg) {
+    if (!IS_DEFINED(KEYLOG_ENABLE)) {
+        return 0;
+    }
+
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
     if (args->device == NULL || args->font == NULL || !is_keylog_dirty()) {
@@ -234,11 +222,87 @@ static uint32_t keylog_task_callback(__unused uint32_t trigger_time, void *cb_ar
     return MILLISECONDS(10);
 }
 
+// CPU/RAM task
+#ifndef COMPUTER_STATS_ARRAY_SIZE
+#    define COMPUTER_STATS_ARRAY_SIZE 10
+#endif
+
+static deferred_token     computer_token = INVALID_DEFERRED_TOKEN;
+static qp_callback_args_t computer_args  = {0};
+
+static struct {
+    uint8_t cpu[COMPUTER_STATS_ARRAY_SIZE];
+    uint8_t ram[COMPUTER_STATS_ARRAY_SIZE];
+} computer_stats = {0};
+
+static bool computer_needs_redraw = false;
+
+static uint32_t computer_task_callback(__unused uint32_t trigger_time, void *cb_arg) {
+    if (!IS_DEFINED(COMMUNITY_MODULE_QP_HELPERS_ENABLE)) {
+        return 0;
+    }
+
+    qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
+
+    if (args->device == NULL || args->font == NULL || !computer_needs_redraw) {
+        return MILLISECONDS(100);
+    }
+
+    const hsv_t axis_color = {HSV_WHITE};
+    const hsv_t bg_color   = {HSV_BLACK};
+
+    const graph_line_t graphs[] = {
+        {.line_data = computer_stats.cpu, .line_color = {HSV_BLUE}},
+        {.line_data = computer_stats.ram, .line_color = {HSV_YELLOW}},
+    };
+
+    qp_draw_graph(args->device, args->x, args->y, 130, 130, axis_color, bg_color, graphs, ARRAY_SIZE(graphs), COMPUTER_STATS_ARRAY_SIZE, 130);
+    computer_needs_redraw = false;
+
+    return SECONDS(1);
+}
+
+//
+// public API
+//
+
+void set_logging_device(painter_device_t device) {
+    logging_args.device = device;
+    cancel_deferred_exec(logging_token);
+    logging_token = defer_exec(MILLISECONDS(10), logging_task_callback, &logging_args);
+}
+
+void set_uptime_device(painter_device_t device) {
+    uptime_args.device = device;
+    cancel_deferred_exec(uptime_token);
+    uptime_token = defer_exec(MILLISECONDS(10), uptime_task_callback, &uptime_args);
+}
+
+void set_layer_device(painter_device_t device) {
+    layer_args.device = device;
+    cancel_deferred_exec(layer_token);
+    layer_token = defer_exec(MILLISECONDS(10), layer_task_callback, &layer_args);
+}
+
+void set_heap_stats_device(painter_device_t device) {
+    heap_stats_args.device = device;
+    cancel_deferred_exec(heap_stats_token);
+    heap_stats_token = defer_exec(MILLISECONDS(10), heap_stats_task_callback, &heap_stats_args);
+}
+
 void set_keylog_device(painter_device_t device) {
     keylog_args.device = device;
     cancel_deferred_exec(keylog_token);
     keylog_token = defer_exec(MILLISECONDS(10), keylog_task_callback, &keylog_args);
 }
+
+void set_computer_device(painter_device_t device) {
+    computer_args.device = device;
+    cancel_deferred_exec(computer_token);
+    computer_token = defer_exec(MILLISECONDS(10), computer_task_callback, &computer_args);
+}
+
+//
 
 void draw_commit(painter_device_t device) {
     painter_font_handle_t font = qp_get_font_by_name("fira_code");
@@ -264,6 +328,16 @@ void draw_commit(painter_device_t device) {
     uint16_t y = real_height - font->line_height;
 
     qp_drawtext_recolor(device, x, y, font, get_build_info().commit, HSV_RED, HSV_WHITE);
+}
+
+void push_computer_stats(uint8_t cpu, uint8_t ram) {
+    memmove(computer_stats.cpu + 1, computer_stats.cpu, COMPUTER_STATS_ARRAY_SIZE - 1);
+    memmove(computer_stats.ram + 1, computer_stats.ram, COMPUTER_STATS_ARRAY_SIZE - 1);
+
+    computer_stats.cpu[0] = cpu;
+    computer_stats.ram[0] = ram;
+
+    computer_needs_redraw = true;
 }
 
 void qp_tasks_init(void) {
@@ -301,7 +375,13 @@ void qp_tasks_init(void) {
     layer_args.x    = 70;
     layer_args.y    = y;
 
+    y += spacing;
+
     if (IS_DEFINED(KEYLOG_ENABLE)) {
         keylog_args.font = font;
     }
+
+    computer_args.font = font;
+    computer_args.x    = 10;
+    computer_args.y    = 180;
 }

@@ -1,16 +1,19 @@
+# TODO: make arrays of len +32 when (if) qmk_xap's codegen gets to support such thing
+#       it is currently limited by serde's implementation
+# NOTE: there are a couple of crates that seem to work around it, but dont feel like hacking around
 {
     routes: {
         0x01: {
             type: command
             name: Capabilities Query
-            define: CAPABILITIES_QUERY_KB
+            define: CAPABILITIES_QUERY_USER
             description:
                 '''
-                KB subsystem capabilities query. Each bit should be considered as a "usable" route within this subsystem.
+                User subsystem capabilities query. Each bit should be considered as a "usable" route within this subsystem.
                 '''
             return_type: u32
             return_purpose: capabilities
-            return_constant: XAP_ROUTE_KB_CAPABILITIES
+            return_constant: XAP_ROUTE_USER_CAPABILITIES
         }
         0x02: {
             type: router
@@ -27,6 +30,7 @@
                     name: clear
                     define: CLEAR
                     description: Expose `qp_clear`
+                    request_type: struct
                     request_struct_length: 10
                     request_struct_members: [
                         {
@@ -45,6 +49,7 @@
                     name: setpixel
                     define: SETPIXEL
                     description: Expose `qp_setpixel`
+                    request_type: struct
                     request_struct_length: 17
                     request_struct_members: [
                         {
@@ -83,6 +88,7 @@
                     name: line
                     define: DRAW_LINE
                     description: Expose `qp_line`
+                    request_type: struct
                     request_struct_length: 21
                     request_struct_members: [
                         {
@@ -129,6 +135,7 @@
                     name: rect
                     define: DRAW_RECT
                     description: Expose `qp_rect`
+                    request_type: struct
                     request_struct_length: 22
                     request_struct_members: [
                         {
@@ -179,6 +186,7 @@
                     name: circle
                     define: DRAW_CIRCLE
                     description: Expose `qp_circle`
+                    request_type: struct
                     request_struct_length: 20
                     request_struct_members: [
                         {
@@ -225,6 +233,7 @@
                     name: ellipse
                     define: DRAW_ELLIPSE
                     description: Expose `qp_ellipse`
+                    request_type: struct
                     request_struct_length: 22
                     request_struct_members: [
                         {
@@ -275,6 +284,7 @@
                     name: drawimage
                     define: DRAWIMAGE
                     description: Expose `qp_drawimage`
+                    request_type: struct
                     request_struct_length: 24
                     request_struct_members: [
                         {
@@ -309,6 +319,7 @@
                     name: drawimage_recolor
                     define: DRAWIMAGE_RECOLOR
                     description: Expose `qp_drawimage_recolor`
+                    request_type: struct
                     request_struct_length: 30
                     request_struct_members: [
                         {
@@ -367,6 +378,7 @@
                     name: animate
                     define: ANIMATE
                     description: Expose `qp_animate`
+                    request_type: struct
                     request_struct_length: 24
                     request_struct_members: [
                         {
@@ -401,6 +413,7 @@
                     name: animate_recolor
                     define: ANIMATE_RECOLOR
                     description: Expose `qp_animate_recolor`
+                    request_type: struct
                     request_struct_length: 30
                     request_struct_members: [
                         {
@@ -459,7 +472,8 @@
                     name: drawtext
                     define: DRAWTEXT
                     description: Expose `qp_drawtext`
-                    request_struct_length: 58
+                    request_type: struct
+                    request_struct_length: 57
                     request_struct_members: [
                         {
                             type: u8[9]
@@ -486,7 +500,7 @@
                             name: font_terminator
                         }
                         {
-                            type: u8[33]
+                            type: u8[32]
                             name: text
                         }
                         {
@@ -501,6 +515,7 @@
                     name: drawtext_recolor
                     define: DRAWTEXT_RECOLOR
                     description: Expose `qp_drawtext_recolor`
+                    request_type: struct
                     request_struct_length: 58
                     request_struct_members: [
                         {
@@ -567,6 +582,7 @@
                     name: get_geometry
                     define: GET_GEOMETRY
                     description: Expose `qp_get_geometry`
+                    request_type: struct
                     request_struct_length: 10
                     request_struct_members: [
                         {
@@ -585,6 +601,7 @@
                     name: flush
                     define: FLUSH
                     description: Expose `qp_flush`
+                    request_type: struct
                     request_struct_length: 10
                     request_struct_members: [
                         {
@@ -603,6 +620,7 @@
                     name: viewport
                     define: VIEWPORT
                     description: Expose `qp_viewport`
+                    request_type: struct
                     request_struct_length: 18
                     request_struct_members: [
                         {
@@ -637,7 +655,8 @@
                     name: pixdata
                     define: PIXDATA
                     description: Expose `qp_pixdata` to stream pixels over XAP
-                    request_struct_length: 58
+                    request_type: struct
+                    request_struct_length: 42
                     request_struct_members: [
                         {
                             type: u8[9]
@@ -648,7 +667,7 @@
                             name: dev_terminator
                         }
                         {
-                            type: u8[48]
+                            type: u8[32]
                             name: pixels
                         }
                     ]
@@ -660,7 +679,8 @@
                     name: textwidth
                     define: TEXTWIDTH
                     description: Expose `qp_textwidth`
-                    request_struct_length: 58
+                    request_type: struct
+                    request_struct_length: 43
                     request_struct_members: [
                         {
                             type: u8[9]
@@ -671,7 +691,7 @@
                             name: font_terminator
                         }
                         {
-                            type: u8[47]
+                            type: u8[32]
                             name: text
                         }
                         {
@@ -686,6 +706,7 @@
                     name: scrolling_text
                     define: SCROLLING_TEXT
                     description: Expose `scrolling_text_start`
+                    request_type: struct
                     request_struct_length: 58
                     request_struct_members: [
                         {
@@ -736,6 +757,7 @@
                     name: scrolling_text_stop
                     define: STOP_SCROLLING_TEXT
                     description: Expose `scrolling_text_stop`
+                    request_type: struct
                     request_struct_length: 1
                     request_struct_members: [
                         {
@@ -750,14 +772,15 @@
                     name: scrolling_text_extend
                     define: EXTEND_SCROLLING_TEXT
                     description: Expose `scrolling_text_extend`
-                    request_struct_length: 58
+                    request_type: struct
+                    request_struct_length: 34
                     request_struct_members: [
                         {
                             type: u8
                             name: token
                         }
                         {
-                            type: u8[56]
+                            type: u8[32]
                             name: text
                         }
                         {
@@ -766,6 +789,25 @@
                         }
                     ]
                     return_execute: scrolling_text_extend
+                }
+                0x16: {
+                    type: command
+                    name: push_computer_stats
+                    define: PUSH_COMPUTER_STATS
+                    description: Expose `push_computer_stats`
+                    request_type: struct
+                    request_struct_length: 2
+                    request_struct_members: [
+                        {
+                            type: u8
+                            name: cpu
+                        }
+                        {
+                            type: u8
+                            name: ram
+                        }
+                    ]
+                    return_execute: push_computer_stats
                 }
             }
         }

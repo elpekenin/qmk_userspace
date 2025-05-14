@@ -21,10 +21,14 @@ class PathArg:
         *,
         require_existence: bool,
         name: str | None = None,
+        stem: str | None = None,
+        suffix: str | None = None,
     ) -> None:
         """Initialize an instance."""
         self.require_existence = require_existence
         self.name = name
+        self.stem = stem
+        self.suffix = suffix
 
     def __call__(self, raw: str) -> Path:
         """Conversion function for arguments."""
@@ -36,6 +40,14 @@ class PathArg:
 
         if self.name is not None and self.name != path.name:
             msg = f"Expected name to be '{self.name}'"
+            raise ArgumentTypeError(msg)
+
+        if self.stem is not None and self.stem != path.stem:
+            msg = f"Expected stem to be '{self.stem}'"
+            raise ArgumentTypeError(msg)
+
+        if self.suffix is not None and self.suffix != path.suffix:
+            msg = f"Expected suffix to be '{self.suffix}'"
             raise ArgumentTypeError(msg)
 
         return path.resolve()

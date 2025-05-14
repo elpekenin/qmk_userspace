@@ -7,7 +7,7 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/logging.h"
-#include "elpekenin/qp/graphics.h"
+#include "elpekenin/qp/tasks.h"
 #include "elpekenin/scrolling_text.h"
 
 static char           qp_log[LOG_N_LINES][LOG_N_CHARS + 1];
@@ -104,7 +104,7 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
         if (text_fits) {
             qp_drawtext_recolor(args->device, args->x, y, args->font, (const char *)qp_log_pointers[i], fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
         } else {
-            scrolling_text_config_t config = {
+            const scrolling_text_config_t config = {
                 .device  = args->device,
                 .x       = args->x,
                 .y       = args->y,
@@ -112,6 +112,7 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
                 .str     = qp_log_pointers[i],
                 .n_chars = args->scrolling_args.n_chars,
                 .delay   = args->scrolling_args.delay,
+                .spaces  = 5,
                 .bg =
                     {
                         .hsv888 =
@@ -131,7 +132,7 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
                             },
                     },
             };
-            qp_log_tokens[i] = scrolling_text_start(config);
+            qp_log_tokens[i] = scrolling_text_start(&config);
         }
     }
 }

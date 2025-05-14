@@ -8,6 +8,7 @@
 #include <quantum/xap/xap.h>
 
 #include "elpekenin/qp/assets.h"
+#include "elpekenin/qp/tasks.h"
 #include "elpekenin/scrolling_text.h"
 #include "elpekenin/split/transactions.h"
 
@@ -278,7 +279,7 @@ bool xap_execute_draw_scrolling_text(xap_token_t token, xap_route_user_quantum_p
     if (device == NULL) {
         xap_slave(arg);
     } else {
-        scrolling_text_config_t config = {
+        const scrolling_text_config_t config = {
             .device  = device,
             .x       = arg->x,
             .y       = arg->y,
@@ -286,6 +287,7 @@ bool xap_execute_draw_scrolling_text(xap_token_t token, xap_route_user_quantum_p
             .str     = (char *)arg->text,
             .n_chars = arg->n_chars,
             .delay   = arg->delay,
+            .spaces  = 5,
             .bg =
                 {
                     .hsv888 = {HSV_BLACK},
@@ -295,7 +297,7 @@ bool xap_execute_draw_scrolling_text(xap_token_t token, xap_route_user_quantum_p
                     .hsv888 = {HSV_WHITE},
                 },
         };
-        deferred_token def_token = scrolling_text_start(config);
+        deferred_token def_token = scrolling_text_start(&config);
 
         xap_send(token, XAP_RESPONSE_FLAG_SUCCESS, (const void *)&def_token, sizeof(def_token));
     }
@@ -310,5 +312,10 @@ bool xap_execute_stop_scrolling_text(__unused xap_token_t token, xap_route_user_
 
 bool xap_execute_extend_scrolling_text(__unused xap_token_t token, xap_route_user_quantum_painter_extend_scrolling_text_arg_t *arg) {
     scrolling_text_extend(arg->token, (const char *)arg->text);
+    return true;
+}
+
+bool xap_execute_push_computer_stats(__unused xap_token_t token, xap_route_user_quantum_painter_push_computer_stats_arg_t *arg) {
+    push_computer_stats(arg->cpu, arg->ram);
     return true;
 }

@@ -14,6 +14,7 @@
         "elpekenin/ledmap",
 
         /* QP */
+        "drashna/qp_helpers",
         "elpekenin/glitch_text",
         "elpekenin/scrolling_text",
 

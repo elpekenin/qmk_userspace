@@ -80,7 +80,7 @@ void keyboard_post_init_kb(void) {
         ret &= qp_init(il91874, IL91874_ROTATION);
         ret &= qp_power(il91874, true);
 
-        printf("QP setup: %s", ret ? "ok" : "failed");
+        printf("QP setup: %s\n", ret ? "ok" : "failed");
     }
 
     if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && IS_DEFINED(RIGHT_HAND)) {
@@ -100,12 +100,12 @@ void keyboard_post_init_kb(void) {
         ret &= qp_power(ili9341, true);
         qp_rect(ili9341, 0, 0, ILI9341_WIDTH, ILI9341_HEIGHT, HSV_BLACK, true);
 
-        printf("QP setup: %s", ret ? "ok" : "failed");
+        printf("QP setup: %s\n", ret ? "ok" : "failed");
     }
 
     if (IS_DEFINED(TOUCH_SCREEN_ENABLE) && IS_DEFINED(RIGHT_HAND)) {
         bool ret = touch_spi_init(ili9341_touch);
-        printf("Touch screen setup: %s", ret ? "ok" : "failed");
+        printf("Touch screen setup: %s\n", ret ? "ok" : "failed");
     }
 
     keyboard_post_init_user();

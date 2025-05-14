@@ -191,9 +191,7 @@ static void keylog_clear(void) {
 }
 
 static void keylog_shift_right_one_byte(void) {
-    for (uint8_t i = KEYLOG_SIZE - 1; i > 0; --i) {
-        keylog[i] = keylog[i - 1];
-    }
+    memmove(keylog + 1, keylog, KEYLOG_SIZE - 1);
     keylog[0] = ' ';
 }
 

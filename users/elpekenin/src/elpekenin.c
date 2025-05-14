@@ -9,7 +9,7 @@
 #include "elpekenin/logging.h"
 #include "elpekenin/logging/backend.h"
 #include "elpekenin/qp/assets.h"
-#include "elpekenin/qp/graphics.h"
+#include "elpekenin/qp/tasks.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/split/transactions.h"
 #include "elpekenin/xap.h"

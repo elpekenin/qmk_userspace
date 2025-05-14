@@ -10,7 +10,7 @@ void qp_tasks_init(void);
 
 // show build info
 void draw_commit(painter_device_t device);
-void draw_features(painter_device_t device);
+void draw_features(painter_device_t device); // generated/features_draw
 
 // configure tasks
 void set_logging_device(painter_device_t device);
@@ -18,6 +18,9 @@ void set_uptime_device(painter_device_t device);
 void set_layer_device(painter_device_t device);
 void set_heap_stats_device(painter_device_t device);
 void set_keylog_device(painter_device_t device);
+void set_computer_device(painter_device_t device);
+
+void push_computer_stats(uint8_t cpu, uint8_t ram);
 
 // exposed for logging/backend/qp.c
 typedef struct PACKED {

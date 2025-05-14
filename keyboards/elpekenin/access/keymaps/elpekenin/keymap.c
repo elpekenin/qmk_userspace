@@ -9,7 +9,7 @@
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/qp/assets.h"
-#include "elpekenin/qp/graphics.h"
+#include "elpekenin/qp/tasks.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/time.h"
 #include "elpekenin/xap.h"
@@ -122,14 +122,12 @@ void keyboard_post_init_keymap(void) {
         set_logging_device(ili9341);
         set_heap_stats_device(ili9341);
         set_layer_device(ili9341);
+        set_keylog_device(ili9341);
+        set_computer_device(ili9341);
+    }
 
-        if (IS_DEFINED(KEYLOG_ENABLE)) {
-            set_keylog_device(ili9341);
-        }
-
-        if (IS_DEFINED(TOUCH_SCREEN_ENABLE)) {
-            defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
-        }
+    if (IS_DEFINED(TOUCH_SCREEN_ENABLE) && IS_DEFINED(RIGHT_HAND)) {
+        defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
     }
 
 #if (COMMUNITY_MODULE_RNG_ENABLE)
