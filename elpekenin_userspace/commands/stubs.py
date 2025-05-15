@@ -121,10 +121,9 @@ class Stubs(BaseCommand):
         parser.add_argument(
             "files",
             help="the C file(s) to generate stubs for",
-            default=argparse.SUPPRESS,
             metavar="FILE",
             type=args.File(require_existence=True),
-            nargs="*",
+            nargs=argparse.ONE_OR_MORE,
         )
         return super().add_args(parser)
 

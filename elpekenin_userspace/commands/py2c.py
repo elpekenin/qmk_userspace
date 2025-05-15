@@ -134,10 +134,9 @@ class Py2C(BaseCommand):
         parser.add_argument(
             "paths",
             help="files/directories to be converted (non-python files ignored)",
-            default=argparse.SUPPRESS,
             metavar="PATH",
             type=args.PathArg(require_existence=True),
-            nargs="*",
+            nargs=argparse.ONE_OR_MORE,
         )
         return super().add_args(parser)
 

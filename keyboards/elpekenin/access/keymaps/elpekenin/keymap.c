@@ -109,6 +109,85 @@ static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused voi
     return interval;
 }
 
+static void configure_qp_tasks(void) {
+    painter_font_handle_t font = qp_get_font_by_name("fira_code");
+    if (font == NULL) {
+        logging(LOG_ERROR, "%s: font == NULL", __func__);
+        return;
+    }
+
+    const uint16_t x_coord = 10;
+    const uint16_t start_y = 10;
+    const uint16_t spacing = font->line_height + 1;
+
+    qp_callback_args_t *keylog = get_keylog_args();
+    if (keylog != NULL) {
+        *keylog = (qp_callback_args_t){
+            .device = ili9341,
+            .font   = font,
+            .x      = x_coord,
+            .y      = start_y,
+        };
+    }
+
+    qp_callback_args_t *uptime = get_uptime_args();
+    if (uptime != NULL) {
+        *uptime = (qp_callback_args_t){
+            .device = ili9341,
+            .font   = font,
+            .x      = x_coord,
+            .y      = start_y + spacing,
+        };
+    }
+
+    qp_callback_args_t *layer = get_layer_args();
+    if (layer != NULL) {
+        *layer = (qp_callback_args_t){
+            .device = ili9341,
+            .font   = font,
+            .x      = x_coord,
+            .y      = start_y + (2 * spacing),
+        };
+    }
+
+    qp_callback_args_t *heap_stats = get_heap_stats_args();
+    if (heap_stats != NULL) {
+        *heap_stats = (qp_callback_args_t){
+            .device = ili9341,
+            .font   = font,
+            .x      = x_coord,
+            .y      = start_y + (3 * spacing),
+        };
+    }
+
+    qp_callback_args_t *logging = get_logging_args();
+    if (logging != NULL) {
+        *logging = (qp_callback_args_t){
+            .device = ili9341,
+            .font   = font,
+            .x      = ILI9341_WIDTH / 2,
+            .y      = start_y,
+            .scrolling_args =
+                {
+                    .delay   = MILLISECONDS(500),
+                    .n_chars = 18, // FIXME: compute at runtime
+                },
+        };
+    }
+
+    const uint16_t      graph_size     = 130;
+    qp_callback_args_t *computer_stats = get_computer_stats_args();
+    if (computer_stats != NULL) {
+        *computer_stats = (qp_callback_args_t){
+            .device = ili9341,
+            .font   = font,
+            .x      = x_coord,
+            .y      = start_y + (4 * spacing),
+            .extra  = (void *)(uintptr_t)graph_size,
+        };
+    }
+}
+
 void keyboard_post_init_keymap(void) {
     if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && IS_DEFINED(LEFT_HAND)) {
         qp_set_device_by_name("il91874", il91874);
@@ -118,12 +197,7 @@ void keyboard_post_init_keymap(void) {
         qp_set_device_by_name("ili9163", ili9163);
         qp_set_device_by_name("ili9341", ili9341);
 
-        set_uptime_device(ili9341);
-        set_logging_device(ili9341);
-        set_heap_stats_device(ili9341);
-        set_layer_device(ili9341);
-        set_keylog_device(ili9341);
-        set_computer_device(ili9341);
+        configure_qp_tasks();
     }
 
     if (IS_DEFINED(TOUCH_SCREEN_ENABLE) && IS_DEFINED(RIGHT_HAND)) {

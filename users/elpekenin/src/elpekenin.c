@@ -73,13 +73,10 @@ void keyboard_post_init_user(void) {
         }
     }
 
-    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE)) {
-        // compat: not visible if feature is off
+    // compat: not visible if feature is off
 #if defined(QUANTUM_PAINTER_ENABLE)
-        load_qp_resources();
+    load_qp_resources();
 #endif
-        qp_tasks_init();
-    }
 
     if (IS_DEFINED(SPLIT_KEYBOARD)) {
         transactions_init();

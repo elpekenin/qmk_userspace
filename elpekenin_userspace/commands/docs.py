@@ -325,6 +325,16 @@ class Docs(BaseCommand):
         }
         action = actions[arguments.action]
 
+        # set to `default=argparse.SUPPRESS` to prevent "bad" error message
+        # configure them from here
+        defaults = {
+            "output": None,
+            "verbose": False,
+        }
+        for attr, value in defaults.items():
+            if not hasattr(arguments, attr):
+                setattr(arguments, attr, value)
+
         with build_dir(arguments.output) as build:
             return action(build, arguments)
 

@@ -43,18 +43,20 @@
 #endif
 
 // logging task
-static deferred_token     logging_token = INVALID_DEFERRED_TOKEN;
-static qp_callback_args_t logging_args  = {0};
+static qp_callback_args_t logging_args = {0};
 
 static uint32_t logging_task_callback(__unused uint32_t trigger_time, void *cb_arg) {
+    if (!IS_DEFINED(COMMUNITY_MODULE_LOGGING_ENABLE)) {
+        return 0;
+    }
+
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
     qp_logging_backend_render(args); // no-op if nothing to draw
     return MILLISECONDS(100);
 }
 
 // uptime task
-static deferred_token     uptime_token = INVALID_DEFERRED_TOKEN;
-static qp_callback_args_t uptime_args  = {0};
+static qp_callback_args_t uptime_args = {0};
 
 static uint32_t uptime_task_callback(uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
@@ -80,7 +82,6 @@ static uint32_t uptime_task_callback(uint32_t trigger_time, void *cb_arg) {
 
 // layer task
 static bool               layer_running = false;
-static deferred_token     layer_token   = INVALID_DEFERRED_TOKEN;
 static qp_callback_args_t layer_args    = {0};
 
 static void draw_layer(const char *text, bool last_frame) {
@@ -103,6 +104,10 @@ static void draw_layer(const char *text, bool last_frame) {
 }
 
 static uint32_t layer_task_callback(__unused uint32_t trigger_time, void *cb_arg) {
+    if (!IS_DEFINED(COMMUNITY_MODULE_GLITCH_TEXT_ENABLE)) {
+        return 0;
+    }
+
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
     static uint8_t last_layer = UINT8_MAX;
@@ -124,7 +129,6 @@ static uint32_t layer_task_callback(__unused uint32_t trigger_time, void *cb_arg
 
 // heap task
 static bool               heap_stats_running = false;
-static deferred_token     heap_stats_token   = INVALID_DEFERRED_TOKEN;
 static qp_callback_args_t heap_stats_args    = {0};
 
 static void draw_heap(const char *text, __unused bool last_frame) {
@@ -180,8 +184,7 @@ static uint32_t heap_stats_task_callback(__unused uint32_t trigger_time, void *c
 }
 
 // keylog task
-static deferred_token     keylog_token = INVALID_DEFERRED_TOKEN;
-static qp_callback_args_t keylog_args  = {0};
+static qp_callback_args_t keylog_args = {0};
 
 static uint32_t keylog_task_callback(__unused uint32_t trigger_time, void *cb_arg) {
     if (!IS_DEFINED(KEYLOG_ENABLE)) {
@@ -193,13 +196,6 @@ static uint32_t keylog_task_callback(__unused uint32_t trigger_time, void *cb_ar
     if (args->device == NULL || args->font == NULL || !is_keylog_dirty()) {
         return MILLISECONDS(10);
     }
-
-    const char *keylog = get_keylog();
-    uint16_t    width  = qp_get_width(args->device);
-    uint16_t    height = qp_get_height(args->device);
-
-    int16_t textwidth = qp_textwidth(args->font, keylog);
-    qp_rect(args->device, 0, height - args->font->line_height, width - textwidth, height, HSV_BLACK, true);
 
     // default to white, change it based on WPM (if enabled)
     hsv_t color = {HSV_WHITE};
@@ -217,7 +213,8 @@ static uint32_t keylog_task_callback(__unused uint32_t trigger_time, void *cb_ar
         }
     }
 
-    qp_drawtext_recolor(args->device, width - textwidth, height - args->font->line_height, args->font, keylog, color.h, color.s, color.v, HSV_BLACK);
+    const char *keylog = get_keylog();
+    qp_drawtext_recolor(args->device, args->x, args->y, args->font, keylog, color.h, color.s, color.v, HSV_BLACK);
 
     return MILLISECONDS(10);
 }
@@ -227,17 +224,20 @@ static uint32_t keylog_task_callback(__unused uint32_t trigger_time, void *cb_ar
 #    define COMPUTER_STATS_ARRAY_SIZE 10
 #endif
 
-static deferred_token     computer_token = INVALID_DEFERRED_TOKEN;
-static qp_callback_args_t computer_args  = {0};
+static qp_callback_args_t computer_stats_args = {0};
 
 static struct {
     uint8_t cpu[COMPUTER_STATS_ARRAY_SIZE];
     uint8_t ram[COMPUTER_STATS_ARRAY_SIZE];
-} computer_stats = {0};
+} computer_data = {0};
 
 static bool computer_needs_redraw = false;
 
 static uint32_t computer_task_callback(__unused uint32_t trigger_time, void *cb_arg) {
+    if (!IS_DEFINED(XAP_ENABLE)) {
+        return 0;
+    }
+
     if (!IS_DEFINED(COMMUNITY_MODULE_QP_HELPERS_ENABLE)) {
         return 0;
     }
@@ -248,58 +248,109 @@ static uint32_t computer_task_callback(__unused uint32_t trigger_time, void *cb_
         return MILLISECONDS(100);
     }
 
+    const uint16_t max_value  = 100;
+    const uint16_t graph_size = (uintptr_t)args->extra;
+
     const hsv_t axis_color = {HSV_WHITE};
     const hsv_t bg_color   = {HSV_BLACK};
 
     const graph_line_t graphs[] = {
-        {.line_data = computer_stats.cpu, .line_color = {HSV_BLUE}},
-        {.line_data = computer_stats.ram, .line_color = {HSV_YELLOW}},
+        {
+            .line_data  = computer_data.cpu,
+            .line_color = {HSV_BLUE},
+            .mode       = LINE,
+        },
+        {
+            .line_data  = computer_data.ram,
+            .line_color = {HSV_YELLOW},
+            .mode       = LINE,
+        },
     };
 
-    qp_draw_graph(args->device, args->x, args->y, 130, 130, axis_color, bg_color, graphs, ARRAY_SIZE(graphs), COMPUTER_STATS_ARRAY_SIZE, 130);
+    qp_draw_graph(args->device, args->x, args->y, graph_size, graph_size, axis_color, bg_color, graphs, ARRAY_SIZE(graphs), COMPUTER_STATS_ARRAY_SIZE, max_value);
     computer_needs_redraw = false;
 
-    return SECONDS(1);
+    return MILLISECONDS(200);
 }
 
 //
 // public API
 //
+//
+// NOTE: these functions always return `NULL` after being called once
+//       this is to prevent overwriting the configuration when (if) task is configured
+//
 
-void set_logging_device(painter_device_t device) {
-    logging_args.device = device;
-    cancel_deferred_exec(logging_token);
-    logging_token = defer_exec(MILLISECONDS(10), logging_task_callback, &logging_args);
+qp_callback_args_t *get_logging_args(void) {
+    static bool configured = false;
+    if (configured) {
+        return NULL;
+    }
+    configured = true;
+
+    defer_exec(MILLISECONDS(10), logging_task_callback, &logging_args);
+
+    return &logging_args;
 }
 
-void set_uptime_device(painter_device_t device) {
-    uptime_args.device = device;
-    cancel_deferred_exec(uptime_token);
-    uptime_token = defer_exec(MILLISECONDS(10), uptime_task_callback, &uptime_args);
+qp_callback_args_t *get_uptime_args(void) {
+    static bool configured = false;
+    if (configured) {
+        return NULL;
+    }
+    configured = true;
+
+    defer_exec(MILLISECONDS(10), uptime_task_callback, &uptime_args);
+
+    return &uptime_args;
 }
 
-void set_layer_device(painter_device_t device) {
-    layer_args.device = device;
-    cancel_deferred_exec(layer_token);
-    layer_token = defer_exec(MILLISECONDS(10), layer_task_callback, &layer_args);
+qp_callback_args_t *get_layer_args(void) {
+    static bool configured = false;
+    if (configured) {
+        return NULL;
+    }
+    configured = true;
+
+    defer_exec(MILLISECONDS(10), layer_task_callback, &layer_args);
+
+    return &layer_args;
 }
 
-void set_heap_stats_device(painter_device_t device) {
-    heap_stats_args.device = device;
-    cancel_deferred_exec(heap_stats_token);
-    heap_stats_token = defer_exec(MILLISECONDS(10), heap_stats_task_callback, &heap_stats_args);
+qp_callback_args_t *get_heap_stats_args(void) {
+    static bool configured = false;
+    if (configured) {
+        return NULL;
+    }
+    configured = true;
+
+    defer_exec(MILLISECONDS(10), heap_stats_task_callback, &heap_stats_args);
+
+    return &heap_stats_args;
 }
 
-void set_keylog_device(painter_device_t device) {
-    keylog_args.device = device;
-    cancel_deferred_exec(keylog_token);
-    keylog_token = defer_exec(MILLISECONDS(10), keylog_task_callback, &keylog_args);
+qp_callback_args_t *get_keylog_args(void) {
+    static bool configured = false;
+    if (configured) {
+        return NULL;
+    }
+    configured = true;
+
+    defer_exec(MILLISECONDS(10), keylog_task_callback, &keylog_args);
+
+    return &keylog_args;
 }
 
-void set_computer_device(painter_device_t device) {
-    computer_args.device = device;
-    cancel_deferred_exec(computer_token);
-    computer_token = defer_exec(MILLISECONDS(10), computer_task_callback, &computer_args);
+qp_callback_args_t *get_computer_stats_args(void) {
+    static bool configured = false;
+    if (configured) {
+        return NULL;
+    }
+    configured = true;
+
+    defer_exec(MILLISECONDS(10), computer_task_callback, &computer_stats_args);
+
+    return &computer_stats_args;
 }
 
 //
@@ -311,77 +362,24 @@ void draw_commit(painter_device_t device) {
         return;
     }
 
-    painter_driver_t *driver     = (painter_driver_t *)device;
-    uint16_t          width      = driver->panel_width;
-    uint16_t          height     = driver->panel_height;
-    int16_t           hash_width = qp_textwidth(font, get_build_info().commit);
+    uint16_t width  = qp_get_width(device);
+    uint16_t height = qp_get_height(device);
 
-    uint16_t real_width  = width;
-    uint16_t real_height = height;
+    const char *commit     = get_build_info().commit;
+    int16_t     hash_width = qp_textwidth(font, commit);
 
-    if (driver->rotation == QP_ROTATION_90 || driver->rotation == QP_ROTATION_270) {
-        real_width  = height;
-        real_height = width;
-    }
+    uint16_t x = width - hash_width;
+    uint16_t y = height - font->line_height;
 
-    uint16_t x = real_width - hash_width;
-    uint16_t y = real_height - font->line_height;
-
-    qp_drawtext_recolor(device, x, y, font, get_build_info().commit, HSV_RED, HSV_WHITE);
+    qp_drawtext_recolor(device, x, y, font, commit, HSV_RED, HSV_WHITE);
 }
 
 void push_computer_stats(uint8_t cpu, uint8_t ram) {
-    memmove(computer_stats.cpu + 1, computer_stats.cpu, COMPUTER_STATS_ARRAY_SIZE - 1);
-    memmove(computer_stats.ram + 1, computer_stats.ram, COMPUTER_STATS_ARRAY_SIZE - 1);
+    memmove(computer_data.cpu + 1, computer_data.cpu, COMPUTER_STATS_ARRAY_SIZE - 1);
+    memmove(computer_data.ram + 1, computer_data.ram, COMPUTER_STATS_ARRAY_SIZE - 1);
 
-    computer_stats.cpu[0] = cpu;
-    computer_stats.ram[0] = ram;
+    computer_data.cpu[0] = cpu;
+    computer_data.ram[0] = ram;
 
     computer_needs_redraw = true;
-}
-
-void qp_tasks_init(void) {
-    painter_font_handle_t font = qp_get_font_by_name("fira_code");
-    if (font == NULL) {
-        logging(LOG_ERROR, "%s: font == NULL", __func__);
-        return;
-    }
-
-    // positions are hard-coded for ILI9341 on access
-    uint16_t y       = 55;
-    size_t   spacing = font->line_height + 2;
-
-    logging_args.font                   = font;
-    logging_args.x                      = 160;
-    logging_args.y                      = 100;
-    logging_args.scrolling_args.n_chars = 18;
-    logging_args.scrolling_args.delay   = 500;
-
-    uptime_args.font = font;
-    uptime_args.x    = 50;
-    uptime_args.y    = y;
-
-    y += spacing;
-
-    if (IS_DEFINED(COMMUNITY_MODULE_ALLOCATOR_ENABLE)) {
-        heap_stats_args.font = font;
-        heap_stats_args.x    = 50;
-        heap_stats_args.y    = y;
-
-        y += spacing;
-    }
-
-    layer_args.font = font;
-    layer_args.x    = 70;
-    layer_args.y    = y;
-
-    y += spacing;
-
-    if (IS_DEFINED(KEYLOG_ENABLE)) {
-        keylog_args.font = font;
-    }
-
-    computer_args.font = font;
-    computer_args.x    = 10;
-    computer_args.y    = 180;
 }
