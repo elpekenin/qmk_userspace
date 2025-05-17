@@ -11,6 +11,7 @@
 #include "elpekenin/logging.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/qp/tasks/computer_stats.h"
+#include "elpekenin/qp/tasks/github_notifications.h"
 #include "elpekenin/qp/tasks/heap_stats.h"
 #include "elpekenin/qp/tasks/keylog.h"
 #include "elpekenin/qp/tasks/layer.h"
@@ -190,6 +191,19 @@ static void configure_qp_tasks(void) {
             .x      = x_coord,
             .y      = start_y + (4 * spacing),
             .extra  = (void *)(uintptr_t)graph_size,
+        };
+    }
+
+    qp_callback_args_t *github_notifications = get_github_notifications_args();
+    if (github_notifications != NULL) {
+        painter_image_handle_t github = qp_get_image_by_name("github");
+        const uint16_t         offset = (github == NULL) ? 50 : github->width;
+
+        *github_notifications = (qp_callback_args_t){
+            .device = ili9341,
+            .font   = font,
+            .x      = (ILI9341_WIDTH / 2) - offset,
+            .y      = start_y,
         };
     }
 }

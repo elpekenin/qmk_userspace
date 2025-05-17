@@ -11,6 +11,43 @@ static uint8_t notifications = 0;
 
 static bool redraw = false;
 
+static const char *as_text(uint8_t value) {
+    switch (value) {
+        case 0:
+            __unreachable();
+
+        case 1:
+            return "1";
+
+        case 2:
+            return "2";
+
+        case 3:
+            return "3";
+
+        case 4:
+            return "4";
+
+        case 5:
+            return "5";
+
+        case 6:
+            return "6";
+
+        case 7:
+            return "7";
+
+        case 8:
+            return "8";
+
+        case 9:
+            return "9";
+
+        default:
+            return "!";
+    }
+}
+
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     if (!IS_DEFINED(XAP_ENABLE)) {
         return 0;
@@ -30,8 +67,9 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     qp_drawimage(args->device, args->x, args->y, logo);
     redraw = false;
 
-    const char *text = get_u8_str(notifications, ' ');
-    qp_drawtext(args->device, args->x, args->y, args->font, text);
+    if (notifications != 0) {
+        qp_drawtext_recolor(args->device, args->x, args->y, args->font, as_text(notifications), HSV_RED, HSV_BLACK);
+    }
 
     return MILLISECONDS(200);
 }
