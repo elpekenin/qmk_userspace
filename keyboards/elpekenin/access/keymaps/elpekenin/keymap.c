@@ -5,11 +5,17 @@
 
 #include <stdlib.h>
 
+#include "elpekenin/build_info.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging.h"
 #include "elpekenin/qp/assets.h"
-#include "elpekenin/qp/tasks.h"
+#include "elpekenin/qp/tasks/computer_stats.h"
+#include "elpekenin/qp/tasks/heap_stats.h"
+#include "elpekenin/qp/tasks/keylog.h"
+#include "elpekenin/qp/tasks/layer.h"
+#include "elpekenin/qp/tasks/logging.h"
+#include "elpekenin/qp/tasks/uptime.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/time.h"
 #include "elpekenin/xap.h"
@@ -210,10 +216,32 @@ void keyboard_post_init_keymap(void) {
 }
 
 void build_info_sync_keymap_callback(void) {
-    if (IS_DEFINED(LEFT_HAND) && IS_DEFINED(QUANTUM_PAINTER_ENABLE)) {
-        draw_commit(il91874);
-        draw_features(il91874);
+    if (!IS_DEFINED(LEFT_HAND) || !IS_DEFINED(QUANTUM_PAINTER_ENABLE)) {
+        return;
     }
+
+    // FIXME: where to put this signature
+    void draw_features(painter_device_t);
+
+    draw_features(il91874);
+
+    // commit
+    painter_font_handle_t font = qp_get_font_by_name("fira_code");
+    if (font == NULL) {
+        logging(LOG_ERROR, "%s: font == NULL", __func__);
+        return;
+    }
+
+    uint16_t width  = qp_get_width(il91874);
+    uint16_t height = qp_get_height(il91874);
+
+    const char *commit     = get_build_info().commit;
+    int16_t     hash_width = qp_textwidth(font, commit);
+
+    uint16_t x = width - hash_width;
+    uint16_t y = height - font->line_height;
+
+    qp_drawtext_recolor(il91874, x, y, font, commit, HSV_RED, HSV_WHITE);
 }
 
 #if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)

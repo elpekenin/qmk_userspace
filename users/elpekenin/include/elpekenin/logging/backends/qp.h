@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-#include "elpekenin/qp/tasks.h" // qp_callback_args_t
+#include "elpekenin/qp/tasks/common.h" // qp_callback_args_t
 
 #ifndef LOG_N_LINES
 #    define LOG_N_LINES 9

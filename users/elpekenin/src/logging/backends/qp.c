@@ -7,7 +7,7 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/logging.h"
-#include "elpekenin/qp/tasks.h"
+#include "elpekenin/qp/tasks/common.h"
 #include "elpekenin/scrolling_text.h"
 
 static char           qp_log[LOG_N_LINES][LOG_N_CHARS + 1];

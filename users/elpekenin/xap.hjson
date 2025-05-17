@@ -790,7 +790,19 @@
                     ]
                     return_execute: scrolling_text_extend
                 }
-                0x16: {
+            }
+        }
+        0x03: {
+            type: router
+            name: tasks
+            define: TASKS
+            description:
+                '''
+                This subsystem allows control over QP tasks
+                '''
+            enable_if_preprocessor: defined(QUANTUM_PAINTER_ENABLE)
+            routes: {
+                0x01: {
                     type: command
                     name: push_computer_stats
                     define: PUSH_COMPUTER_STATS
@@ -808,6 +820,21 @@
                         }
                     ]
                     return_execute: push_computer_stats
+                }
+                0x02: {
+                    type: command
+                    name: set_github_notifications_count
+                    define: SET_GITHUB_NOTIFICATIONS_COUNT
+                    description: Expose `set_github_notifications_count`
+                    request_type: struct
+                    request_struct_length: 1
+                    request_struct_members: [
+                        {
+                            type: u8
+                            name: count
+                        }
+                    ]
+                    return_execute: set_github_notifications_count
                 }
             }
         }
