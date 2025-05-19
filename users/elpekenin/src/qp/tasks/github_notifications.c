@@ -14,7 +14,7 @@ static bool redraw = false;
 static const char *as_text(uint8_t value) {
     switch (value) {
         case 0:
-            __unreachable();
+            return " ";
 
         case 1:
             return "1";
@@ -67,9 +67,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     qp_drawimage(args->device, args->x, args->y, logo);
     redraw = false;
 
-    if (notifications != 0) {
-        qp_drawtext_recolor(args->device, args->x, args->y, args->font, as_text(notifications), HSV_RED, HSV_BLACK);
-    }
+    qp_drawtext_recolor(args->device, args->x, args->y, args->font, as_text(notifications), HSV_RED, HSV_BLACK);
 
     return MILLISECONDS(200);
 }

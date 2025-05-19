@@ -12,11 +12,11 @@
 static qp_callback_args_t args = {0};
 
 static struct {
+    bool    redraw;
+    uint8_t points;
     uint8_t cpu[COMPUTER_STATS_ARRAY_SIZE];
     uint8_t ram[COMPUTER_STATS_ARRAY_SIZE];
-} data = {0};
-
-static bool redraw = false;
+} state = {0};
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     if (!IS_DEFINED(XAP_ENABLE) || !IS_DEFINED(COMMUNITY_MODULE_QP_HELPERS_ENABLE)) {
@@ -25,31 +25,47 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
 
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
-    if (args->device == NULL || args->font == NULL || !redraw) {
+    if (args->device == NULL || args->font == NULL || !state.redraw) {
         return MILLISECONDS(100);
     }
 
-    const uint16_t max_value  = 100;
     const uint16_t graph_size = (uintptr_t)args->extra;
 
-    const hsv_t axis_color = {HSV_WHITE};
-    const hsv_t bg_color   = {HSV_BLACK};
-
-    const graph_line_t graphs[] = {
+    const graph_line_t lines[] = {
         {
-            .line_data  = data.cpu,
-            .line_color = {HSV_BLUE},
-            .mode       = LINE,
+            .data      = state.cpu,
+            .color     = {HSV_BLUE},
+            .mode      = LINE,
+            .max_value = 100,
         },
         {
-            .line_data  = data.ram,
-            .line_color = {HSV_YELLOW},
-            .mode       = LINE,
+            .data      = state.ram,
+            .color     = {HSV_YELLOW},
+            .mode      = LINE,
+            .max_value = 100,
         },
+        GRAPHS_END,
     };
 
-    qp_draw_graph(args->device, args->x, args->y, graph_size, graph_size, axis_color, bg_color, graphs, ARRAY_SIZE(graphs), COMPUTER_STATS_ARRAY_SIZE, max_value);
-    redraw = false;
+    const graph_config_t config = {
+        .device = args->device,
+        .start =
+            {
+                .x = args->x,
+                .y = args->y,
+            },
+        .size =
+            {
+                .x = graph_size,
+                .y = graph_size,
+            },
+        .axis        = {HSV_WHITE},
+        .background  = {HSV_BLACK},
+        .data_points = state.points,
+    };
+
+    qp_draw_graph(&config, lines);
+    state.redraw = false;
 
     return MILLISECONDS(200);
 }
@@ -67,11 +83,12 @@ qp_callback_args_t *get_computer_stats_args(void) {
 }
 
 void push_computer_stats(uint8_t cpu, uint8_t ram) {
-    memmove(data.cpu + 1, data.cpu, COMPUTER_STATS_ARRAY_SIZE - 1);
-    memmove(data.ram + 1, data.ram, COMPUTER_STATS_ARRAY_SIZE - 1);
+    memmove(state.cpu + 1, state.cpu, COMPUTER_STATS_ARRAY_SIZE - 1);
+    memmove(state.ram + 1, state.ram, COMPUTER_STATS_ARRAY_SIZE - 1);
 
-    data.cpu[0] = cpu;
-    data.ram[0] = ram;
+    state.cpu[0] = cpu;
+    state.ram[0] = ram;
 
-    redraw = true;
+    state.points = MIN(COMPUTER_STATS_ARRAY_SIZE, state.points + 1);
+    state.redraw = true;
 }
