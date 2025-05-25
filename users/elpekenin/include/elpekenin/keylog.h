@@ -13,10 +13,6 @@
 
 #include <quantum/quantum.h>
 
-#ifndef KEYLOG_SIZE
-#    define KEYLOG_SIZE 40
-#endif
-
 /**
  * Hook into :c:func:`process_record_user` that performs the tracking.
  */

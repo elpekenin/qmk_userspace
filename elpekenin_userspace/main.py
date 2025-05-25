@@ -21,6 +21,7 @@ from elpekenin_userspace.commands.docs import Docs
 from elpekenin_userspace.commands.features import Features
 from elpekenin_userspace.commands.jsonschema import Jsonschema
 from elpekenin_userspace.commands.keycode_str import KeycodeStr
+from elpekenin_userspace.commands.menuconfig import MenuConfig
 from elpekenin_userspace.commands.micropython import Micropython
 from elpekenin_userspace.commands.py2c import Py2C
 from elpekenin_userspace.commands.qp_resources import QpResources
@@ -38,6 +39,7 @@ SUBCOMMANDS: dict[str, type[BaseCommand]] = {
     "features": Features,
     "jsonschema": Jsonschema,
     "keycode_str": KeycodeStr,
+    "menuconfig": MenuConfig,
     "micropython": Micropython,
     "qp_resources": QpResources,
     "py2c": Py2C,

@@ -4,48 +4,28 @@
 #include "elpekenin/qp/tasks/github_notifications.h"
 
 #include "elpekenin/qp/assets.h"
+#include "elpekenin/xap.h"
 
-static qp_callback_args_t args = {0};
-
-static uint8_t notifications = 0;
-
-static bool redraw = false;
+static struct {
+    qp_callback_args_t args;
+    uint8_t            count;
+    bool               redraw;
+    bool               clear;
+} state = {0};
 
 static const char *as_text(uint8_t value) {
+    static char text[2] = {0, 0};
+
     switch (value) {
-        case 0:
-            return " ";
-
-        case 1:
-            return "1";
-
-        case 2:
-            return "2";
-
-        case 3:
-            return "3";
-
-        case 4:
-            return "4";
-
-        case 5:
-            return "5";
-
-        case 6:
-            return "6";
-
-        case 7:
-            return "7";
-
-        case 8:
-            return "8";
-
-        case 9:
-            return "9";
+        case 0 ... 9:
+            text[0] = value + '0';
+            break;
 
         default:
-            return "!";
+            text[0] = '!';
     }
+
+    return text;
 }
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
@@ -55,7 +35,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
 
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
-    if (args->device == NULL || args->font == NULL || !redraw) {
+    if (args->device == NULL || args->font == NULL) {
         return MILLISECONDS(100);
     }
 
@@ -64,10 +44,25 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
         return 0;
     }
 
-    qp_drawimage(args->device, args->x, args->y, logo);
-    redraw = false;
+    if (xap_last_activity_elapsed() > SECONDS(5)) {
+        if (state.clear) {
+            // clear previous drawings
+            qp_rect(args->device, args->x, args->y, args->x + logo->width, args->y + logo->height, HSV_BLACK, true);
+            qp_drawtext(args->device, args->x, args->y, args->font, " ");
+        }
 
-    qp_drawtext_recolor(args->device, args->x, args->y, args->font, as_text(notifications), HSV_RED, HSV_BLACK);
+        state.clear = false;
+    } else {
+        state.clear = true;
+
+        if (state.redraw) {
+            const hsv_t color = (state.count == 0) ? (hsv_t){HSV_GREEN} : (hsv_t){HSV_RED};
+            qp_drawimage(args->device, args->x, args->y, logo);
+            qp_drawtext_recolor(args->device, args->x, args->y, args->font, as_text(state.count), color.h, color.s, color.v, HSV_BLACK);
+        }
+
+        state.redraw = false;
+    }
 
     return MILLISECONDS(200);
 }
@@ -79,12 +74,12 @@ qp_callback_args_t *get_github_notifications_args(void) {
     }
     configured = true;
 
-    defer_exec(MILLISECONDS(10), callback, &args);
+    defer_exec(MILLISECONDS(10), callback, &state.args);
 
-    return &args;
+    return &state.args;
 }
 
 void set_github_notifications_count(uint8_t count) {
-    notifications = count;
-    redraw        = true;
+    state.count  = count;
+    state.redraw = true;
 }

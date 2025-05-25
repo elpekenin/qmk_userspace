@@ -17,10 +17,11 @@
 #    error Must enable 'elpekenin/types'
 #endif
 
-static bool keylog_dirty            = true;
-static char keylog[KEYLOG_SIZE + 1] = {
-    [0 ... KEYLOG_SIZE - 1] = ' ',
-    [KEYLOG_SIZE]           = '\0',
+static bool keylog_dirty = true;
+
+static char keylog[CONFIG_KEYLOG_SIZE + 1] = {
+    [0 ... CONFIG_KEYLOG_SIZE - 1] = ' ',
+    [CONFIG_KEYLOG_SIZE]           = '\0',
 }; // extra space for terminator
 
 typedef enum {
@@ -120,8 +121,6 @@ static Option(replacements_t) find_replacement(const char *str) {
     return None(replacements_t);
 }
 
-OptionImpl(uintptr_t);
-
 static void maybe_symbol(const char **str) {
     const Option(replacements_t) maybe_replacement = find_replacement(*str);
     if (!maybe_replacement.is_some) {
@@ -136,8 +135,8 @@ static void maybe_symbol(const char **str) {
             target = replacement.strings[NO_MODS];
             break;
 
-        case MOD_BIT_LCTRL:
-        case MOD_BIT_RCTRL:
+        case MOD_BIT_LSHIFT:
+        case MOD_BIT_RSHIFT:
             target = replacement.strings[SHIFT];
             break;
 
@@ -186,18 +185,18 @@ static void apply_casing(const char **str) {
 
 static void keylog_clear(void) {
     // spaces (not 0) so `qp_drawtext` actually renders something
-    memset(keylog, ' ', KEYLOG_SIZE);
-    keylog[KEYLOG_SIZE] = '\0';
+    memset(keylog, ' ', CONFIG_KEYLOG_SIZE);
+    keylog[CONFIG_KEYLOG_SIZE] = '\0';
 }
 
 static void keylog_shift_right_one_byte(void) {
-    memmove(keylog + 1, keylog, KEYLOG_SIZE - 1);
+    memmove(keylog + 1, keylog, CONFIG_KEYLOG_SIZE - 1);
     keylog[0] = ' ';
 }
 
 static void keylog_shift_right(void) {
     // pop all utf-continuation bytes
-    while (is_utf8_continuation(keylog[KEYLOG_SIZE - 1])) {
+    while (is_utf8_continuation(keylog[CONFIG_KEYLOG_SIZE - 1])) {
         keylog_shift_right_one_byte();
     }
 
@@ -206,16 +205,16 @@ static void keylog_shift_right(void) {
 }
 
 static void keylog_shift_left(uint8_t len) {
-    memmove(keylog, keylog + len, KEYLOG_SIZE - len);
+    memmove(keylog, keylog + len, CONFIG_KEYLOG_SIZE - len);
 
     uint8_t counter = 0;
     while (is_utf8_continuation(keylog[0])) {
-        memmove(keylog, keylog + 1, KEYLOG_SIZE - 1);
+        memmove(keylog, keylog + 1, CONFIG_KEYLOG_SIZE - 1);
         ++counter;
     }
 
     // pad buffer to the right, to align after a utf8 symbol is deleted
-    memmove(keylog + counter, keylog, KEYLOG_SIZE - counter);
+    memmove(keylog + counter, keylog, CONFIG_KEYLOG_SIZE - counter);
     memset(keylog, ' ', counter);
 }
 
@@ -224,7 +223,7 @@ static void keylog_append(const char *str) {
 
     keylog_shift_left(len);
     for (uint8_t i = 0; i < len; ++i) {
-        keylog[KEYLOG_SIZE - len + i] = str[i];
+        keylog[CONFIG_KEYLOG_SIZE - len + i] = str[i];
     }
 }
 

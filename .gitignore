@@ -20,3 +20,7 @@ compile_commands.json
 __pycache__
 build/
 *egg-info
+
+# kconfig
+.config
+.config.old

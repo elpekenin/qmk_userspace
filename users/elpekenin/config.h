@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "kconf.h"
+
 // check for features at C (not pre-processor) level
 // based on https://hmijailblog.blogspot.com/2016/03/an-isdefined-c-macro-to-check-whether.html
 //
@@ -24,7 +26,6 @@
 // logging
 #undef PRINTF_SUPPORT_DECIMAL_SPECIFIERS
 #define PRINTF_SUPPORT_DECIMAL_SPECIFIERS 1
-#define LOGGING_FORMAT "[%T] (%LS): %M\n"
 
 // QP
 #define QUANTUM_PAINTER_DISPLAY_TIMEOUT 0

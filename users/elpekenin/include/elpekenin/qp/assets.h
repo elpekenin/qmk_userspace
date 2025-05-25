@@ -5,13 +5,6 @@
 
 #include <quantum/painter/qp.h>
 
-/**
- * How big the array to store different assets will be.
- */
-#ifndef ASSET_POOL_SIZE
-#    define ASSET_POOL_SIZE 30
-#endif
-
 //
 
 void qp_set_device_by_name(const char *name, painter_device_t device);

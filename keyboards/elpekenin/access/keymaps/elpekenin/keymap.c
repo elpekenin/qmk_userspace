@@ -98,22 +98,27 @@ static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused voi
         return 0;
     }
 
-    uint32_t interval = TOUCH_MS;
+    static touch_report_t last = {
+        .pressed = false,
+    };
 
-    if (IS_DEFINED(XAP_ENABLE)) {
-        if (!is_ili9341_pressed()) {
-            xap_screen_released(ILI9341_ID);
-            return interval;
+    const bool pressed = is_ili9341_pressed();
+    if (pressed) {
+        const touch_report_t now = get_spi_touch_report(ili9341_touch, false);
+        if (IS_DEFINED(XAP_ENABLE)) {
+            xap_screen_pressed(ILI9341_ID, now);
         }
+        last = now;
+    } else {
+        // notify about release, if XAP is enabled
+        if (last.pressed && IS_DEFINED(XAP_ENABLE)) {
+            xap_screen_released(ILI9341_ID);
+        }
+
+        last.pressed = false;
     }
 
-    // Make a read and send it to Tauri
-    touch_report_t ili9341_touch_report = get_spi_touch_report(ili9341_touch, false);
-    if (IS_DEFINED(XAP_ENABLE)) {
-        xap_screen_pressed(ILI9341_ID, ili9341_touch_report);
-    }
-
-    return interval;
+    return MILLISECONDS(100);
 }
 
 static void configure_qp_tasks(void) {

@@ -1,6 +1,6 @@
 KEYLOG_ENABLE    = no
 TAP_DANCE_ENABLE = yes
-TOUCH_SCREEN     = no
+TOUCH_SCREEN     = yes
 WPM_ENABLE       = yes
 XAP_ENABLE       = yes
 

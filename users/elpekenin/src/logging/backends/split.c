@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <ctype.h>
+#include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 #include <quantum/split_common/transactions.h>
 #include <quantum/util.h>
@@ -20,7 +21,7 @@ typedef struct PACKED {
     split_logging_header_t header;
     char                   buff[PAYLOAD_SIZE];
 } split_logging_t;
-_Static_assert(sizeof(split_logging_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
+STATIC_ASSERT(sizeof(split_logging_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
 
 // slave will write on its copy of this variable, master will copy (over split) onto its own
 static new_rbuf(char, 200, ring_buffer);

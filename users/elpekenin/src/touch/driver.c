@@ -54,7 +54,7 @@ void report_from(int16_t x, int16_t y, touch_driver_t *driver, touch_report_t *r
     y = MIN(MAX(y, 0), driver->height);
     logging(LOG_DEBUG, "Edge: (%d, %d)", x, y);
 
-    // Apply updside-down adjustment
+    // Apply upside-down adjustment
     if (driver->upside_down) {
         logging(LOG_DEBUG, "Upside: (%d, %d)", x, y);
 
@@ -97,8 +97,8 @@ __weak_symbol touch_report_t get_spi_touch_report(touch_device_t device, bool ch
     // Static variable so previous report is stored
     // Goal: When the screen is not pressed anymore, we can see the latest point pressed
     static touch_report_t report = {
-        .x       = 0,
-        .y       = 0,
+        .x       = UINT16_MAX,
+        .y       = UINT16_MAX,
         .pressed = false,
     };
 

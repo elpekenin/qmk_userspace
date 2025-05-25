@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 #include <quantum/util.h>
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
@@ -24,6 +25,11 @@
 #include "elpekenin/touch.h"
 
 #define MAX_PAYLOAD (XAP_EPSIZE - sizeof(xap_broadcast_header_t))
+
+void xap_last_activity_update(void);
+
+uint32_t xap_last_activity_time(void);
+uint32_t xap_last_activity_elapsed(void);
 
 /**
  * Identifier for each type of message.
@@ -36,7 +42,7 @@ typedef enum {
     SHUTDOWN,
     N_XAP_MSGS,
 } xap_msg_id_t;
-_Static_assert(N_XAP_MSGS <= UINT8_MAX, "too many identifiers for a u8");
+STATIC_ASSERT(N_XAP_MSGS <= UINT8_MAX, "too many identifiers for a u8");
 
 /**
  * Inform about a screen press event.
@@ -102,7 +108,7 @@ typedef struct PACKED {
      */
     layer_state_t layer;
 } layer_change_msg_t;
-_Static_assert(sizeof(layer_state_t) == sizeof(uint8_t), "Client code expects layer to be u8");
+STATIC_ASSERT(sizeof(layer_state_t) == sizeof(uint8_t), "Client code expects layer to be u8");
 
 /**
  * Send a message to PC's client about a layer change event.
@@ -114,64 +120,50 @@ void xap_layer(layer_state_t state);
  */
 typedef struct PACKED {
     /**
-     * Internal type used to hold event's information.
-     *
-     * Defined an inner struct instead of plain attributes to compute space left for the string.
+     * Identify this message.
      */
-    struct PACKED base {
-        /**
-         * Identify this message.
-         */
-        xap_msg_id_t msg_id;
+    xap_msg_id_t msg_id;
 
-        /**
-         * Keycode involved.
-         */
-        uint16_t keycode;
+    /**
+     * Keycode involved.
+     */
+    uint16_t keycode;
 
-        /**
-         * Whether it got pressed or released.
-         */
-        bool pressed;
+    /**
+     * Whether it got pressed or released.
+     */
+    bool pressed;
 
-        /**
-         * Highest layer currently enabled.
-         */
-        uint8_t layer;
+    /**
+     * Highest layer currently enabled.
+     */
+    uint8_t layer;
 
-        /**
-         * Electrical row of the key.
-         */
-        uint8_t row;
+    /**
+     * Electrical row of the key.
+     */
+    uint8_t row;
 
-        /**
-         * Electrical column of the key.
-         */
-        uint8_t col;
+    /**
+     * Electrical column of the key.
+     */
+    uint8_t col;
 
-        /**
-         * Current modifiers.
-         */
-        uint8_t mods;
-    } base;
+    /**
+     * Current modifiers.
+     */
+    uint8_t mods;
 
-// compat: xap_broadcast_header_t does not exist if XAP is not enabled
-//         because it's generated code, which would make MAX_PAYLOAD error
-#if defined(XAP_ENABLE) || defined(__SPHINX__)
     /**
      * String representation of the keycode.
      */
-    char str[MAX_PAYLOAD - sizeof(struct base) - 1];
-#endif
+    char str[32];
 
     /**
      * Ensure we have a null terminator byte.
      */
     uint8_t null;
 } keyevent_msg_t;
-#if defined(XAP_ENABLE)
-_Static_assert(sizeof(keyevent_msg_t) == MAX_PAYLOAD, "wrong size for keyevent_msg_t");
-#endif
 
 /**
  * Send a message to PC's client about a key event.

@@ -12,6 +12,9 @@ dependencies = [
 completion = [
     "argcomplete",
 ]
+config = [
+    "kconfiglib",
+]
 docs = [
     "clang==14",  # must match your libclangX.so
     "furo",
