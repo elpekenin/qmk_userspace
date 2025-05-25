@@ -287,7 +287,6 @@ class Docs(BaseCommand):
             "--listen",
             help="interface where to listen",
             metavar="ADDRESS:PORT",
-            required=False,
             default="localhost:8000",
         )
 
@@ -299,14 +298,12 @@ class Docs(BaseCommand):
             "--host",
             help="device where to copy docs",
             metavar="HOST",
-            required=False,
             default="elraspberrin",
         )
         deploy.add_argument(
             "--path",
             help="location where docs should be copied",
             metavar="DIR",
-            required=False,
             default="~/qmk_docs",
         )
 

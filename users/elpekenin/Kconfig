@@ -1,34 +1,4 @@
-menu "keylogger"
-    config KEYLOG_ENABLE
-        bool "enable keylog"
-
-    config KEYLOG_SIZE
-        int "size of array storing keylog"
-        default 40
-        depends on KEYLOG_ENABLE
-endmenu
-
-menu "qp"
-    menu "logging"
-        config QP_LOG_ENABLE
-            bool "enable QP logging"
-
-        config QP_LOG_N_CHARS
-            int "size of arrays storing each line's text"
-            default 70
-            depends on QP_LOG_ENABLE
-
-        config QP_LOG_N_LINES
-            int "number of lines stored"
-            default 9
-            depends on QP_LOG_ENABLE
-    endmenu
-
-    config QP_ASSETS_SIZE
-        int "size of array tracking assets"
-        default 30
-
-    config QP_COMPUTER_STATS_SIZE
-        int "size of array tracking computer usage stats"
-        default 30
+menu "userspace"
+rsource "src/Kconfig.keylog"
+rsource "src/qp/Kconfig"
 endmenu

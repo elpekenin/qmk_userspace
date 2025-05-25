@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "kconf.h"
+#include "elpekenin/kconfig.h"
 
 // check for features at C (not pre-processor) level
 // based on https://hmijailblog.blogspot.com/2016/03/an-isdefined-c-macro-to-check-whether.html

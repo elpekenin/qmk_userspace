@@ -1,0 +1,14 @@
+menu "keylog"
+
+config KEYLOG_ENABLE
+    bool "enable keylog"
+
+if KEYLOG_ENABLE
+
+config KEYLOG_SIZE
+    int "size of array storing keylog"
+    default 40
+
+endif
+
+endmenu

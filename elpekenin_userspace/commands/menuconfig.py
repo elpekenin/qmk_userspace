@@ -22,7 +22,15 @@ if TYPE_CHECKING:
 
     from elpekenin_userspace.result import Result
 
-CONF_FILE = Path("users") / "elpekenin" / "kconf.h"
+ELPEKENIN = Path("users") / "elpekenin"
+DEFAULT_AUTOHEADER = ELPEKENIN / "include" / "elpekenin" / "autoconf.h"
+DEFAULT_KCONFIG_CONFIG = ELPEKENIN / ".config"
+
+DEFAULTS = {
+    "KCONFIG_AUTOHEADER": str(DEFAULT_AUTOHEADER),
+    "KCONFIG_CONFIG": str(DEFAULT_KCONFIG_CONFIG),
+    "MENUCONFIG_STYLE": "monochrome",
+}
 
 
 class MenuConfig(BaseCommand):
@@ -35,15 +43,25 @@ class MenuConfig(BaseCommand):
         if not HAS_KCONFIGLIB:
             return Err("Dependencies missing")
 
-        os.environ.setdefault("MENUCONFIG_STYLE", "monochrome")
+        # apply default environment values
+        for name, value in DEFAULTS.items():
+            os.environ.setdefault(name, value)
 
         # read Kconfig
         kconfig = kconfiglib.Kconfig()
 
-        # open TUI to configure project
+        # run TUI to configure project
         menuconfig.menuconfig(kconfig)
 
         # generate header file
-        kconfig.write_autoconf(CONF_FILE)
+        file = os.getenv("KCONFIG_AUTOHEADER")
+        if file is None:
+            return Err("Unreachable")
+
+        Path(file).parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )  # make sure target directory exists
+        kconfig.write_autoconf()
 
         return Ok(None)

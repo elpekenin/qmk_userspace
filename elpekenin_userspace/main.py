@@ -60,7 +60,6 @@ def get_parser() -> argparse.ArgumentParser:
         help="path to your qmk_firmware (needed to make `import qmk` work)",
         metavar="DIR",
         type=args.qmk,
-        required=False,
         default="",
     )
 
