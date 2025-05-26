@@ -29,7 +29,7 @@ static const char *as_text(uint8_t value) {
 }
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
-    if (!IS_DEFINED(XAP_ENABLE)) {
+    if (!IS_ENABLED(XAP)) {
         return 0;
     }
 

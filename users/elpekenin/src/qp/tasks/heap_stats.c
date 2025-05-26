@@ -42,7 +42,7 @@ static void draw_heap(const char *text, __unused bool last_frame) {
 }
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
-    if (!IS_DEFINED(COMMUNITY_MODULE_ALLOCATOR_ENABLE)) {
+    if (!IS_ENABLED(COMMUNITY_MODULE_ALLOCATOR)) {
         return 0;
     }
 

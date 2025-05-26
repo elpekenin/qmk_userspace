@@ -32,7 +32,7 @@ const char *get_layer_name(layer_names_t layer) {
 layer_state_t layer_state_set_user(layer_state_t state) {
     state = layer_state_set_keymap(state);
 
-    if (IS_DEFINED(XAP_ENABLE)) {
+    if (IS_ENABLED(XAP)) {
         xap_layer(state);
     }
 

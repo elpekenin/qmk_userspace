@@ -16,7 +16,8 @@
 //       will be stripped away thanks to compiler/linker identifying the function will never be used
 //       otherwise we'd get an 'undefined symbol' error when trying to resolve the function name (it was not compiled)
 #define STRINGIFY(x) "" #x
-#define IS_DEFINED(MACRO) (sizeof("" #MACRO) != sizeof(STRINGIFY(MACRO)))
+#define IS_DEFINED(x) (sizeof("" #x) != sizeof(STRINGIFY(x)))
+#define IS_ENABLED(x) IS_DEFINED(x##_ENABLE)
 
 // misc
 #define MAX_DEFERRED_EXECUTORS 64

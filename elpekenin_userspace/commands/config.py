@@ -33,7 +33,7 @@ DEFAULTS = {
 }
 
 
-class MenuConfig(BaseCommand):
+class Config(BaseCommand):
     """Configure build."""
 
     def run(self, arguments: Namespace) -> Result[None, str]:

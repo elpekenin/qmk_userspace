@@ -14,7 +14,7 @@
 static qp_callback_args_t args = {0};
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
-    if (!IS_DEFINED(KEYLOG_ENABLE)) {
+    if (!IS_ENABLED(KEYLOG)) {
         return 0;
     }
 
@@ -26,7 +26,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
 
     // default to white, change it based on WPM (if enabled)
     hsv_t color = {HSV_WHITE};
-    if (IS_DEFINED(WPM_ENABLE)) {
+    if (IS_ENABLED(WPM)) {
         uint8_t wpm = get_current_wpm();
 
         if (wpm > 10) {

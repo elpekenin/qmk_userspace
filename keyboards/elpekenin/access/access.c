@@ -63,14 +63,14 @@ touch_device_t ili9341_touch = &ili9341_touch_driver;
 void keyboard_post_init_kb(void) {
     debug_config.enable = true;
 
-    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE)) {
+    if (IS_ENABLED(QUANTUM_PAINTER)) {
         gpio_set_pin_output(SIPO_CS_PIN);
         gpio_write_pin_high(SIPO_CS_PIN);
 
         wait_ms(150); // Let screens draw some power
     }
 
-    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && IS_DEFINED(LEFT_HAND)) {
+    if (IS_ENABLED(QUANTUM_PAINTER) && IS_DEFINED(LEFT_HAND)) {
         bool ret = true;
 
         // compat: factory function not available
@@ -83,7 +83,7 @@ void keyboard_post_init_kb(void) {
         printf("QP setup: %s\n", ret ? "ok" : "failed");
     }
 
-    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && IS_DEFINED(RIGHT_HAND)) {
+    if (IS_ENABLED(QUANTUM_PAINTER) && IS_DEFINED(RIGHT_HAND)) {
         bool ret = true;
 
 #if defined(QUANTUM_PAINTER_ILI9163_SPI_ENABLE)
@@ -103,7 +103,7 @@ void keyboard_post_init_kb(void) {
         printf("QP setup: %s\n", ret ? "ok" : "failed");
     }
 
-    if (IS_DEFINED(TOUCH_SCREEN_ENABLE) && IS_DEFINED(RIGHT_HAND)) {
+    if (IS_ENABLED(TOUCH_SCREEN) && IS_DEFINED(RIGHT_HAND)) {
         bool ret = touch_spi_init(ili9341_touch);
         printf("Touch screen setup: %s\n", ret ? "ok" : "failed");
     }

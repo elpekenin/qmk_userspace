@@ -53,11 +53,11 @@ void keyboard_pre_init_user(void) {
 }
 
 void keyboard_post_init_user(void) {
-    if (IS_DEFINED(AUTOCORRECT_ENABLE)) {
+    if (IS_ENABLED(AUTOCORRECT)) {
         autocorrect_enable();
     }
 
-    if (IS_DEFINED(COMMUNITY_MODULE_CRASH_ENABLE)) {
+    if (IS_ENABLED(COMMUNITY_MODULE_CRASH)) {
         Option(crash_info_t) maybe_crash = get_crash();
 
         if (maybe_crash.is_some) {
@@ -81,7 +81,7 @@ void keyboard_post_init_user(void) {
         transactions_init();
     }
 
-    if (IS_DEFINED(TRI_LAYER_ENABLE)) {
+    if (IS_ENABLED(TRI_LAYER)) {
         set_tri_layer_lower_layer(FN1);
         set_tri_layer_upper_layer(FN2);
         set_tri_layer_adjust_layer(RST);
@@ -96,7 +96,7 @@ bool shutdown_user(bool jump_to_bootloader) {
     }
 
     // power off all screens
-    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE)) {
+    if (IS_ENABLED(QUANTUM_PAINTER)) {
         for (uint8_t i = 0; i < qp_get_num_devices(); ++i) {
             painter_device_t device = qp_get_device_by_index(i);
             qp_power(device, false);
@@ -118,7 +118,7 @@ bool shutdown_user(bool jump_to_bootloader) {
 #endif
 
     // let host know
-    if (IS_DEFINED(XAP_ENABLE)) {
+    if (IS_ENABLED(XAP)) {
         xap_shutdown(jump_to_bootloader);
     }
 

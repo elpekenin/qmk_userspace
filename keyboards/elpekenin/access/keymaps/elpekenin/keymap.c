@@ -94,7 +94,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 
 static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused void *cb_arg) {
-    if (!IS_DEFINED(TOUCH_SCREEN_ENABLE) || !IS_DEFINED(RIGHT_HAND)) {
+    if (!IS_ENABLED(TOUCH_SCREEN) || !IS_DEFINED(RIGHT_HAND)) {
         return 0;
     }
 
@@ -105,13 +105,13 @@ static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused voi
     const bool pressed = is_ili9341_pressed();
     if (pressed) {
         const touch_report_t now = get_spi_touch_report(ili9341_touch, false);
-        if (IS_DEFINED(XAP_ENABLE)) {
+        if (IS_ENABLED(XAP)) {
             xap_screen_pressed(ILI9341_ID, now);
         }
         last = now;
     } else {
         // notify about release, if XAP is enabled
-        if (last.pressed && IS_DEFINED(XAP_ENABLE)) {
+        if (last.pressed && IS_ENABLED(XAP)) {
             xap_screen_released(ILI9341_ID);
         }
 
@@ -214,18 +214,18 @@ static void configure_qp_tasks(void) {
 }
 
 void keyboard_post_init_keymap(void) {
-    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && IS_DEFINED(LEFT_HAND)) {
+    if (IS_ENABLED(QUANTUM_PAINTER) && IS_DEFINED(LEFT_HAND)) {
         qp_set_device_by_name("il91874", il91874);
     }
 
-    if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && IS_DEFINED(RIGHT_HAND)) {
+    if (IS_ENABLED(QUANTUM_PAINTER) && IS_DEFINED(RIGHT_HAND)) {
         qp_set_device_by_name("ili9163", ili9163);
         qp_set_device_by_name("ili9341", ili9341);
 
         configure_qp_tasks();
     }
 
-    if (IS_DEFINED(TOUCH_SCREEN_ENABLE) && IS_DEFINED(RIGHT_HAND)) {
+    if (IS_ENABLED(TOUCH_SCREEN) && IS_DEFINED(RIGHT_HAND)) {
         defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
     }
 
@@ -235,7 +235,7 @@ void keyboard_post_init_keymap(void) {
 }
 
 void build_info_sync_keymap_callback(void) {
-    if (!IS_DEFINED(LEFT_HAND) || !IS_DEFINED(QUANTUM_PAINTER_ENABLE)) {
+    if (!IS_DEFINED(LEFT_HAND) || !IS_ENABLED(QUANTUM_PAINTER)) {
         return;
     }
 

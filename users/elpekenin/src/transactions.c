@@ -98,7 +98,7 @@ void transactions_init(void) {
     transaction_register_rpc(RPC_ID_USER_LOGGING, user_logging_slave_callback);
     transaction_register_rpc(RPC_ID_USER_EE_CLR, user_ee_clr_callback);
 
-    if (IS_DEFINED(XAP_ENABLE)) {
+    if (IS_ENABLED(XAP)) {
         transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
     }
 

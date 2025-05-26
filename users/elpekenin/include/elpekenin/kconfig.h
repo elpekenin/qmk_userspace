@@ -4,4 +4,5 @@
 // generated file
 #include "elpekenin/autoconf.h"
 
-// perhaps add some helper macros here later
+#define KCONF(x) CONFIG_##x
+#define KCONF_ENABLED(x) IS_ENABLED(KCONF(x))

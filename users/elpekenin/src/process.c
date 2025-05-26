@@ -70,16 +70,16 @@ static bool keylog_active = true;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     string_t str = str_new(15);
 
-    if (IS_DEFINED(KEYLOG_ENABLE) && keylog_active) {
+    if (IS_ENABLED(KEYLOG) && keylog_active) {
         keylog_process(keycode, record);
     }
 
     // log events over XAP
-    if (IS_DEFINED(XAP_ENABLE)) {
+    if (IS_ENABLED(XAP)) {
         xap_keyevent(keycode, record);
     }
 
-    if (IS_DEFINED(RGB_MATRIX_ENABLE) && IS_RGB_MATRIX_KEYCODE(keycode)) {
+    if (IS_ENABLED(RGB_MATRIX) && IS_RGB_MATRIX_KEYCODE(keycode)) {
         if (record->event.pressed) {
             logging(LOG_INFO, "Used %s", get_keycode_string(keycode));
         }
@@ -128,13 +128,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
 
         case PK_QCLR:
-            if (IS_DEFINED(QUANTUM_PAINTER_ENABLE) && pressed) {
+            if (IS_ENABLED(QUANTUM_PAINTER) && pressed) {
                 qp_log_clear();
             }
             return false;
 
         case PK_KLOG:
-            if (IS_DEFINED(KEYLOG_ENABLE) && pressed) {
+            if (IS_ENABLED(KEYLOG) && pressed) {
                 keylog_active = !keylog_active;
             }
             return false;
@@ -146,7 +146,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
 
         case PK_SIZE:
-            if (IS_DEFINED(COMMUNITY_MODULE_MEMORY_ENABLE) && pressed) {
+            if (IS_ENABLED(COMMUNITY_MODULE_MEMORY) && pressed) {
                 pretty_bytes(&str, get_flash_size());
                 logging(LOG_INFO, "Binary takes %.*s", str.used, str.ptr);
             }

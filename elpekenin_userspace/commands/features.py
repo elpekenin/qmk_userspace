@@ -101,7 +101,7 @@ def gen_c_file(file: Path, features: set[str]) -> None:
 
         for feature in features:
             f.write(
-                f"        .{feature.lower()} = IS_DEFINED({feature}_ENABLE),\n",
+                f"        .{feature.lower()} = IS_ENABLED({feature}),\n",
             )
 
         f.writelines(
