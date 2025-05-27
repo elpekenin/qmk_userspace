@@ -1,0 +1,126 @@
+
+#
+# QMK
+#
+DYNAMIC_KEYMAP_LAYER_COUNT=5
+MAX_DEFERRED_EXECUTORS=64
+QUANTUM_PAINTER_DISPLAY_TIMEOUT=0
+LAYER_STATE_8BIT=yes
+# LAYER_STATE_16BIT is not set
+# LAYER_STATE_32BIT is not set
+
+#
+# features
+#
+ANALOG_DRIVER_REQUIRED=yes
+TAP_DANCE_ENABLE=yes
+WPM_ENABLE=yes
+XAP_ENABLE=yes
+# end of features
+
+#
+# rgb
+#
+RGB_MATRIX_DEFAULT_VAL=30
+RGB_MATRIX_MAXIMUM_BRIGHTNESS=150
+# end of rgb
+
+#
+# split
+#
+RPC_M2S_BUFFER_SIZE=80
+RPC_S2M_BUFFER_SIZE=80
+SPLIT_ACTIVITY_ENABLE=yes
+# SPLIT_HAPTIC_ENABLE is not set
+SPLIT_LAYER_STATE_ENABLE=yes
+SPLIT_LED_STATE_ENABLE=yes
+SPLIT_MODS_ENABLE=yes
+# SPLIT_OLED_ENABLE is not set
+# SPLIT_POINTING_ENABLE is not set
+SPLIT_TRANSPORT_MIRROR=yes
+SPLIT_WPM_ENABLE=yes
+# end of split
+# end of QMK
+
+#
+# userspace
+#
+# KEYLOG_ENABLE is not set
+SIPO_PINS_ENABLE=yes
+N_SIPO_PINS=8
+
+#
+# logging
+#
+QP_LOG_ENABLE=yes
+QP_LOG_N_CHARS=70
+QP_LOG_N_LINES=9
+SPLIT_LOG_ENABLE=yes
+SPLIT_LOG_BUFFER_SIZE=200
+UART_LOG_ENABLE=yes
+UART_LOG_BAUD_RATE=9600
+UART_CLIENT=1
+# UART_CLIENT_NONE is not set
+UART_CLIENT_PUTTY=yes
+XAP_LOG_ENABLE=yes
+XAP_LOG_BUFFER_SIZE=200
+# end of logging
+
+#
+# quantum painter
+#
+QP_ASSETS_SIZE=30
+QP_COMPUTER_STATS_SIZE=30
+# end of quantum painter
+
+#
+# touch screen
+#
+TOUCH_SCREEN_ENABLE=yes
+# end of touch screen
+# end of userspace
+
+#
+# modules
+#
+
+#
+# allocator
+#
+ALLOC_ALLOCATORS_SIZE=10
+ALLOC_ALLOCATIONS_SIZE=100
+# end of allocator
+
+#
+# crash
+#
+CRASH_UNWIND_DEPTH=100
+CRASH_MESAGE_LENGTH=200
+# end of crash
+
+#
+# glitch text
+#
+GLITCH_TEXT_N_WORKERS=15
+# end of glitch text
+
+#
+# logging
+#
+LOGGING_FORMAT="[%T] (%LS): %M"
+# end of logging
+
+#
+# sanitizer
+#
+KASAN_INIT_DELAY=3000
+KASAN_REDZONE_SIZE=4
+KASAN_MALLOC_ARRAY_SIZE=300
+# end of sanitizer
+
+#
+# scrolling text
+#
+SCROLLING_TEXT_N_WORKERS=15
+# end of scrolling text
+# end of modules

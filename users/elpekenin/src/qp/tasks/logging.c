@@ -8,7 +8,7 @@
 static qp_callback_args_t args = {0};
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
-    if (!IS_ENABLED(COMMUNITY_MODULE_LOGGING)) {
+    if (!CM_ENABLED(LOGGING)) {
         return 0;
     }
 

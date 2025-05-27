@@ -11,11 +11,11 @@
 typedef void (*init_func_t)(void);
 
 static init_func_t init_functions[] = {
-#if defined(QUANTUM_PAINTER_ENABLE)
+#if IS_ENABLED(QP_LOG)
     sendchar_qp_init,
 #endif
 
-#if defined(UART_ENABLE)
+#if IS_ENABLED(UART_LOG)
     sendchar_uart_init,
 #endif
 };
@@ -26,19 +26,19 @@ static sendchar_func_t send_functions[] = {
     //    - no-op otherwise
     sendchar,
 
-#if defined(QUANTUM_PAINTER_ENABLE)
+#if IS_ENABLED(QP_LOG)
     sendchar_qp,
 #endif
 
-#if defined(SPLIT_KEYBOARD)
+#if IS_ENABLED(SPLIT_LOG)
     sendchar_split,
 #endif
 
-#if defined(UART_ENABLE)
+#if IS_ENABLED(UART_LOG)
     sendchar_uart,
 #endif
 
-#if defined(XAP_ENABLE)
+#if IS_ENABLED(XAP_LOG)
     sendchar_xap,
 #endif
 };

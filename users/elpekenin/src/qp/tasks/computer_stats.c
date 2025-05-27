@@ -5,7 +5,7 @@
 
 #include "elpekenin/xap.h"
 
-#if defined(COMMUNITY_MODULE_QP_HELPERS_ENABLE)
+#if CM_ENABLED(QP_HELPERS)
 #    include "qp_helpers.h"
 #else
 #    error Must enable 'drashna/qp_helpers'
@@ -16,12 +16,12 @@ static struct {
     bool               redraw;
     bool               clear;
     uint8_t            points;
-    uint8_t            cpu[KCONF(QP_COMPUTER_STATS_SIZE)];
-    uint8_t            ram[KCONF(QP_COMPUTER_STATS_SIZE)];
+    uint8_t            cpu[QP_COMPUTER_STATS_SIZE];
+    uint8_t            ram[QP_COMPUTER_STATS_SIZE];
 } state = {0};
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
-    if (!IS_ENABLED(XAP) || !IS_ENABLED(COMMUNITY_MODULE_QP_HELPERS)) {
+    if (!IS_ENABLED(XAP) || !CM_ENABLED(QP_HELPERS)) {
         return 0;
     }
 
@@ -98,12 +98,12 @@ qp_callback_args_t *get_computer_stats_args(void) {
 }
 
 void push_computer_stats(uint8_t cpu, uint8_t ram) {
-    memmove(state.cpu + 1, state.cpu, KCONF(QP_COMPUTER_STATS_SIZE) - 1);
-    memmove(state.ram + 1, state.ram, KCONF(QP_COMPUTER_STATS_SIZE) - 1);
+    memmove(state.cpu + 1, state.cpu, QP_COMPUTER_STATS_SIZE - 1);
+    memmove(state.ram + 1, state.ram, QP_COMPUTER_STATS_SIZE - 1);
 
     state.cpu[0] = cpu;
     state.ram[0] = ram;
 
-    state.points = MIN(KCONF(QP_COMPUTER_STATS_SIZE), state.points + 1);
+    state.points = MIN(QP_COMPUTER_STATS_SIZE, state.points + 1);
     state.redraw = true;
 }

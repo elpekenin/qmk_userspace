@@ -5,13 +5,13 @@
 
 #include "elpekenin/layers.h"
 
-#if defined(COMMUNITY_MODULE_GLITCH_TEXT_ENABLE)
+#if CM_ENABLED(GLITCH_TEXT)
 #    include "elpekenin/glitch_text.h"
 #else
 #    error Must enable 'elpekenin/glitch_text'
 #endif
 
-#if defined(COMMUNITY_MODULE_RNG_ENABLE)
+#if CM_ENABLED(RNG)
 #    include "elpekenin/rng.h"
 #else
 #    error Must enable 'elpekenin/rng'
@@ -40,7 +40,7 @@ static void draw_layer(const char *text, bool last_frame) {
 }
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
-    if (!IS_ENABLED(COMMUNITY_MODULE_GLITCH_TEXT)) {
+    if (!CM_ENABLED(GLITCH_TEXT)) {
         return 0;
     }
 

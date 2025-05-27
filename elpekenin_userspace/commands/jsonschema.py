@@ -181,7 +181,7 @@ class Jsonschema(BaseCommand):
             "file",
             help="file describing build steps",
             metavar="FILE",
-            type=args.File(require_existence=False),
+            type=args.File(),
             nargs="?",
             default="build.schema",
         )

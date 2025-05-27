@@ -10,16 +10,16 @@
 #include "elpekenin/qp/tasks/common.h"
 #include "elpekenin/scrolling_text.h"
 
-static char           qp_log[KCONF(QP_LOG_N_LINES)][KCONF(QP_LOG_N_CHARS) + 1];
+static char           qp_log[QP_LOG_N_LINES][QP_LOG_N_CHARS + 1];
 static uint8_t        qp_log_current_col;
-static char          *qp_log_pointers[KCONF(QP_LOG_N_LINES)];
-static deferred_token qp_log_tokens[KCONF(QP_LOG_N_LINES)];
+static char          *qp_log_pointers[QP_LOG_N_LINES];
+static deferred_token qp_log_tokens[QP_LOG_N_LINES];
 static bool           qp_log_redraw;
-static log_level_t    qp_log_levels[KCONF(QP_LOG_N_LINES)];
+static log_level_t    qp_log_levels[QP_LOG_N_LINES];
 
 void sendchar_qp_init(void) {
     memset(qp_log, 0, sizeof(qp_log));
-    for (uint8_t i = 0; i < KCONF(QP_LOG_N_LINES); ++i) {
+    for (uint8_t i = 0; i < QP_LOG_N_LINES; ++i) {
         qp_log_pointers[i] = qp_log[i];
         qp_log_tokens[i]   = INVALID_DEFERRED_TOKEN;
     }
@@ -29,35 +29,35 @@ void sendchar_qp_init(void) {
 int8_t sendchar_qp(uint8_t chr) {
     if (chr == '\n') {
         // Add null pointer to current line
-        qp_log_pointers[KCONF(QP_LOG_N_LINES) - 1][qp_log_current_col] = 0;
+        qp_log_pointers[QP_LOG_N_LINES - 1][qp_log_current_col] = 0;
 
         // Move everything 1 line upwards
         char *temp = qp_log_pointers[0];
-        for (uint8_t i = 0; i < KCONF(QP_LOG_N_LINES) - 1; ++i) {
+        for (uint8_t i = 0; i < QP_LOG_N_LINES - 1; ++i) {
             qp_log_pointers[i] = qp_log_pointers[i + 1];
             qp_log_levels[i]   = qp_log_levels[i + 1];
         }
-        qp_log_pointers[KCONF(QP_LOG_N_LINES) - 1] = temp;
-        qp_log_levels[KCONF(QP_LOG_N_LINES) - 1]   = LOG_NONE;
+        qp_log_pointers[QP_LOG_N_LINES - 1] = temp;
+        qp_log_levels[QP_LOG_N_LINES - 1]   = LOG_NONE;
 
         // Reset stuff
-        qp_log_current_col                                             = 0;
-        qp_log_pointers[KCONF(QP_LOG_N_LINES) - 1][qp_log_current_col] = '\0';
-        qp_log_redraw                                                  = true;
-    } else if (qp_log_current_col >= KCONF(QP_LOG_N_CHARS)) {
+        qp_log_current_col                                      = 0;
+        qp_log_pointers[QP_LOG_N_LINES - 1][qp_log_current_col] = '\0';
+        qp_log_redraw                                           = true;
+    } else if (qp_log_current_col >= QP_LOG_N_CHARS) {
         return 0;
     } else {
-        qp_log_pointers[KCONF(QP_LOG_N_LINES) - 1][qp_log_current_col++] = chr;
-        qp_log_pointers[KCONF(QP_LOG_N_LINES) - 1][qp_log_current_col]   = '\0';
-        qp_log_levels[KCONF(QP_LOG_N_LINES) - 1]                         = get_current_message_level();
-        qp_log_redraw                                                    = true;
+        qp_log_pointers[QP_LOG_N_LINES - 1][qp_log_current_col++] = chr;
+        qp_log_pointers[QP_LOG_N_LINES - 1][qp_log_current_col]   = '\0';
+        qp_log_levels[QP_LOG_N_LINES - 1]                         = get_current_message_level();
+        qp_log_redraw                                             = true;
     }
 
     return 0;
 }
 
 void qp_log_clear(void) {
-    for (uint8_t i = 0; i < KCONF(QP_LOG_N_LINES); ++i) {
+    for (uint8_t i = 0; i < QP_LOG_N_LINES; ++i) {
         sendchar_qp('\n');
     }
 }
@@ -85,10 +85,10 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
     qp_log_redraw = false;
 
     // Clear space
-    qp_rect(args->device, args->x, args->y, qp_get_width(args->device), args->y + (KCONF(QP_LOG_N_LINES) * args->font->line_height), HSV_BLACK, true);
+    qp_rect(args->device, args->x, args->y, qp_get_width(args->device), args->y + (QP_LOG_N_LINES * args->font->line_height), HSV_BLACK, true);
 
     uint16_t y = args->y;
-    for (uint8_t i = 0; i < KCONF(QP_LOG_N_LINES); ++i) {
+    for (uint8_t i = 0; i < QP_LOG_N_LINES; ++i) {
         int16_t textwidth = qp_textwidth(args->font, (const char *)qp_log_pointers[i]);
 
         bool text_fits = textwidth < (qp_get_width(args->device) - args->x);

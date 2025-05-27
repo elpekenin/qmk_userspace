@@ -22,6 +22,8 @@ KEYCODE_STRING_ENABLE ?= yes
 TRI_LAYER_ENABLE ?= yes
 INTROSPECTION_KEYMAP_C = $(USER_SRC)/introspection.c
 
+include $(MK_PATH)/kconfig.mk
+
 # Include everything, checks are inside the files
 include $(MK_PATH)/codegen.mk
 include $(MK_PATH)/custom_features.mk

@@ -1,0 +1,7 @@
+menu "touch screen"
+
+config TOUCH_SCREEN_ENABLE
+    bool "touch screen"
+    default y
+
+endmenu

@@ -1,0 +1,15 @@
+menu "features"
+
+config ANALOG_DRIVER_REQUIRED
+    bool "analog input"
+
+config TAP_DANCE_ENABLE
+    bool "tap dance"
+
+config WPM_ENABLE
+    bool "wpm"
+
+config XAP_ENABLE
+    bool "xap"
+
+endmenu

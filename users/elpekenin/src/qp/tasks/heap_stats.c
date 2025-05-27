@@ -6,19 +6,19 @@
 #include "elpekenin/memory.h"
 
 // compat: function must exist
-#if defined(COMMUNITY_MODULE_ALLOCATOR_ENABLE)
+#if CM_ENABLED(ALLOCATOR)
 #    include "elpekenin/allocator.h"
 #else
 #    define get_used_heap() 0
 #endif
 
-#if defined(COMMUNITY_MODULE_GLITCH_TEXT_ENABLE)
+#if CM_ENABLED(GLITCH_TEXT)
 #    include "elpekenin/glitch_text.h"
 #else
 #    error Must enable 'elpekenin/glitch_text'
 #endif
 
-#if defined(COMMUNITY_MODULE_STRING_ENABLE)
+#if CM_ENABLED(STRING)
 #    include "elpekenin/string.h"
 #else
 #    error Must enable 'elpekenin/string'
@@ -42,7 +42,7 @@ static void draw_heap(const char *text, __unused bool last_frame) {
 }
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
-    if (!IS_ENABLED(COMMUNITY_MODULE_ALLOCATOR)) {
+    if (!CM_ENABLED(ALLOCATOR)) {
         return 0;
     }
 

@@ -24,7 +24,7 @@ typedef struct PACKED {
 STATIC_ASSERT(sizeof(split_logging_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
 
 // slave will write on its copy of this variable, master will copy (over split) onto its own
-static new_rbuf(char, 200, ring_buffer);
+static new_rbuf(char, SPLIT_LOG_BUFFER_SIZE, ring_buffer);
 
 int8_t sendchar_split(uint8_t chr) {
     // on master, this does nothing

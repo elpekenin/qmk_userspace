@@ -8,7 +8,7 @@
 #include "elpekenin/sipo.h"
 
 // compat: include-dir-dependant #include fails
-#if defined(QUANTUM_PAINTER_ENABLE)
+#if IS_ENABLED(QUANTUM_PAINTER)
 #    include <drivers/painter/eink_panel/qp_eink_panel.h>
 #else
 #    define EINK_BYTES_REQD(x, y) (1)
@@ -74,7 +74,7 @@ void keyboard_post_init_kb(void) {
         bool ret = true;
 
         // compat: factory function not available
-#if defined(QUANTUM_PAINTER_IL91874_SPI_ENABLE)
+#if IS_ENABLED(QUANTUM_PAINTER_IL91874_SPI)
         il91874 = qp_il91874_make_spi_device(_IL91874_WIDTH, _IL91874_HEIGHT, IL91874_CS_PIN, SCREENS_DC_PIN_LEFT, IL91874_RST_PIN, SCREENS_SPI_DIV, SCREENS_SPI_MODE, (void *)il91874_buffer);
 #endif
         ret &= qp_init(il91874, IL91874_ROTATION);
@@ -86,14 +86,14 @@ void keyboard_post_init_kb(void) {
     if (IS_ENABLED(QUANTUM_PAINTER) && IS_DEFINED(RIGHT_HAND)) {
         bool ret = true;
 
-#if defined(QUANTUM_PAINTER_ILI9163_SPI_ENABLE)
+#if IS_ENABLED(QUANTUM_PAINTER_ILI9163_SPI)
         ili9163 = qp_ili9163_make_spi_device(_ILI9163_WIDTH, _ILI9163_HEIGHT, ILI9163_CS_PIN, SCREENS_DC_PIN_RIGHT, ILI9163_RST_PIN, SCREENS_SPI_DIV, SCREENS_SPI_MODE);
 #endif
         ret &= qp_init(ili9163, ILI9163_ROTATION);
         ret &= qp_power(ili9163, true);
         qp_rect(ili9163, 0, 0, ILI9163_WIDTH, ILI9163_HEIGHT, HSV_BLACK, true);
 
-#if defined(QUANTUM_PAINTER_ILI9341_SPI_ENABLE)
+#if IS_ENABLED(QUANTUM_PAINTER_ILI9341_SPI)
         ili9341 = qp_ili9341_make_spi_device(_ILI9341_WIDTH, _ILI9341_HEIGHT, ILI9341_CS_PIN, SCREENS_DC_PIN_RIGHT, ILI9341_RST_PIN, SCREENS_SPI_DIV, SCREENS_SPI_MODE);
 #endif
         ret &= qp_init(ili9341, ILI9341_ROTATION);

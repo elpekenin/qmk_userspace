@@ -1,4 +1,29 @@
 menu "userspace"
-rsource "src/Kconfig.keylog"
+
+config KEYLOG_ENABLE
+    bool "keylog"
+
+if KEYLOG_ENABLE
+
+config KEYLOG_SIZE
+    int "maximum keylog length"
+    default 40
+
+endif
+
+config SIPO_PINS_ENABLE
+    bool "sipo pins"
+    default y
+
+if SIPO_PINS_ENABLE
+
+config N_SIPO_PINS
+    int "number of outputs"
+
+endif # sipo
+
+rsource "src/logging/Kconfig"
 rsource "src/qp/Kconfig"
+rsource "src/touch/Kconfig"
+
 endmenu

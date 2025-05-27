@@ -36,8 +36,8 @@ static struct {
     uint8_t images;
 } count = {0};
 
-static asset_t assets[KCONF(QP_ASSETS_SIZE)] = {
-    [0 ... KCONF(QP_ASSETS_SIZE) - 1] =
+static asset_t assets[QP_ASSETS_SIZE] = {
+    [0 ... QP_ASSETS_SIZE - 1] =
         {
             .kind = EMPTY,
             .name = NULL,
@@ -47,7 +47,7 @@ static asset_t assets[KCONF(QP_ASSETS_SIZE)] = {
 
 static void set(asset_kind_t kind, const char *name, const void *ptr) {
     const uint16_t n = count.devices + count.fonts + count.images;
-    if (n >= KCONF(QP_ASSETS_SIZE)) {
+    if (n >= QP_ASSETS_SIZE) {
         logging(LOG_ERROR, "%s: too many assets", __func__);
         return;
     }

@@ -21,25 +21,25 @@
 #include "elpekenin/time.h"
 #include "elpekenin/xap.h"
 
-#if defined(COMMUNITY_MODULE_INDICATORS_ENABLE)
+#if CM_ENABLED(INDICATORS)
 #    include "elpekenin/indicators.h"
 #endif
 
-#if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
+#if CM_ENABLED(LEDMAP)
 #    include "elpekenin/ledmap.h"
 #endif
 
-#if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
+#if CM_ENABLED(MICROPYTHON)
 #    include "port/micropython_embed.h"
 #endif
 
-#if defined(COMMUNITY_MODULE_RNG_ENABLE)
+#if CM_ENABLED(RNG)
 #    include <platforms/chibios/drivers/analog.h>
 
 #    include "elpekenin/rng.h"
 #endif
 
-#if defined(COMMUNITY_MODULE_STRING_ENABLE)
+#if CM_ENABLED(STRING)
 #    include "elpekenin/string.h"
 #else
 #    error Must enable 'elpekenin/string'
@@ -229,7 +229,7 @@ void keyboard_post_init_keymap(void) {
         defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
     }
 
-#if (COMMUNITY_MODULE_RNG_ENABLE)
+#if CM_ENABLED(RNG)
     rng_set_seed(analogReadPin(GP28) * analogReadPin(GP28));
 #endif
 }
@@ -263,7 +263,7 @@ void build_info_sync_keymap_callback(void) {
     qp_drawtext_recolor(il91874, x, y, font, commit, HSV_RED, HSV_WHITE);
 }
 
-#if defined(COMMUNITY_MODULE_LEDMAP_ENABLE)
+#if CM_ENABLED(LEDMAP)
 // clang-format off
 const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
     [QWERTY] = LAYOUT(
@@ -298,7 +298,7 @@ const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 #endif
 
-#if defined(COMMUNITY_MODULE_INDICATORS_ENABLE)
+#if CM_ENABLED(INDICATORS)
 const indicator_t PROGMEM indicators[] = {
     LAYER_INDICATOR(RST, RGB_OFF),
 
@@ -315,7 +315,7 @@ const indicator_t PROGMEM indicators[] = {
 #endif
 
 bool rgb_matrix_indicators_advanced_keymap(__unused uint8_t led_min, __unused uint8_t led_max) {
-#if defined(COMMUNITY_MODULE_MICROPYTHON_ENABLE)
+#if CM_ENABLED(MICROPYTHON)
 #    include "py/rgb_effect.c"
     mp_embed_exec_str(rgb_effect);
 #endif

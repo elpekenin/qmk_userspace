@@ -8,23 +8,4 @@ config QP_COMPUTER_STATS_SIZE
     int "size of array tracking computer usage stats"
     default 30
 
-menu "logging"
-
-config QP_LOG_ENABLE
-    bool "enable QP logging"
-
-if QP_LOG_ENABLE
-
-config QP_LOG_N_CHARS
-    int "size of arrays storing each line's text"
-    default 70
-
-config QP_LOG_N_LINES
-    int "number of lines stored"
-    default 9
-
-endif
-
-endmenu # logging
-
 endmenu # qp

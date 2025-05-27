@@ -4,17 +4,36 @@
 #include <drivers/uart.h>
 #include <quantum/quantum.h>
 
-#define BAUD_RATE 9600
+typedef enum {
+    CLIENT_NONE,
+    CLIENT_PUTTY,
+} uart_client_t;
+
+typedef struct {
+    const char *clear;
+    const char *cursor;
+} escape_sequences_t;
+
+static const escape_sequences_t sequences[] = {
+    [CLIENT_NONE] =
+        {
+            .clear  = NULL,
+            .cursor = NULL,
+        },
+    [CLIENT_PUTTY] =
+        {
+            .clear  = "\x1B[2J",
+            .cursor = "\x1B[H",
+        },
+};
+
+static const escape_sequences_t sequence = sequences[UART_CLIENT];
 
 void sendchar_uart_init(void) {
-    uart_init(BAUD_RATE);
+    uart_init(UART_LOG_BAUD_RATE);
 
-    // clear PuTTY serial monitor
-    const uint8_t clear[] = {27, '[', '2', 'J'};
-    uart_transmit(clear, ARRAY_SIZE(clear));
-
-    const uint8_t cursor_home[] = {27, '[', 'H'};
-    uart_transmit(cursor_home, ARRAY_SIZE(cursor_home));
+    uart_transmit((const uint8_t *)sequence.clear, strlen(sequence.clear));
+    uart_transmit((const uint8_t *)sequence.cursor, strlen(sequence.cursor));
 }
 
 int8_t sendchar_uart(uint8_t chr) {

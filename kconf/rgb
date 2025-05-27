@@ -1,0 +1,15 @@
+# TODO?: effects
+
+menu "rgb"
+
+config RGB_MATRIX_DEFAULT_VAL
+    int "default val"
+    range 0 255
+    default 30
+
+config RGB_MATRIX_MAXIMUM_BRIGHTNESS
+    int "maximum brightness"
+    range 0 255
+    default 150
+
+endmenu

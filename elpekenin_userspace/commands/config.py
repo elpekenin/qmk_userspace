@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from elpekenin_userspace import args
 from elpekenin_userspace.commands import BaseCommand
 from elpekenin_userspace.result import Err, Ok
 
@@ -18,23 +19,52 @@ else:
     HAS_KCONFIGLIB = True
 
 if TYPE_CHECKING:
-    from argparse import Namespace
+    from argparse import ArgumentParser, Namespace
 
     from elpekenin_userspace.result import Result
 
 ELPEKENIN = Path("users") / "elpekenin"
+DEFAULT_CONFIG = ELPEKENIN / "mk" / "kconfig.mk"
 DEFAULT_AUTOHEADER = ELPEKENIN / "include" / "elpekenin" / "autoconf.h"
-DEFAULT_KCONFIG_CONFIG = ELPEKENIN / ".config"
-
-DEFAULTS = {
-    "KCONFIG_AUTOHEADER": str(DEFAULT_AUTOHEADER),
-    "KCONFIG_CONFIG": str(DEFAULT_KCONFIG_CONFIG),
-    "MENUCONFIG_STYLE": "monochrome",
-}
 
 
 class Config(BaseCommand):
     """Configure build."""
+
+    @classmethod
+    def add_args(cls, parser: ArgumentParser) -> None:
+        """Command-specific arguments."""
+        parser.add_argument(
+            "--kconfig",
+            help="Kconfig entrypoint",
+            metavar="FILE",
+            type=args.File(require_existence=True),
+            default="Kconfig",
+        )
+
+        parser.add_argument(
+            "--config",
+            help="generated config",
+            metavar="FILE",
+            type=args.File(),
+            default=str(DEFAULT_CONFIG),
+        )
+
+        parser.add_argument(
+            "--autoheader",
+            help="generated header",
+            metavar="FILE",
+            type=args.File(suffix=".h"),
+            default=str(DEFAULT_AUTOHEADER),
+        )
+
+        parser.add_argument(
+            "--style",
+            help="menuconfig style",
+            default="monochrome",
+        )
+
+        return super().add_args(parser)
 
     def run(self, arguments: Namespace) -> Result[None, str]:
         """Entrypoint."""
@@ -43,25 +73,35 @@ class Config(BaseCommand):
         if not HAS_KCONFIGLIB:
             return Err("Dependencies missing")
 
-        # apply default environment values
-        for name, value in DEFAULTS.items():
-            os.environ.setdefault(name, value)
+        config: Path = arguments.config
+
+        # setup environment
+        environment = {
+            "CONFIG_": "",  # no prefix, for QMK settings
+            "KCONFIG_AUTOHEADER": str(arguments.autoheader),
+            "KCONFIG_CONFIG": str(config),
+            "MENUCONFIG_STYLE": arguments.style,
+        }
+        for key, val in environment.items():
+            env = os.environ.get(key)
+            if env is not None and env != val:
+                return Err("Environment variable and CLI argument don't match")
+
+            os.environ[key] = val
 
         # read Kconfig
-        kconfig = kconfiglib.Kconfig()
+        kconfig = kconfiglib.Kconfig(str(arguments.kconfig))
 
         # run TUI to configure project
         menuconfig.menuconfig(kconfig)
 
-        # generate header file
-        file = os.getenv("KCONFIG_AUTOHEADER")
-        if file is None:
-            return Err("Unreachable")
+        # HACK: "y" -> "yes" in config file, to use it as a makefile  # noqa: FIX004
+        #       reading config with "=yes" in it doesn't break (yet?)
+        config.write_text(
+            config.read_text().replace("=y\n", "=yes\n"),
+        )
 
-        Path(file).parent.mkdir(
-            parents=True,
-            exist_ok=True,
-        )  # make sure target directory exists
+        # generate header file
         kconfig.write_autoconf()
 
         return Ok(None)

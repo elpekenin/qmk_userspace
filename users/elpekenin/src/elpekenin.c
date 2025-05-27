@@ -21,11 +21,11 @@
 #include "elpekenin/crash.h"
 
 // compat: QFF/QGF files have `#include <qp.h>`, which fails if feature is disabled
-#if defined(QUANTUM_PAINTER_ENABLE)
+#if IS_ENABLED(QUANTUM_PAINTER)
 #    include "generated/qp_resources.h"
 #endif
 
-#if defined(RGB_MATRIX_ENABLE)
+#if IS_ENABLED(RGB_MATRIX)
 #    include <quantum/rgb_matrix/rgb_matrix.h>
 #endif
 
@@ -57,7 +57,7 @@ void keyboard_post_init_user(void) {
         autocorrect_enable();
     }
 
-    if (IS_ENABLED(COMMUNITY_MODULE_CRASH)) {
+    if (CM_ENABLED(CRASH)) {
         Option(crash_info_t) maybe_crash = get_crash();
 
         if (maybe_crash.is_some) {
@@ -73,7 +73,7 @@ void keyboard_post_init_user(void) {
     }
 
     // compat: not visible if feature is off
-#if defined(QUANTUM_PAINTER_ENABLE)
+#if IS_ENABLED(QUANTUM_PAINTER)
     load_qp_resources();
 #endif
 
@@ -104,7 +104,7 @@ bool shutdown_user(bool jump_to_bootloader) {
     }
 
     // compat: functions not visible if feature is off
-#if defined(RGB_MATRIX_ENABLE)
+#if IS_ENABLED(RGB_MATRIX)
     if (jump_to_bootloader) {
         // off for bootloader
         rgb_matrix_set_color_all(RGB_OFF);

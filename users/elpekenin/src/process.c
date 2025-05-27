@@ -15,7 +15,7 @@
 #include "elpekenin/xap.h"
 
 // compat: function must exist
-#if defined(COMMUNITY_MODULE_MEMORY_ENABLE)
+#if CM_ENABLED(MEMORY)
 #    include "elpekenin/memory.h"
 #else
 #    define get_flash_size() 0
@@ -146,7 +146,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
 
         case PK_SIZE:
-            if (IS_ENABLED(COMMUNITY_MODULE_MEMORY) && pressed) {
+            if (CM_ENABLED(MEMORY) && pressed) {
                 pretty_bytes(&str, get_flash_size());
                 logging(LOG_INFO, "Binary takes %.*s", str.used, str.ptr);
             }

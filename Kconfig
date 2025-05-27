@@ -1,3 +1,4 @@
-mainmenu "elpekenin"
+mainmenu "configuration"
+rsource "kconf/qmk"
 rsource "users/elpekenin/Kconfig"
 rsource "modules/elpekenin/Kconfig"

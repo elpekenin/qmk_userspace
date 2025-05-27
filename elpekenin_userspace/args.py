@@ -19,7 +19,7 @@ class PathArg:
     def __init__(
         self,
         *,
-        require_existence: bool,
+        require_existence: bool = False,
         name: str | None = None,
         stem: str | None = None,
         suffix: str | None = None,

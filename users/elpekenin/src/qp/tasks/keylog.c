@@ -5,12 +5,6 @@
 
 #include "elpekenin/keylog.h"
 
-#if defined(COMMUNITY_MODULE_GLITCH_TEXT_ENABLE)
-#    include "elpekenin/glitch_text.h"
-#else
-#    error Must enable 'elpekenin/glitch_text'
-#endif
-
 static qp_callback_args_t args = {0};
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {

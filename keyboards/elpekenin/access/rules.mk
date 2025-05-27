@@ -4,9 +4,6 @@ SRC += matrix.c
 # debug over UART
 UART_DRIVER_REQUIRED = yes
 
-# Custom features
-SIPO_PINS = yes
-
 # BOARD = GENERIC_PROMICRO_RP2040  # default
 # BOARD = GENERIC_RP_RP2040  # remove __late_init and some pinctrl settings
 

@@ -8,7 +8,7 @@
 
 #define MAX_PAYLOAD_SIZE (XAP_EPSIZE - sizeof(xap_broadcast_header_t)) // -1 for terminator
 
-static new_rbuf(char, 200, rbuf);
+static new_rbuf(char, XAP_LOG_BUFFER_SIZE, rbuf);
 
 int8_t sendchar_xap(uint8_t chr) {
     rbuf_push(rbuf, chr);
