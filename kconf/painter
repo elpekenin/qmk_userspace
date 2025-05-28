@@ -1,0 +1,15 @@
+menu "quantum painter"
+
+config QUANTUM_PAINTER_DISPLAY_TIMEOUT
+    int "display timeout (ms)"
+
+config QUANTUM_PAINTER_NUM_FONTS
+    int "maximum fonts"
+
+config QUANTUM_PAINTER_NUM_IMAGES
+    int "maximum images"
+
+config QUANTUM_PAINTER_SUPPORTS_NATIVE_COLORS
+    bool "support native colors"
+
+endmenu

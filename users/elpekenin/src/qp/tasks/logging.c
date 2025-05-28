@@ -15,7 +15,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
     qp_logging_backend_render(args); // no-op if nothing to draw
 
-    return MILLISECONDS(100);
+    return MILLISECONDS(QP_TASK_LOGGING_REDRAW_INTERVAL);
 }
 
 qp_callback_args_t *get_logging_args(void) {

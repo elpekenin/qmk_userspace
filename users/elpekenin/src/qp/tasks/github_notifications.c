@@ -36,7 +36,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
     if (args->device == NULL || args->font == NULL) {
-        return MILLISECONDS(100);
+        return MILLISECONDS(QP_TASK_GITHUB_NOTIFICATIONS_REDRAW_INTERVAL);
     }
 
     const painter_image_handle_t logo = qp_get_image_by_name("github");
@@ -44,7 +44,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
         return 0;
     }
 
-    if (xap_last_activity_elapsed() > SECONDS(5)) {
+    if (xap_last_activity_elapsed() > MILLISECONDS(QP_TASK_GITHUB_NOTIFICATIONS_TIMEOUT)) {
         if (state.clear) {
             // clear previous drawings
             qp_rect(args->device, args->x, args->y, args->x + logo->width, args->y + logo->height, HSV_BLACK, true);
@@ -64,7 +64,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
         state.redraw = false;
     }
 
-    return MILLISECONDS(200);
+    return MILLISECONDS(QP_TASK_GITHUB_NOTIFICATIONS_REDRAW_INTERVAL);
 }
 
 qp_callback_args_t *get_github_notifications_args(void) {

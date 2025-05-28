@@ -7,13 +7,11 @@ if KEYLOG_ENABLE
 
 config KEYLOG_SIZE
     int "maximum keylog length"
-    default 40
 
 endif
 
 config SIPO_PINS_ENABLE
     bool "sipo pins"
-    default y
 
 if SIPO_PINS_ENABLE
 

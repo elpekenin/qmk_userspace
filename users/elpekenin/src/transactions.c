@@ -65,12 +65,12 @@ static uint32_t build_info_sync_task(__unused uint32_t trigger_time, __unused vo
 }
 
 static uint32_t slave_log_sync_task(__unused uint32_t trigger_time, __unused void* cb_arg) {
-    if (!is_keyboard_master()) {
+    if (!is_keyboard_master() || !IS_DEFINED(SPLIT_LOG)) {
         return 0;
     }
 
     user_logging_master_poll();
-    return SECONDS(3);
+    return MILLISECONDS(SPLIT_LOG_SYNC_INTERVAL);
 }
 
 void reset_ee_slave(void) {
@@ -82,7 +82,7 @@ void reset_ee_slave(void) {
 }
 
 void xap_execute_slave(const void* data) {
-    if (!is_keyboard_master()) {
+    if (!is_keyboard_master() || !IS_ENABLED(XAP)) {
         return;
     }
 
@@ -97,13 +97,11 @@ void transactions_init(void) {
     transaction_register_rpc(RPC_ID_USER_SHUTDOWN, user_shutdown_slave_callback);
     transaction_register_rpc(RPC_ID_USER_LOGGING, user_logging_slave_callback);
     transaction_register_rpc(RPC_ID_USER_EE_CLR, user_ee_clr_callback);
-
-    if (IS_ENABLED(XAP)) {
-        transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
-    }
+    transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
 
     // wait a bit to prevent drawing on eInk right after flash, also ensures that
     // initialization has run, making sure `is_keyboard_master` returns correct value
     defer_exec(SECONDS(5), build_info_sync_task, NULL);
-    defer_exec(SECONDS(5), slave_log_sync_task, NULL);
+
+    defer_exec(MILLISECONDS(SPLIT_LOG_SYNC_DELAY), slave_log_sync_task, NULL);
 }

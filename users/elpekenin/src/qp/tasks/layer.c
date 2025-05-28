@@ -51,7 +51,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     const uint8_t layer = get_highest_layer(layer_state | default_layer_state);
 
     if (args->device == NULL || args->font == NULL || last_layer == layer || running) {
-        return MILLISECONDS(100);
+        return MILLISECONDS(QP_TASK_LAYER_REDRAW_INTERVAL);
     }
 
     last_layer = layer;
@@ -60,7 +60,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     // start the animation
     glitch_text_start(get_layer_name(layer), draw_layer);
 
-    return MILLISECONDS(100);
+    return MILLISECONDS(QP_TASK_LAYER_REDRAW_INTERVAL);
 }
 
 qp_callback_args_t *get_layer_args(void) {

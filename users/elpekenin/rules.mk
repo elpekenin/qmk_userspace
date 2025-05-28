@@ -12,19 +12,12 @@ SRC += \
     $(USER_SRC)/power.c \
     $(USER_SRC)/process.c
 
-DEBUG_ENABLE = yes
-
-# Default configuration
-AUTOCORRECT_ENABLE ?= yes
-DEFERRED_EXEC_ENABLE ?= yes
-KEY_OVERRIDE_ENABLE ?= yes
-KEYCODE_STRING_ENABLE ?= yes
-TRI_LAYER_ENABLE ?= yes
 INTROSPECTION_KEYMAP_C = $(USER_SRC)/introspection.c
 
+# first because it contains configuration for other features
 include $(MK_PATH)/kconfig.mk
 
-# Include everything, checks are inside the files
+# include unconditionally, `ifeq`'s in the files
 include $(MK_PATH)/codegen.mk
 include $(MK_PATH)/custom_features.mk
 include $(MK_PATH)/logging.mk

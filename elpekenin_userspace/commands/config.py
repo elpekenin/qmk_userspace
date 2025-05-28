@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from elpekenin_userspace import args
+from elpekenin_userspace.codegen import MK_HEADER
 from elpekenin_userspace.commands import BaseCommand
 from elpekenin_userspace.result import Err, Ok
 
@@ -80,6 +81,7 @@ class Config(BaseCommand):
             "CONFIG_": "",  # no prefix, for QMK settings
             "KCONFIG_AUTOHEADER": str(arguments.autoheader),
             "KCONFIG_CONFIG": str(config),
+            "KCONFIG_CONFIG_HEADER": MK_HEADER,
             "MENUCONFIG_STYLE": arguments.style,
         }
         for key, val in environment.items():

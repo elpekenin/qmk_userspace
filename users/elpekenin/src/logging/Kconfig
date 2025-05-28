@@ -1,72 +1,68 @@
 menu "logging"
 
-config QP_LOG_ENABLE
-    bool "quantum painter"
-    default y
+if QUANTUM_PAINTER_ENABLE
+    config QP_LOG_ENABLE
+        bool "quantum painter"
 
-if QP_LOG_ENABLE
+    if QP_LOG_ENABLE
+        config QP_LOG_N_CHARS
+            int "size of array storing each line"
 
-config QP_LOG_N_CHARS
-    int "size of array storing each line"
-    default 70
+        config QP_LOG_N_LINES
+            int "lines stored"
+    endif
+endif
 
-config QP_LOG_N_LINES
-    int "lines stored"
-    default 9
-
-endif # qp
 
 config SPLIT_LOG_ENABLE
     bool "split"
-    default y
 
 if SPLIT_LOG_ENABLE
+    config SPLIT_LOG_BUFFER_SIZE
+        int "size of ring buffer"
 
-config SPLIT_LOG_BUFFER_SIZE
-    int "size of ring buffer"
-    default 200
+    config SPLIT_LOG_SYNC_DELAY
+        int "delay before first sync (ms)"
 
-endif # split
+    config SPLIT_LOG_SYNC_INTERVAL
+        int "sync interval (ms)"
+endif
 
-config UART_LOG_ENABLE
-    bool "uart"
-    default y
 
-if UART_LOG_ENABLE
+if UART_DRIVER_REQUIRED
+    config UART_LOG_ENABLE
+        bool "uart"
 
-config UART_LOG_BAUD_RATE
-    int "baud rate"
-    default 9600
+    if UART_LOG_ENABLE
+        config UART_LOG_BAUD_RATE
+            int "baud rate"
 
-# must be kept in sync with `uart_client_t`
-config UART_CLIENT
-    int
-    default 0 if UART_CLIENT_NONE
-    default 1 if UART_CLIENT_PUTTY
+        # must be kept in sync with `uart_client_t`
+        config UART_CLIENT
+            int
+            default 0 if UART_CLIENT_NONE
+            default 1 if UART_CLIENT_PUTTY
 
-choice
-prompt "client software"
+        choice
+            prompt "client software"
+            config UART_CLIENT_NONE
+                bool "none"
 
-config UART_CLIENT_NONE
-    bool "none"
+            config UART_CLIENT_PUTTY
+                bool "PuTTY"
+        endchoice
+    endif
+endif
 
-config UART_CLIENT_PUTTY
-    bool "PuTTY"
 
-endchoice
+if XAP_ENABLE
+    config XAP_LOG_ENABLE
+        bool "xap"
 
-endif # uart
-
-config XAP_LOG_ENABLE
-    bool "xap"
-    default y
-
-if XAP_LOG_ENABLE
-
-config XAP_LOG_BUFFER_SIZE
-    int "size of ring buffer"
-    default 200
-
-endif # xap
+    if XAP_LOG_ENABLE
+        config XAP_LOG_BUFFER_SIZE
+            int "size of ring buffer"
+    endif
+endif
 
 endmenu

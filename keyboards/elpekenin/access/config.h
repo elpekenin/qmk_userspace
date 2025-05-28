@@ -28,7 +28,6 @@
 #define REGISTERS_SPI_MODE 0
 #define REGISTERS_SPI_DIV 0
 #define PISO_SPI_DIV 16
-#define N_SIPO_PINS 8
 
 // Multi-SPI driver config
 #define SCREENS_SPI_DRIVER_ID 0

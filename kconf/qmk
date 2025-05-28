@@ -2,31 +2,31 @@ menu "QMK"
 
 config DYNAMIC_KEYMAP_LAYER_COUNT
     int "dynamic keymap layers"
-    default 5
 
 config MAX_DEFERRED_EXECUTORS
     int "deferred executors"
-    default 64
-
-config QUANTUM_PAINTER_DISPLAY_TIMEOUT
-    int "qp display timeout (ms)"
-    default 0
 
 choice
-prompt "layer bitmask size"
+    prompt "layer bitmask size"
 
-config LAYER_STATE_8BIT
-    bool "8 bits"
+    config LAYER_STATE_8BIT
+        bool "8 bits"
 
-config LAYER_STATE_16BIT
-    bool "16 bits"
+    config LAYER_STATE_16BIT
+        bool "16 bits"
 
-config LAYER_STATE_32BIT
-    bool "32 bits"
-
+    config LAYER_STATE_32BIT
+        bool "32 bits"
 endchoice
 
+config HOLD_ON_OTHER_KEY_PRESS
+    bool "hold on other key press"
+
+config TAPPING_TERM
+    int "tapping term (ms)"
+
 rsource "features"
+rsource "painter"
 rsource "rgb"
 rsource "split"
 

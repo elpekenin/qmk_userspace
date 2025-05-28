@@ -15,7 +15,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
     if (args->device == NULL || args->font == NULL || !is_keylog_dirty()) {
-        return MILLISECONDS(10);
+        return MILLISECONDS(QP_TASK_KEYLOG_REDRAW_INTERVAL);
     }
 
     // default to white, change it based on WPM (if enabled)
@@ -37,7 +37,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     const char *keylog = get_keylog();
     qp_drawtext_recolor(args->device, args->x, args->y, args->font, keylog, color.h, color.s, color.v, HSV_BLACK);
 
-    return MILLISECONDS(10);
+    return MILLISECONDS(QP_TASK_KEYLOG_REDRAW_INTERVAL);
 }
 
 qp_callback_args_t *get_keylog_args(void) {

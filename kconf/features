@@ -3,8 +3,44 @@ menu "features"
 config ANALOG_DRIVER_REQUIRED
     bool "analog input"
 
+config AUTOCORRECT_ENABLE
+    bool "autocorrect"
+
+config BOOTMAGIC_ENABLE
+    bool "bootmagic"
+
+config DEBUG_ENABLE
+    bool "debug (eg: .map file)"
+
+config CONSOLE_ENABLE
+    bool "console"
+
+config DEFERRED_EXEC_ENABLE
+    bool "deferred execution"
+
+config EXTRAKEY_ENABLE
+    bool "extrakey"
+
+config KEY_OVERRIDE_ENABLE
+    bool "key override"
+
+config KEYCODE_STRING_ENABLE
+    bool "keycode string"
+
+config QUANTUM_PAINTER_ENABLE
+    bool "quantum painter"
+
+config RGB_MATRIX_ENABLE
+    bool "rgb"
+
 config TAP_DANCE_ENABLE
     bool "tap dance"
+
+config TRI_LAYER_ENABLE
+    bool "tri layer"
+
+config UART_DRIVER_REQUIRED
+    bool "uart"
 
 config WPM_ENABLE
     bool "wpm"

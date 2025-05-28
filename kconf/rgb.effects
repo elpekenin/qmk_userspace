@@ -1,0 +1,146 @@
+config ENABLE_RGB_MATRIX_ALPHAS_MODS
+    bool "alphas mods"
+
+config ENABLE_RGB_MATRIX_GRADIENT_UP_DOWN
+    bool "gradient up down"
+
+config ENABLE_RGB_MATRIX_GRADIENT_LEFT_RIGHT
+    bool "gradient left right"
+
+config ENABLE_RGB_MATRIX_BREATHING
+    bool "breathing"
+
+config ENABLE_RGB_MATRIX_BAND_SAT
+    bool "band sat"
+
+config ENABLE_RGB_MATRIX_BAND_VAL
+    bool "band val"
+
+config ENABLE_RGB_MATRIX_BAND_PINWHEEL_SAT
+    bool "band pinwheel sat"
+
+config ENABLE_RGB_MATRIX_BAND_PINWHEEL_VAL
+    bool "band pinwheel val"
+
+config ENABLE_RGB_MATRIX_BAND_SPIRAL_SAT
+    bool "band spiral sat"
+
+config ENABLE_RGB_MATRIX_BAND_SPIRAL_VAL
+    bool "band spiral val"
+
+config ENABLE_RGB_MATRIX_CYCLE_ALL
+    bool "cycle all"
+
+config ENABLE_RGB_MATRIX_CYCLE_LEFT_RIGHT
+    bool "cycle left right"
+
+config ENABLE_RGB_MATRIX_CYCLE_UP_DOWN
+    bool "cycle up down"
+
+config ENABLE_RGB_MATRIX_CYCLE_OUT_IN
+    bool "cycle out in"
+
+config ENABLE_RGB_MATRIX_CYCLE_OUT_IN_DUAL
+    bool "cycle out in dual"
+
+config ENABLE_RGB_MATRIX_RAINBOW_MOVING_CHEVRON
+    bool "rainbow moving chevron"
+
+config ENABLE_RGB_MATRIX_CYCLE_PINWHEEL
+    bool "cycle pinwheel"
+
+config ENABLE_RGB_MATRIX_CYCLE_SPIRAL
+    bool "cycle spiral"
+
+config ENABLE_RGB_MATRIX_DUAL_BEACON
+    bool "dual beacon"
+
+config ENABLE_RGB_MATRIX_RAINBOW_BEACON
+    bool "rainbow beacon"
+
+config ENABLE_RGB_MATRIX_RAINBOW_PINWHEELS
+    bool "rainbow pinwheels"
+
+config ENABLE_RGB_MATRIX_FLOWER_BLOOMING
+    bool "flower blooming"
+
+config ENABLE_RGB_MATRIX_RAINDROPS
+    bool "raindrops"
+
+config ENABLE_RGB_MATRIX_JELLYBEAN_RAINDROPS
+    bool "jellybean raindrops"
+
+config ENABLE_RGB_MATRIX_HUE_BREATHING
+    bool "hue breathing"
+
+config ENABLE_RGB_MATRIX_HUE_PENDULUM
+    bool "hue pendulum"
+
+config ENABLE_RGB_MATRIX_HUE_WAVE
+    bool "hue wave"
+
+config ENABLE_RGB_MATRIX_PIXEL_FRACTAL
+    bool "pixel fractal"
+
+config ENABLE_RGB_MATRIX_PIXEL_FLOW
+    bool "pixel flow"
+
+config ENABLE_RGB_MATRIX_PIXEL_RAIN
+    bool "pixel rain"
+
+config ENABLE_RGB_MATRIX_TYPING_HEATMAP
+    bool "typing heatmap"
+
+config ENABLE_RGB_MATRIX_DIGITAL_RAIN
+    bool "digital rain"
+
+config ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
+    bool "solid reactive simple"
+
+config ENABLE_RGB_MATRIX_SOLID_REACTIVE
+    bool "solid reactive"
+
+config ENABLE_RGB_MATRIX_SOLID_REACTIVE_WIDE
+    bool "solid reactive wide"
+
+config ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTIWIDE
+    bool "solid reactive multiwide"
+
+config ENABLE_RGB_MATRIX_SOLID_REACTIVE_CROSS
+    bool "solid reactive cross"
+
+config ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
+    bool "solid reactive multicross"
+
+config ENABLE_RGB_MATRIX_SOLID_REACTIVE_NEXUS
+    bool "solid reactive nexus"
+
+config ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTINEXUS
+    bool "solid reactive multinexus"
+
+config ENABLE_RGB_MATRIX_SPLASH
+    bool "splash"
+
+config ENABLE_RGB_MATRIX_MULTISPLASH
+    bool "multisplash"
+
+config ENABLE_RGB_MATRIX_SOLID_SPLASH
+    bool "solid splash"
+
+config ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
+    bool "solid multisplash"
+
+config ENABLE_RGB_MATRIX_STARLIGHT
+    bool "starlight"
+
+config ENABLE_RGB_MATRIX_STARLIGHT_SMOOTH
+    bool "starlight smooth"
+
+config ENABLE_RGB_MATRIX_STARLIGHT_DUAL_HUE
+    bool "starlight dual hue"
+
+config ENABLE_RGB_MATRIX_STARLIGHT_DUAL_SAT
+    bool "starlight dual sat"
+
+config ENABLE_RGB_MATRIX_RIVERFLOW
+    bool "riverflow"

@@ -2,10 +2,7 @@ menu "quantum painter"
 
 config QP_ASSETS_SIZE
     int "size of array tracking assets"
-    default 30
 
-config QP_COMPUTER_STATS_SIZE
-    int "size of array tracking computer usage stats"
-    default 30
+rsource "tasks/Kconfig"
 
 endmenu # qp

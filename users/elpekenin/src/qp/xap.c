@@ -20,7 +20,7 @@ static inline uint8_t lsb(uint16_t val) {
 }
 
 static inline uint8_t msb(uint16_t val) {
-    return (val >> 8) && 0xFF;
+    return (val >> 8) & 0xFF;
 }
 
 static inline void xap_slave(const void *data) {

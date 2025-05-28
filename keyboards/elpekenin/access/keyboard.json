@@ -7,12 +7,6 @@
         "enabled": true,
         "matrix": [0, 6]
     },
-    "features": {
-        "console": true,
-        "extrakey": true,
-        "quantum_painter": true,
-        "rgb_matrix": true
-    },
     "processor": "RP2040",
     "rgb_matrix": {
         "driver": "ws2812",

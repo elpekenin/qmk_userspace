@@ -52,7 +52,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     const size_t  used_heap = get_used_heap();
 
     if (args->device == NULL || args->font == NULL || last_used == used_heap || running) {
-        return SECONDS(1);
+        return MILLISECONDS(QP_TASK_HEAP_STATS_REDRAW_INTERVAL);
     }
 
     last_used = used_heap;
@@ -76,7 +76,7 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
 
     glitch_text_start(str.ptr, draw_heap);
 
-    return SECONDS(1);
+    return MILLISECONDS(QP_TASK_HEAP_STATS_REDRAW_INTERVAL);
 }
 
 qp_callback_args_t *get_heap_stats_args(void) {
