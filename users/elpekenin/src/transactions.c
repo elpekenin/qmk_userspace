@@ -65,7 +65,7 @@ static uint32_t build_info_sync_task(__unused uint32_t trigger_time, __unused vo
 }
 
 static uint32_t slave_log_sync_task(__unused uint32_t trigger_time, __unused void* cb_arg) {
-    if (!is_keyboard_master() || !IS_DEFINED(SPLIT_LOG)) {
+    if (!is_keyboard_master() || !IS_ENABLED(SPLIT_LOG)) {
         return 0;
     }
 

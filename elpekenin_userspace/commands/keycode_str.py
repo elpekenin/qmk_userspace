@@ -33,7 +33,6 @@ LAYOUT = re.compile(r"\[(.*)\]( *)=( *)LAYOUT(.*)\(")
 
 H_FILE = f"""\
 {H_HEADER}
-
 const char *get_keycode_name(uint16_t keycode);
 """
 

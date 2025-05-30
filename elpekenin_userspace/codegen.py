@@ -9,8 +9,8 @@ HEADER_TEMPLATE = """\
 {comment} SPDX-License-Identifier: GPL-2.0-or-later
 """
 
-C_HEADER = HEADER_TEMPLATE.format(comment="//")
-H_HEADER = f"{C_HEADER}\n\n#pragma once"
+C_HEADER = HEADER_TEMPLATE.format(comment="//") + "\n// clang-format off\n\n"
+H_HEADER = f"{C_HEADER}#pragma once\n\n"
 
 MK_HEADER = HEADER_TEMPLATE.format(comment="#")
 PY_HEADER = MK_HEADER

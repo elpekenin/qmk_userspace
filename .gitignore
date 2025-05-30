@@ -21,6 +21,4 @@ __pycache__
 build/
 *egg-info
 
-# kconfig
-autoconf.h
 kconfig.mk.old

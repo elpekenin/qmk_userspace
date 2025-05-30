@@ -58,7 +58,12 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     running    = true;
 
     // start the animation
-    glitch_text_start(get_layer_name(layer), draw_layer);
+    const glitch_text_config_t config = {
+        .str      = get_layer_name(layer),
+        .callback = draw_layer,
+        .delay    = 30,
+    };
+    glitch_text_start(&config);
 
     return MILLISECONDS(QP_TASK_LAYER_REDRAW_INTERVAL);
 }

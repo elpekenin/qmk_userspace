@@ -57,7 +57,7 @@ def gen_h_file(file: Path, assets: AssetsDictT) -> None:
     with file.open("w") as f:
         f.writelines(
             [
-                H_HEADER + "\n",
+                H_HEADER,
                 "\n",
             ],
         )

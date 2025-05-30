@@ -5,6 +5,7 @@
 #include <quantum/process_keycode/process_rgb_matrix.h>
 #include <quantum/quantum.h>
 
+#include "elpekenin/autoconf_rt.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/keylog.h"
 #include "elpekenin/logging.h"
@@ -21,14 +22,17 @@
 #    define get_flash_size() 0
 #endif
 
-// dont mind me, just bodging my way in  :)
-static bool last_td_spc = false;
+static struct {
+    // dont mind me, just bodging my way in  :)
+    bool last_td_spc;
+    bool keylog_active;
+} global_state = {0};
 
 bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *correct) {
     logging(LOG_WARN, "'%s' - '%s'", typo, correct);
 
     // regular handle
-    if (!last_td_spc) {
+    if (!global_state.last_td_spc) {
         return true;
     }
 
@@ -46,13 +50,13 @@ bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *co
 }
 
 bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *typo_buffer_size, uint8_t *mods) {
-    last_td_spc = false;
+    global_state.last_td_spc = false;
 
     switch (*keycode) {
         case TD_SPC:
-            *keycode              = KC_SPC; // make this look like a regular spacebar
-            record->event.pressed = false;  // trigger an extra backspace when corrected
-            last_td_spc           = true;
+            *keycode                 = KC_SPC; // make this look like a regular spacebar
+            record->event.pressed    = false;  // trigger an extra backspace when corrected
+            global_state.last_td_spc = true;
             break;
 
         case TD_Z:
@@ -65,12 +69,10 @@ bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *t
     return process_autocorrect_default_handler(keycode, record, typo_buffer_size, mods);
 }
 
-static bool keylog_active = true;
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     string_t str = str_new(15);
 
-    if (IS_ENABLED(KEYLOG) && keylog_active) {
+    if (IS_ENABLED(KEYLOG) && global_state.keylog_active) {
         keylog_process(keycode, record);
     }
 
@@ -128,14 +130,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
 
         case PK_QCLR:
-            if (IS_ENABLED(QUANTUM_PAINTER) && pressed) {
+            if (IS_ENABLED(QP_LOG) && pressed) {
                 qp_log_clear();
             }
             return false;
 
         case PK_KLOG:
             if (IS_ENABLED(KEYLOG) && pressed) {
-                keylog_active = !keylog_active;
+                global_state.keylog_active ^= true;
             }
             return false;
 
@@ -149,6 +151,27 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (CM_ENABLED(MEMORY) && pressed) {
                 pretty_bytes(&str, get_flash_size());
                 logging(LOG_INFO, "Binary takes %.*s", str.used, str.ptr);
+            }
+            return false;
+
+        case PK_CONF:
+            if (pressed) {
+                const autoconf_setting_t *settings = get_autoconf_settings();
+                for (size_t i = 0; i < autoconf_settings_count(); ++i) {
+                    const autoconf_setting_t setting = settings[i];
+
+                    printf("%s=", setting.name);
+                    switch (setting.value.type) {
+                        case AUTOCONF_INT:
+                            printf("%d", setting.value.integer);
+                            break;
+
+                        case AUTOCONF_STRING:
+                            printf("\"%s\"", setting.value.string);
+                            break;
+                    }
+                    print("\n");
+                }
             }
             return false;
 

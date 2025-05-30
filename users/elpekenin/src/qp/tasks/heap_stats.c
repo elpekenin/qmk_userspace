@@ -74,7 +74,12 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     str_append(&str, "/");
     pretty_bytes(&str, get_heap_size());
 
-    glitch_text_start(str.ptr, draw_heap);
+    const glitch_text_config_t config = {
+        .str      = str.ptr,
+        .callback = draw_heap,
+        .delay    = 30,
+    };
+    glitch_text_start(&config);
 
     return MILLISECONDS(QP_TASK_HEAP_STATS_REDRAW_INTERVAL);
 }

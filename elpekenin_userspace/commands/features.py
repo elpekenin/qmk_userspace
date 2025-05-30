@@ -61,7 +61,7 @@ def gen_h_file(file: Path, features: set[str], type_: str) -> None:
     with file.open("w") as f:
         f.writelines(
             [
-                H_HEADER + "\n",
+                H_HEADER,
                 "\n",
                 "#include <stdbool.h>\n",
                 "#include <stdint.h>\n",

@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from elpekenin_userspace import args
-from elpekenin_userspace.codegen import MK_HEADER
+from elpekenin_userspace.codegen import H_HEADER, MK_HEADER
 from elpekenin_userspace.commands import BaseCommand
 from elpekenin_userspace.result import Err, Ok
 
@@ -74,13 +74,15 @@ class Config(BaseCommand):
         if not HAS_KCONFIGLIB:
             return Err("Dependencies missing")
 
-        config: Path = arguments.config
+        mk_file: Path = arguments.config
+        h_file: Path = arguments.autoheader
 
         # setup environment
         environment = {
             "CONFIG_": "",  # no prefix, for QMK settings
-            "KCONFIG_AUTOHEADER": str(arguments.autoheader),
-            "KCONFIG_CONFIG": str(config),
+            "KCONFIG_AUTOHEADER": str(h_file),
+            "KCONFIG_AUTOHEADER_HEADER": H_HEADER,
+            "KCONFIG_CONFIG": str(mk_file),
             "KCONFIG_CONFIG_HEADER": MK_HEADER,
             "MENUCONFIG_STYLE": arguments.style,
         }
@@ -99,11 +101,30 @@ class Config(BaseCommand):
 
         # HACK: "y" -> "yes" in config file, to use it as a makefile  # noqa: FIX004
         #       reading config with "=yes" in it doesn't break (yet?)
-        config.write_text(
-            config.read_text().replace("=y\n", "=yes\n"),
+        mk_file.write_text(
+            mk_file.read_text().replace("=y\n", "=yes\n"),
         )
 
         # generate header file
         kconfig.write_autoconf()
+
+        # add an X-macro in case we wanna eg print all settings
+        settings: list[str] = []
+        with h_file.open("r") as f:
+            for line in f.readlines():
+                if not line.startswith("#define"):
+                    continue
+
+                # each line is `#define NAME VALUE`
+                settings.append(line.split(" ")[1])
+
+        with h_file.open("a") as f:
+            f.writelines(
+                [
+                    "\n#define FOREACH_AUTOCONF(X)",
+                    *(f" \\\n    X({setting})" for setting in settings),
+                    "\n",
+                ],
+            )
 
         return Ok(None)

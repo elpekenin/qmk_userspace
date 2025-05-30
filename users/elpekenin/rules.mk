@@ -5,6 +5,7 @@ USER_INCLUDE = $(USER_PATH)/include
 VPATH += $(USER_INCLUDE)
 
 SRC += \
+    $(USER_SRC)/autoconf_rt.c \
     $(USER_SRC)/build_info.c \
     $(USER_SRC)/elpekenin.c \
     $(USER_SRC)/placeholders.c \

@@ -1,5 +1,8 @@
 menu "quantum painter"
 
+config QUANTUM_PAINTER_DEBUG
+    bool "debug"
+
 config QUANTUM_PAINTER_DISPLAY_TIMEOUT
     int "display timeout (ms)"
 
