@@ -57,7 +57,7 @@ void user_logging_slave_callback(__unused uint8_t m2s_size, __unused const void*
             break;
         }
 
-        const char chr = unwrap(pop);
+        const char chr = pop.unwrap(pop);
         if (chr == '\n') {
             data.header.flush = true;
         }
@@ -101,7 +101,7 @@ void user_logging_master_poll(void) {
                 break;
             }
 
-            buff[i]     = unwrap(pop);
+            buff[i]     = pop.unwrap(pop);
             buff[i + 1] = '\0';
         }
 

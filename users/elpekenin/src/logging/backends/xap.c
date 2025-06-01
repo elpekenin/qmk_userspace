@@ -35,7 +35,7 @@ int8_t sendchar_xap(uint8_t chr) {
             break;
         }
 
-        xap_buff[i]     = unwrap(pop);
+        xap_buff[i]     = pop.unwrap(pop);
         xap_buff[i + 1] = '\0';
     }
     xap_broadcast(0x00, xap_buff, MAX_PAYLOAD_SIZE);

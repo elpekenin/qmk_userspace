@@ -63,7 +63,7 @@ void keyboard_post_init_user(void) {
         Option(crash_info_t) maybe_crash = get_crash();
 
         if (maybe_crash.is_some) {
-            crash_info_t crash = unwrap(maybe_crash);
+            crash_info_t crash = maybe_crash.unwrap(maybe_crash);
 
             logging(LOG_WARN, "%s", crash.msg);
             for (uint8_t i = 0; i < crash.stack_depth; ++i) {

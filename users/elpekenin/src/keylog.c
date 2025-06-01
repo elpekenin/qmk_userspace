@@ -126,7 +126,7 @@ static void maybe_symbol(const char **str) {
         return;
     }
 
-    replacements_t replacement = unwrap(maybe_replacement);
+    replacements_t replacement = maybe_replacement.unwrap(maybe_replacement);
 
     const char *target = NULL;
     switch (get_mods()) {
