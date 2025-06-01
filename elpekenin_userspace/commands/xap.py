@@ -77,7 +77,7 @@ class Xap(BaseCommand):
                 ),
             )
 
-        subprocess.run(  # noqa: S603  # out of attacker control
+        subprocess.run(
             [
                 cargo,
                 "build",
@@ -88,7 +88,7 @@ class Xap(BaseCommand):
         )
 
         exe = folder / "target" / "debug" / "xap-specs-codegen"
-        subprocess.run(  # noqa: S603  # out of attacker control
+        subprocess.run(
             [
                 exe,
                 "--format",

@@ -206,7 +206,7 @@ def remove_docs(host: str, path: str) -> None:
         msg = "ssh not found"
         raise RuntimeError(msg)
 
-    subprocess.run(  # noqa: S603  # out of attacker control
+    subprocess.run(
         [
             ssh,
             host,
@@ -227,7 +227,7 @@ def deploy_docs(src: str, host: str, dst: str) -> None:
         raise RuntimeError(msg)
 
     html = str(Path(src) / "html")
-    subprocess.run(  # noqa: S603  # out of attacker control
+    subprocess.run(
         [
             scp,
             "-prq",

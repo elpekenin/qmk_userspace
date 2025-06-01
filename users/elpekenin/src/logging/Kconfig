@@ -1,7 +1,7 @@
 menu "logging"
 
 if QUANTUM_PAINTER_ENABLE
-    config QP_LOG_ENABLE
+    menuconfig QP_LOG_ENABLE
         bool "quantum painter"
 
     if QP_LOG_ENABLE
@@ -14,7 +14,7 @@ if QUANTUM_PAINTER_ENABLE
 endif
 
 
-config SPLIT_LOG_ENABLE
+menuconfig SPLIT_LOG_ENABLE
     bool "split"
 
 if SPLIT_LOG_ENABLE
@@ -30,7 +30,7 @@ endif
 
 
 if UART_DRIVER_REQUIRED
-    config UART_LOG_ENABLE
+    menuconfig UART_LOG_ENABLE
         bool "uart"
 
     if UART_LOG_ENABLE
@@ -56,7 +56,7 @@ endif
 
 
 if XAP_ENABLE
-    config XAP_LOG_ENABLE
+    menuconfig XAP_LOG_ENABLE
         bool "xap"
 
     if XAP_LOG_ENABLE

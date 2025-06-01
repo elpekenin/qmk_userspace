@@ -62,7 +62,6 @@ static const replacements_t replacements[] = {
     replacement("_______", "__",  NULL, NULL),
     replacement("AT",      "@",   NULL, NULL),
     replacement("BSLS",    "\\",  NULL, NULL),
-    replacement("BSPC",    "⇤",   NULL, NULL),
     replacement("CAPS",    "↕",   NULL, NULL),
     replacement("COMM",    ",",   ";",  NULL),
     replacement("DB_TOGG", "DBG", NULL, NULL),

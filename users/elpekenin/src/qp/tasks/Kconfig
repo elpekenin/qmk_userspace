@@ -1,4 +1,4 @@
-config QP_TASK_COMPUTER_STATS_ENABLE
+menuconfig QP_TASK_COMPUTER_STATS_ENABLE
     bool "computer stats"
 
 if QP_TASK_COMPUTER_STATS_ENABLE
@@ -6,14 +6,13 @@ if QP_TASK_COMPUTER_STATS_ENABLE
         int "draw interval (ms)"
 
     config QP_TASK_COMPUTER_STATS_SIZE
-        int "size of array tracking computer usage stats"
+        int "size of array"
 
     config QP_TASK_COMPUTER_STATS_TIMEOUT
-        int "timeout before removing graph (ms)"
+        int "timeout before removing (ms)"
 endif # computer stats
 
-
-config QP_TASK_GITHUB_NOTIFICATIONS_ENABLE
+menuconfig QP_TASK_GITHUB_NOTIFICATIONS_ENABLE
     bool "github notifications"
 
 if QP_TASK_GITHUB_NOTIFICATIONS_ENABLE
@@ -21,11 +20,10 @@ if QP_TASK_GITHUB_NOTIFICATIONS_ENABLE
         int "draw interval (ms)"
 
     config QP_TASK_GITHUB_NOTIFICATIONS_TIMEOUT
-        int "timeout before removing count"
+        int "timeout before removing (ms)"
 endif # github notifications
 
-
-config QP_TASK_HEAP_STATS_ENABLE
+menuconfig QP_TASK_HEAP_STATS_ENABLE
     bool "heap stats"
 
 if QP_TASK_HEAP_STATS_ENABLE
@@ -33,8 +31,7 @@ if QP_TASK_HEAP_STATS_ENABLE
         int "draw interval (ms)"
 endif # heap stats
 
-
-config QP_TASK_KEYLOG_ENABLE
+menuconfig QP_TASK_KEYLOG_ENABLE
     bool "keylog"
 
 if QP_TASK_KEYLOG_ENABLE
@@ -42,8 +39,7 @@ if QP_TASK_KEYLOG_ENABLE
         int "draw interval (ms)"
 endif # keylog
 
-
-config QP_TASK_LAYER_ENABLE
+menuconfig QP_TASK_LAYER_ENABLE
     bool "layer"
 
 if QP_TASK_LAYER_ENABLE
@@ -51,15 +47,13 @@ if QP_TASK_LAYER_ENABLE
         int "draw interval (ms)"
 endif # layer
 
-
-config QP_TASK_LOGGING_ENABLE
+menuconfig QP_TASK_LOGGING_ENABLE
     bool "logging"
 
 if QP_TASK_LOGGING_ENABLE
     config QP_TASK_LOGGING_REDRAW_INTERVAL
         int "draw interval (ms)"
 endif # logging
-
 
 config QP_TASK_UPTIME_ENABLE
     bool "uptime"

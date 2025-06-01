@@ -160,6 +160,11 @@ def extend(func: Callable[[str], str]) -> Callable[[str], str]:
             _, val = ret.split(sep)
             return f"Option({val})"
 
+        # convert `rbuf___<T>` back into `RingBuffer(<T>)`
+        if ret.startswith("rbuf" + sep):
+            _, val = ret.split(sep)
+            return f"RingBuffer({val})"
+
         return ret
 
     return wrapper

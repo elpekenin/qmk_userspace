@@ -8,8 +8,11 @@ QP_DIRS := $(KEYBOARD_PATHS) $(KEYMAP_PATH) $(USER_PATH)
 # make sure folder exists
 $(shell mkdir -p $(USER_GENERATED))
 
+# hack to force running other steps
+FORCE:
+
 # enabled_features_t
-$(USER_GENERATED)/features.c $(USER_GENERATED)/features_draw.c:
+$(USER_GENERATED)/features.c $(USER_GENERATED)/features_draw.c: FORCE
 	$(USERSPACE_CLI) features $(CODEGEN_ARGS)
 
 # HACK: eagerly run command, so that we can `include ...mk`

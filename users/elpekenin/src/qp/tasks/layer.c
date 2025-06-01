@@ -17,12 +17,14 @@
 #    error Must enable 'elpekenin/rng'
 #endif
 
-static bool               running = false;
-static qp_callback_args_t args    = {0};
+static struct {
+    bool               running;
+    qp_callback_args_t args;
+} global = {0};
 
 static void draw_layer(const char *text, bool last_frame) {
     // FIXME:
-    qp_callback_args_t *arg = &args;
+    qp_callback_args_t *arg = &global.args;
 
     if (arg->device == NULL || arg->font == NULL) {
         return;
@@ -35,7 +37,7 @@ static void draw_layer(const char *text, bool last_frame) {
     qp_drawtext_recolor(arg->device, arg->x, arg->y, arg->font, text, hue, sat, UINT8_MAX, HSV_BLACK);
 
     if (last_frame) {
-        running = false;
+        global.running = false;
     }
 }
 
@@ -50,12 +52,12 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
 
     const uint8_t layer = get_highest_layer(layer_state | default_layer_state);
 
-    if (args->device == NULL || args->font == NULL || last_layer == layer || running) {
+    if (args->device == NULL || args->font == NULL || last_layer == layer || global.running) {
         return MILLISECONDS(QP_TASK_LAYER_REDRAW_INTERVAL);
     }
 
-    last_layer = layer;
-    running    = true;
+    last_layer     = layer;
+    global.running = true;
 
     // start the animation
     const glitch_text_config_t config = {
@@ -75,7 +77,7 @@ qp_callback_args_t *get_layer_args(void) {
     }
     configured = true;
 
-    defer_exec(MILLISECONDS(10), callback, &args);
+    defer_exec(MILLISECONDS(10), callback, &global.args);
 
-    return &args;
+    return &global.args;
 }

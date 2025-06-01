@@ -50,5 +50,6 @@ exclude = ["modules"]
 extend-select = ["ALL"]
 extend-ignore = [
     "FIX002",  # line contains TODO
-    "TD003",  # TODO without link to issue
+    "TD003",   # TODO without link to issue
+    "S603",    # subprocess input not in attacker's control
 ]

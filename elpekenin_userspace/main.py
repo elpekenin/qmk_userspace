@@ -26,6 +26,7 @@ from elpekenin_userspace.commands.micropython import Micropython
 from elpekenin_userspace.commands.py2c import Py2C
 from elpekenin_userspace.commands.qp_resources import QpResources
 from elpekenin_userspace.commands.stubs import Stubs
+from elpekenin_userspace.commands.tidy import Tidy
 from elpekenin_userspace.commands.xap import Xap
 from elpekenin_userspace.result import is_err
 
@@ -44,6 +45,7 @@ SUBCOMMANDS: dict[str, type[BaseCommand]] = {
     "qp_resources": QpResources,
     "py2c": Py2C,
     "stubs": Stubs,
+    "tidy": Tidy,
     "xap": Xap,
 }
 

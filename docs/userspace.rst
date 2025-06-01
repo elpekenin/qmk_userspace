@@ -10,10 +10,6 @@ keylog
 ######
 .. c:autodoc:: users/elpekenin/include/elpekenin/keylog.h
 
-ring_buffer
-###########
-.. c:autodoc:: users/elpekenin/include/elpekenin/ring_buffer.h
-
 sipo
 ####
 .. c:autodoc:: users/elpekenin/include/elpekenin/sipo.h

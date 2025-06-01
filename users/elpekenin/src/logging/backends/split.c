@@ -7,8 +7,11 @@
 #include <quantum/split_common/transactions.h>
 #include <quantum/util.h>
 
-#include "elpekenin/logging.h"
-#include "elpekenin/ring_buffer.h"
+#if CM_ENABLED(TYPES)
+#    include "elpekenin/types.h"
+#else
+#    error Must enable 'elpekenin/types'
+#endif
 
 typedef struct PACKED {
     bool    flush;
@@ -23,8 +26,13 @@ typedef struct PACKED {
 } split_logging_t;
 STATIC_ASSERT(sizeof(split_logging_t) == RPC_S2M_BUFFER_SIZE, "Wrong size");
 
+OptionImpl(char);
+RingBufferImpl(char);
+
+static char rbuf_inner[SPLIT_LOG_BUFFER_SIZE] = {0};
+
 // slave will write on its copy of this variable, master will copy (over split) onto its own
-static new_rbuf(char, SPLIT_LOG_BUFFER_SIZE, ring_buffer);
+static RingBuffer(char) rbuf = rbuf_from(char, rbuf_inner);
 
 int8_t sendchar_split(uint8_t chr) {
     // on master, this does nothing
@@ -32,8 +40,9 @@ int8_t sendchar_split(uint8_t chr) {
         return 0;
     }
 
-    if (isprint(chr) || chr == '\n') {
-        rbuf_push(ring_buffer, chr);
+    const bool pushed = rbuf.push(&rbuf, chr);
+    if (!pushed) {
+        // TODO: some warning or smth?
     }
 
     return 0;
@@ -42,17 +51,21 @@ int8_t sendchar_split(uint8_t chr) {
 void user_logging_slave_callback(__unused uint8_t m2s_size, __unused const void* m2s_buffer, __unused uint8_t s2m_size, void* s2m_buffer) {
     split_logging_t data = {0};
 
-    size_t size = rbuf_pop(ring_buffer, ARRAY_SIZE(data.buff), data.buff);
-
-    data.header.bytes = size;
-
-    // work out the data
-    for (size_t i = 0; i < size; ++i) {
-        // update message: do we have to flush?
-        if (data.buff[i] == '\n') {
-            data.header.flush = true;
+    for (size_t i = 0; i < PAYLOAD_SIZE - 1; ++i) {
+        const Option(char) pop = rbuf.pop(&rbuf);
+        if (!pop.is_some) {
             break;
         }
+
+        const char chr = unwrap(pop);
+        if (chr == '\n') {
+            data.header.flush = true;
+        }
+
+        data.buff[i]     = chr;
+        data.buff[i + 1] = '\0';
+
+        data.header.bytes += 1;
     }
 
     // copy data on send buffer
@@ -64,23 +77,35 @@ void user_logging_master_poll(void) {
     split_logging_t data = {0};
     transaction_rpc_recv(RPC_ID_USER_LOGGING, sizeof(split_logging_t), &data);
 
-    size_t size = data.header.bytes;
-    if (size == 0) {
+    if (data.header.bytes == 0) {
         return;
     }
 
     // copy received
-    for (size_t i = 0; i < size; ++i) {
-        rbuf_push(ring_buffer, data.buff[i]);
+    bool rbuf_full = false;
+    for (size_t i = 0; i < data.header.bytes; ++i) {
+        const bool pushed = rbuf.push(&rbuf, data.buff[i]);
+        if (!pushed) {
+            rbuf_full = true;
+            break;
+        }
     }
 
     // flush if asked to
-    if (data.header.flush || rbuf_full(ring_buffer)) {
-        char   buff[PAYLOAD_SIZE];
-        size_t size = rbuf_pop(ring_buffer, PAYLOAD_SIZE, buff);
-        buff[size]  = '\0';
+    if (data.header.flush || rbuf_full) {
+        char buff[PAYLOAD_SIZE] = {0};
+
+        for (size_t i = 0; i < PAYLOAD_SIZE - 1; ++i) {
+            const Option(char) pop = rbuf.pop(&rbuf);
+            if (!pop.is_some) {
+                break;
+            }
+
+            buff[i]     = unwrap(pop);
+            buff[i + 1] = '\0';
+        }
 
         // write it
-        logging(LOG_DEBUG, "*****\n%s*****\n", buff);
+        printf("split\n%s\nendsplit\n", buff);
     }
 }

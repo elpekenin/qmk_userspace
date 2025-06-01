@@ -12,7 +12,7 @@
 static struct {
     bool               init;
     autoconf_setting_t settings[NUM_AUTOCONF];
-} global_state = {0};
+} global = {0};
 
 static autoconf_value_t initialize_int(size_t value) {
     return (autoconf_value_t){
@@ -30,10 +30,10 @@ static autoconf_value_t initialize_str(const char *value) {
 
 #define INITIALIZE_VALUE(val) _Generic((val), int: initialize_int, char *: initialize_str)(val)
 
-#define AUTOCONF_ENTRY(setting)                            \
-    global_state.settings[index++] = (autoconf_setting_t){ \
-        .name  = #setting,                                 \
-        .value = INITIALIZE_VALUE(setting),                \
+#define AUTOCONF_ENTRY(setting)                      \
+    global.settings[index++] = (autoconf_setting_t){ \
+        .name  = #setting,                           \
+        .value = INITIALIZE_VALUE(setting),          \
     };
 
 static void autoconf_settings_init(void) {
@@ -42,12 +42,12 @@ static void autoconf_settings_init(void) {
 }
 
 const autoconf_setting_t *get_autoconf_settings(void) {
-    if (!global_state.init) {
-        global_state.init = true;
+    if (!global.init) {
+        global.init = true;
         autoconf_settings_init();
     }
 
-    return global_state.settings;
+    return global.settings;
 }
 
 size_t autoconf_settings_count(void) {

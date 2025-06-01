@@ -34,15 +34,13 @@ uint32_t xap_last_activity_elapsed(void);
 /**
  * Identifier for each type of message.
  */
-typedef enum {
+typedef enum : uint8_t {
     SCREEN_PRESSED,
     SCREEN_RELEASED,
     LAYER_CHANGE,
     KEYEVENT,
     SHUTDOWN,
-    N_XAP_MSGS,
 } xap_msg_id_t;
-STATIC_ASSERT(N_XAP_MSGS <= UINT8_MAX, "too many identifiers for a u8");
 
 /**
  * Inform about a screen press event.

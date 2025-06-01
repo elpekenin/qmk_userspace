@@ -26,37 +26,37 @@ static struct {
     // dont mind me, just bodging my way in  :)
     bool last_td_spc;
     bool keylog_active;
-} global_state = {0};
+} global = {0};
 
 bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *correct) {
     logging(LOG_WARN, "'%s' - '%s'", typo, correct);
 
     // regular handle
-    if (!global_state.last_td_spc) {
+    if (!global.last_td_spc) {
         return true;
     }
 
     // on space tap dance
     // ... fix the typo
     for (uint8_t i = 0; i < backspaces; ++i) {
-        tap_code(BSPC);
+        tap_code(KC_BSPC);
     }
     send_string_P(str);
 
     // ... and add the actual space
-    tap_code(SPC);
+    tap_code(KC_SPC);
 
     return false;
 }
 
 bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *typo_buffer_size, uint8_t *mods) {
-    global_state.last_td_spc = false;
+    global.last_td_spc = false;
 
     switch (*keycode) {
         case TD_SPC:
-            *keycode                 = KC_SPC; // make this look like a regular spacebar
-            record->event.pressed    = false;  // trigger an extra backspace when corrected
-            global_state.last_td_spc = true;
+            *keycode              = KC_SPC; // make this look like a regular spacebar
+            record->event.pressed = false;  // trigger an extra backspace when corrected
+            global.last_td_spc    = true;
             break;
 
         case TD_Z:
@@ -72,7 +72,7 @@ bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *t
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     string_t str = str_new(15);
 
-    if (IS_ENABLED(KEYLOG) && global_state.keylog_active) {
+    if (IS_ENABLED(KEYLOG) && global.keylog_active) {
         keylog_process(keycode, record);
     }
 
@@ -137,7 +137,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         case PK_KLOG:
             if (IS_ENABLED(KEYLOG) && pressed) {
-                global_state.keylog_active ^= true;
+                global.keylog_active ^= true;
             }
             return false;
 
