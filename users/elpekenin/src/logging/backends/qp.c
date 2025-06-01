@@ -6,9 +6,19 @@
 #include <quantum/color.h>
 #include <quantum/quantum.h>
 
-#include "elpekenin/logging.h"
 #include "elpekenin/qp/tasks/common.h"
-#include "elpekenin/scrolling_text.h"
+
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
+#endif
+
+#if CM_ENABLED(SCROLLING_TEXT)
+#    include "elpekenin/scrolling_text.h"
+#else
+#    error Must enable 'elpekenin/scrolling_text'
+#endif
 
 static char           qp_log[QP_LOG_N_LINES][QP_LOG_N_CHARS + 1];
 static uint8_t        qp_log_current_col;

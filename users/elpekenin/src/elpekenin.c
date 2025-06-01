@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <quantum/color.h>
+#include <quantum/process_keycode/process_autocorrect.h>
+#include <quantum/tri_layer.h>
 
 #include "elpekenin/build_info.h"
 #include "elpekenin/keycodes.h"

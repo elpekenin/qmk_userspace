@@ -3,6 +3,8 @@
 
 #include QMK_KEYBOARD_H
 
+#include <platforms/chibios/drivers/analog.h>
+#include <quantum/color.h>
 #include <stdlib.h>
 
 #include "elpekenin/build_info.h"
@@ -34,8 +36,6 @@
 #endif
 
 #if CM_ENABLED(RNG)
-#    include <platforms/chibios/drivers/analog.h>
-
 #    include "elpekenin/rng.h"
 #endif
 
@@ -221,7 +221,8 @@ void keyboard_post_init_keymap(void) {
         defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
     }
 
-#if CM_ENABLED(RNG)
+    // NOTE: analog macro is not provided by QMK, but custom Kconfig
+#if CM_ENABLED(RNG) && IS_DEFINED(ANALOG_DRIVER_REQUIRED)
     rng_set_seed(analogReadPin(GP28) * analogReadPin(GP28));
 #endif
 }

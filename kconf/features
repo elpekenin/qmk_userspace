@@ -15,8 +15,13 @@ config DEBUG_ENABLE
 config CONSOLE_ENABLE
     bool "console"
 
-config DEFERRED_EXEC_ENABLE
+menuconfig DEFERRED_EXEC_ENABLE
     bool "deferred execution"
+
+if DEFERRED_EXEC_ENABLE
+    config MAX_DEFERRED_EXECUTORS
+        int "executors"
+endif
 
 config EXTRAKEY_ENABLE
     bool "extrakey"

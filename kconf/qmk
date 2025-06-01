@@ -3,9 +3,6 @@ menu "QMK"
 config DYNAMIC_KEYMAP_LAYER_COUNT
     int "dynamic keymap layers"
 
-config MAX_DEFERRED_EXECUTORS
-    int "deferred executors"
-
 choice
     prompt "layer bitmask size"
 
@@ -26,8 +23,15 @@ config TAPPING_TERM
     int "tapping term (ms)"
 
 rsource "features"
+
+if QUANTUM_PAINTER_ENABLE
 rsource "painter"
+endif
+
+if RGB_MATRIX_ENABLE
 rsource "rgb"
+endif
+
 rsource "split"
 
 endmenu

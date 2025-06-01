@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <quantum/keymap_extras/sendstring_spanish.h>
+#include <quantum/process_keycode/process_autocorrect.h>
 #include <quantum/process_keycode/process_rgb_matrix.h>
 #include <quantum/quantum.h>
 
@@ -50,6 +51,12 @@ bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *co
 }
 
 bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *typo_buffer_size, uint8_t *mods) {
+    // prevent compilation error when feature is disabled
+    // `process_autocorrect_default_handler` (used later) won't be compiled
+    if (!IS_ENABLED(AUTOCORRECT)) {
+        return false;
+    }
+
     global.last_td_spc = false;
 
     switch (*keycode) {
@@ -66,6 +73,7 @@ bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *t
         default:
             break;
     }
+
     return process_autocorrect_default_handler(keycode, record, typo_buffer_size, mods);
 }
 

@@ -7,10 +7,11 @@ if KEYLOG_ENABLE
 
 config KEYLOG_SIZE
     int "maximum keylog length"
+    default 70
 
 endif
 
-config SIPO_PINS_ENABLE
+menuconfig SIPO_PINS_ENABLE
     bool "sipo pins"
 
 if SIPO_PINS_ENABLE
@@ -21,7 +22,11 @@ config N_SIPO_PINS
 endif # sipo
 
 rsource "src/logging/Kconfig"
+
+if QUANTUM_PAINTER_ENABLE
 rsource "src/qp/Kconfig"
+endif
+
 rsource "src/touch/Kconfig"
 
 endmenu

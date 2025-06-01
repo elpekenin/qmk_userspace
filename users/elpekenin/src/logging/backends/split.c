@@ -73,12 +73,12 @@ void user_logging_slave_callback(__unused uint8_t m2s_size, __unused const void*
 }
 
 // master
-void user_logging_master_poll(void) {
+uint32_t user_logging_master_poll(void) {
     split_logging_t data = {0};
     transaction_rpc_recv(RPC_ID_USER_LOGGING, sizeof(split_logging_t), &data);
 
     if (data.header.bytes == 0) {
-        return;
+        return MILLISECONDS(SPLIT_LOG_SYNC_INTERVAL);
     }
 
     // copy received
@@ -108,4 +108,6 @@ void user_logging_master_poll(void) {
         // write it
         printf("split\n%s\nendsplit\n", buff);
     }
+
+    return MILLISECONDS(SPLIT_LOG_SYNC_INTERVAL);
 }

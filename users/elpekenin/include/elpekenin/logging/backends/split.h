@@ -7,6 +7,6 @@
 
 int8_t sendchar_split(uint8_t chr);
 
-void user_logging_master_poll(void);
+uint32_t user_logging_master_poll(void);
 
 void user_logging_slave_callback(uint8_t m2s_size, const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer);

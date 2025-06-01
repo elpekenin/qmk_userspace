@@ -7,9 +7,11 @@ if QUANTUM_PAINTER_ENABLE
     if QP_LOG_ENABLE
         config QP_LOG_N_CHARS
             int "size of array storing each line"
+            default 70
 
         config QP_LOG_N_LINES
             int "lines stored"
+            default 9
     endif
 endif
 
@@ -20,12 +22,15 @@ menuconfig SPLIT_LOG_ENABLE
 if SPLIT_LOG_ENABLE
     config SPLIT_LOG_BUFFER_SIZE
         int "size of ring buffer"
+        default 200
 
     config SPLIT_LOG_SYNC_DELAY
         int "delay before first sync (ms)"
+        default 1000
 
     config SPLIT_LOG_SYNC_INTERVAL
         int "sync interval (ms)"
+        default 3000
 endif
 
 
@@ -36,6 +41,7 @@ if UART_DRIVER_REQUIRED
     if UART_LOG_ENABLE
         config UART_LOG_BAUD_RATE
             int "baud rate"
+            default 9600
 
         # must be kept in sync with `uart_client_t`
         config UART_CLIENT
@@ -45,6 +51,9 @@ if UART_DRIVER_REQUIRED
 
         choice
             prompt "client software"
+
+            default UART_CLIENT_PUTTY
+
             config UART_CLIENT_NONE
                 bool "none"
 

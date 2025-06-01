@@ -11,6 +11,11 @@
 #include "elpekenin/signatures.h"
 #include "elpekenin/time.h"
 
+#if !IS_ENABLED(SPLIT_LOG)
+// no work to be done
+#    define SPLIT_LOG_SYNC_DELAY 0
+#endif
+
 // slave-side callbacks
 static void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != sizeof(build_info_t)) {
@@ -69,8 +74,7 @@ static uint32_t slave_log_sync_task(__unused uint32_t trigger_time, __unused voi
         return 0;
     }
 
-    user_logging_master_poll();
-    return MILLISECONDS(SPLIT_LOG_SYNC_INTERVAL);
+    return user_logging_master_poll();
 }
 
 void reset_ee_slave(void) {
@@ -94,10 +98,18 @@ void xap_execute_slave(const void* data) {
 // register message handlers and kick off tasks
 void transactions_init(void) {
     transaction_register_rpc(RPC_ID_BUILD_INFO, build_info_slave_callback);
+
     transaction_register_rpc(RPC_ID_USER_SHUTDOWN, user_shutdown_slave_callback);
-    transaction_register_rpc(RPC_ID_USER_LOGGING, user_logging_slave_callback);
+
+    if (IS_ENABLED(SPLIT_LOG)) {
+        transaction_register_rpc(RPC_ID_USER_LOGGING, user_logging_slave_callback);
+    }
+
     transaction_register_rpc(RPC_ID_USER_EE_CLR, user_ee_clr_callback);
-    transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
+
+    if (IS_ENABLED(XAP)) {
+        transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
+    }
 
     // wait a bit to prevent drawing on eInk right after flash, also ensures that
     // initialization has run, making sure `is_keyboard_master` returns correct value
