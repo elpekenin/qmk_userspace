@@ -1,20 +1,18 @@
 menu "logging"
 
-if QUANTUM_PAINTER_ENABLE
-    menuconfig QP_LOG_ENABLE
-        bool "quantum painter"
+menuconfig QP_LOG_ENABLE
+    bool "quantum painter"
+    depends on QUANTUM_PAINTER_ENABLE
 
-    if QP_LOG_ENABLE
-        config QP_LOG_N_CHARS
-            int "size of array storing each line"
-            default 70
+if QP_LOG_ENABLE
+    config QP_LOG_N_CHARS
+        int "size of array storing each line"
+        default 70
 
-        config QP_LOG_N_LINES
-            int "lines stored"
-            default 9
-    endif
+    config QP_LOG_N_LINES
+        int "lines stored"
+        default 9
 endif
-
 
 menuconfig SPLIT_LOG_ENABLE
     bool "split"
@@ -34,44 +32,41 @@ if SPLIT_LOG_ENABLE
 endif
 
 
-if UART_DRIVER_REQUIRED
-    menuconfig UART_LOG_ENABLE
-        bool "uart"
+menuconfig UART_LOG_ENABLE
+    bool "uart"
+    depends on UART_DRIVER_REQUIRED
 
-    if UART_LOG_ENABLE
-        config UART_LOG_BAUD_RATE
-            int "baud rate"
-            default 9600
+if UART_LOG_ENABLE
+    config UART_LOG_BAUD_RATE
+        int "baud rate"
+        default 9600
 
-        # must be kept in sync with `uart_client_t`
-        config UART_CLIENT
-            int
-            default 0 if UART_CLIENT_NONE
-            default 1 if UART_CLIENT_PUTTY
+    # must be kept in sync with `uart_client_t`
+    config UART_CLIENT
+        int
+        default 0 if UART_CLIENT_NONE
+        default 1 if UART_CLIENT_PUTTY
 
-        choice
-            prompt "client software"
+    choice
+        prompt "client software"
 
-            default UART_CLIENT_PUTTY
+        default UART_CLIENT_PUTTY
 
-            config UART_CLIENT_NONE
-                bool "none"
+        config UART_CLIENT_NONE
+            bool "none"
 
-            config UART_CLIENT_PUTTY
-                bool "PuTTY"
-        endchoice
-    endif
+        config UART_CLIENT_PUTTY
+            bool "PuTTY"
+    endchoice
 endif
 
+menuconfig XAP_LOG_ENABLE
+    bool "xap"
+    depends on XAP_ENABLE
 
-if XAP_ENABLE
-    menuconfig XAP_LOG_ENABLE
-        bool "xap"
-
-    if XAP_LOG_ENABLE
-        config XAP_LOG_BUFFER_SIZE
-            int "size of ring buffer"
-    endif
+if XAP_LOG_ENABLE
+    config XAP_LOG_BUFFER_SIZE
+        int "size of ring buffer"
 endif
 
 endmenu

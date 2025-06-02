@@ -9,7 +9,7 @@
 #include "elpekenin/time.h"
 
 typedef struct PACKED {
-    uint8_t  n_chars;
+    size_t   n_chars;
     uint32_t delay;
 } scrolling_args_t;
 

@@ -1,5 +1,7 @@
+// Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 /* Copyright 2020 Nick Brassel (tzarc)
- * Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +21,8 @@
 
 #include "elpekenin/spi_custom.h"
 
-#include <quantum/util.h> // ARRAY_SIZE
+#include <quantum/compiler_support.h>
+#include <quantum/util.h>
 #include <sys/cdefs.h>
 
 #ifdef SPI_CUSTOM_DEBUG
@@ -31,6 +34,7 @@
 
 static SPIDriver *drivers[] = SPI_DRIVERS;
 #define SPI_COUNT ARRAY_SIZE(drivers)
+STATIC_ASSERT(SPI_COUNT <= UINT8_MAX, "too many buses defined");
 
 static pin_t spi_sck_pins[SPI_COUNT]   = SPI_SCK_PINS;
 static pin_t spi_mosi_pins[SPI_COUNT]  = SPI_MOSI_PINS;

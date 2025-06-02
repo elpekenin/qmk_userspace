@@ -31,9 +31,9 @@ typedef struct PACKED {
 } asset_t;
 
 static struct {
-    uint8_t devices;
-    uint8_t fonts;
-    uint8_t images;
+    size_t devices;
+    size_t fonts;
+    size_t images;
 } count = {0};
 
 static asset_t assets[QP_ASSETS_SIZE] = {
@@ -46,7 +46,7 @@ static asset_t assets[QP_ASSETS_SIZE] = {
 };
 
 static void set(asset_kind_t kind, const char *name, const void *ptr) {
-    const uint16_t n = count.devices + count.fonts + count.images;
+    const size_t n = count.devices + count.fonts + count.images;
     if (n >= QP_ASSETS_SIZE) {
         logging(LOG_ERROR, "%s: too many assets", __func__);
         return;
@@ -80,11 +80,11 @@ static void set(asset_kind_t kind, const char *name, const void *ptr) {
 }
 
 // (FONT, 3) is not 3rd element in pool, but the third *font* in pool
-static const void *get_by_index(asset_kind_t kind, uint8_t index) {
-    const uint16_t n = count.devices + count.fonts + count.images;
+static const void *get_by_index(asset_kind_t kind, size_t index) {
+    const size_t n = count.devices + count.fonts + count.images;
 
-    uint8_t counter = 0;
-    for (uint16_t i = 0; i < n; ++i) {
+    size_t counter = 0;
+    for (size_t i = 0; i < n; ++i) {
         asset_t asset = assets[i];
 
         if (asset.kind == kind) {
@@ -103,9 +103,9 @@ static const void *get_by_index(asset_kind_t kind, uint8_t index) {
 }
 
 static const void *get_by_name(asset_kind_t kind, const char *name) {
-    const uint16_t n = count.devices + count.fonts + count.images;
+    const size_t n = count.devices + count.fonts + count.images;
 
-    for (uint16_t i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         asset_t asset = assets[i];
 
         if (asset.kind == kind && asset.name != NULL && strcmp(asset.name, name) == 0) {
@@ -129,11 +129,11 @@ painter_device_t qp_get_device_by_name(const char *name) {
     return get_by_name(DEVICE, name);
 }
 
-uint8_t qp_get_num_devices(void) {
+size_t qp_get_num_devices(void) {
     return count.devices;
 }
 
-painter_device_t qp_get_device_by_index(uint8_t index) {
+painter_device_t qp_get_device_by_index(size_t index) {
     return get_by_index(DEVICE, index);
 }
 
@@ -147,11 +147,11 @@ painter_font_handle_t qp_get_font_by_name(const char *name) {
     return get_by_name(FONT, name);
 }
 
-uint8_t qp_get_num_fonts(void) {
+size_t qp_get_num_fonts(void) {
     return count.fonts;
 }
 
-painter_font_handle_t qp_get_font_by_index(uint8_t index) {
+painter_font_handle_t qp_get_font_by_index(size_t index) {
     return get_by_index(FONT, index);
 }
 
@@ -165,10 +165,10 @@ painter_image_handle_t qp_get_image_by_name(const char *name) {
     return get_by_name(IMAGE, name);
 }
 
-uint8_t qp_get_num_images(void) {
+size_t qp_get_num_images(void) {
     return count.images;
 }
 
-painter_image_handle_t qp_get_image_by_index(uint8_t index) {
+painter_image_handle_t qp_get_image_by_index(size_t index) {
     return get_by_index(IMAGE, index);
 }

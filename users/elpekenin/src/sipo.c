@@ -3,7 +3,11 @@
 
 #include "elpekenin/sipo.h"
 
+#include <quantum/compiler_support.h>
+
 #include "elpekenin/spi_custom.h"
+
+STATIC_ASSERT(N_SIPO_PINS <= UINT8_MAX, "too many pins defined");
 
 #ifdef SIPO_DEBUG
 #    include "quantum/logging/debug.h"

@@ -20,6 +20,6 @@
 
         /* experimental */
         // "elpekenin/micropython",
-        "elpekenin/sanitizer",
+        // "elpekenin/sanitizer",
     ]
 }

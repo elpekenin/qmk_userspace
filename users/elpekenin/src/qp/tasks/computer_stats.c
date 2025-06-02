@@ -3,6 +3,8 @@
 
 #include "elpekenin/qp/tasks/computer_stats.h"
 
+#include <quantum/compiler_support.h>
+
 #include "elpekenin/xap.h"
 
 #if CM_ENABLED(QP_HELPERS)
@@ -15,10 +17,12 @@ static struct {
     qp_callback_args_t args;
     bool               redraw;
     bool               clear;
-    uint8_t            points;
+    size_t             points;
     uint8_t            cpu[QP_TASK_COMPUTER_STATS_SIZE];
     uint8_t            ram[QP_TASK_COMPUTER_STATS_SIZE];
-} state = {0};
+} computer_stats = {0};
+STATIC_ASSERT(sizeof(*computer_stats.cpu) == 1, "memmove will use wrong size");
+STATIC_ASSERT(sizeof(*computer_stats.ram) == 1, "memmove will use wrong size");
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     if (!IS_ENABLED(XAP) || !CM_ENABLED(QP_HELPERS)) {
@@ -34,23 +38,23 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     const uint16_t graph_size = (uintptr_t)args->extra;
 
     if (xap_last_activity_elapsed() > MILLISECONDS(QP_TASK_COMPUTER_STATS_TIMEOUT)) {
-        if (state.clear) {
+        if (computer_stats.clear) {
             qp_rect(args->device, args->x, args->y, args->x + graph_size, args->y + graph_size, HSV_BLACK, true);
         }
 
-        state.clear = false;
+        computer_stats.clear = false;
     } else {
-        state.clear = true;
+        computer_stats.clear = true;
 
         const graph_line_t lines[] = {
             {
-                .data      = state.cpu,
+                .data      = computer_stats.cpu,
                 .color     = {HSV_BLUE},
                 .mode      = LINE,
                 .max_value = 100,
             },
             {
-                .data      = state.ram,
+                .data      = computer_stats.ram,
                 .color     = {HSV_YELLOW},
                 .mode      = LINE,
                 .max_value = 100,
@@ -72,14 +76,14 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
                 },
             .axis        = {HSV_WHITE},
             .background  = {HSV_BLACK},
-            .data_points = state.points,
+            .data_points = computer_stats.points,
         };
 
-        if (state.redraw) {
+        if (computer_stats.redraw) {
             qp_draw_graph(&config, lines);
         }
 
-        state.redraw = false;
+        computer_stats.redraw = false;
     }
 
     return MILLISECONDS(QP_TASK_COMPUTER_STATS_REDRAW_INTERVAL);
@@ -92,18 +96,18 @@ qp_callback_args_t *get_computer_stats_args(void) {
     }
     configured = true;
 
-    defer_exec(MILLISECONDS(10), callback, &state.args);
+    defer_exec(MILLISECONDS(10), callback, &computer_stats.args);
 
-    return &state.args;
+    return &computer_stats.args;
 }
 
 void push_computer_stats(uint8_t cpu, uint8_t ram) {
-    memmove(state.cpu + 1, state.cpu, QP_TASK_COMPUTER_STATS_SIZE - 1);
-    memmove(state.ram + 1, state.ram, QP_TASK_COMPUTER_STATS_SIZE - 1);
+    memmove(computer_stats.cpu + 1, computer_stats.cpu, QP_TASK_COMPUTER_STATS_SIZE - 1);
+    memmove(computer_stats.ram + 1, computer_stats.ram, QP_TASK_COMPUTER_STATS_SIZE - 1);
 
-    state.cpu[0] = cpu;
-    state.ram[0] = ram;
+    computer_stats.cpu[0] = cpu;
+    computer_stats.ram[0] = ram;
 
-    state.points = MIN(QP_TASK_COMPUTER_STATS_SIZE, state.points + 1);
-    state.redraw = true;
+    computer_stats.points = MIN(QP_TASK_COMPUTER_STATS_SIZE, computer_stats.points + 1);
+    computer_stats.redraw = true;
 }

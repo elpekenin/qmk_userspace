@@ -47,9 +47,10 @@ static int8_t user_sendchar(uint8_t chr) {
     for (size_t i = 0; i < ARRAY_SIZE(send_functions); ++i) {
         sendchar_func_t function = send_functions[i];
 
-        // TODO: make something with returned value?
-        // my custom hooks return 0 (so far)
-        function(chr);
+        const int8_t ret = function(chr);
+        if (ret < 0) {
+            // error
+        }
     }
 
     return 0;

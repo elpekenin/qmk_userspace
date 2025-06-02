@@ -4,6 +4,7 @@
 #include "elpekenin/keylog.h"
 
 #include <ctype.h>
+#include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 #include <quantum/util.h>
 #include <string.h>
@@ -23,6 +24,7 @@ static char keylog[KEYLOG_SIZE + 1] = {
     [0 ... KEYLOG_SIZE - 1] = ' ',
     [KEYLOG_SIZE]           = '\0',
 }; // extra space for terminator
+STATIC_ASSERT(sizeof(*keylog) == 1, "memmove will use wrong size");
 
 typedef enum {
     NO_MODS,
@@ -96,8 +98,8 @@ static void skip_prefix(const char **str) {
     char *prefixes[] = {"KC_", "RGB_", "QK_", "ES_", "TD_", "TL_"};
 
     for (size_t i = 0; i < ARRAY_SIZE(prefixes); ++i) {
-        char   *prefix = prefixes[i];
-        uint8_t len    = strlen(prefix);
+        char  *prefix = prefixes[i];
+        size_t len    = strlen(prefix);
 
         if (strncmp(prefix, *str, len) == 0) {
             *str += len;
@@ -203,10 +205,10 @@ static void keylog_shift_right(void) {
     keylog_shift_right_one_byte();
 }
 
-static void keylog_shift_left(uint8_t len) {
+static void keylog_shift_left(size_t len) {
     memmove(keylog, keylog + len, KEYLOG_SIZE - len);
 
-    uint8_t counter = 0;
+    size_t counter = 0;
     while (is_utf8_continuation(keylog[0])) {
         memmove(keylog, keylog + 1, KEYLOG_SIZE - 1);
         ++counter;
@@ -218,10 +220,10 @@ static void keylog_shift_left(uint8_t len) {
 }
 
 static void keylog_append(const char *str) {
-    uint8_t len = strlen(str);
+    size_t len = strlen(str);
 
     keylog_shift_left(len);
-    for (uint8_t i = 0; i < len; ++i) {
+    for (size_t i = 0; i < len; ++i) {
         keylog[KEYLOG_SIZE - len + i] = str[i];
     }
 }

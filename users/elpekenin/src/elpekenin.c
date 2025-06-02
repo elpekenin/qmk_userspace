@@ -27,6 +27,7 @@
 #    include "generated/qp_resources.h"
 #endif
 
+// compat: includes effect files which fail with RGB disabled
 #if IS_ENABLED(RGB_MATRIX)
 #    include <quantum/rgb_matrix/rgb_matrix.h>
 #endif
@@ -68,7 +69,7 @@ void keyboard_post_init_user(void) {
             crash_info_t crash = maybe_crash.unwrap(maybe_crash);
 
             logging(LOG_WARN, "%s", crash.msg);
-            for (uint8_t i = 0; i < crash.stack_depth; ++i) {
+            for (size_t i = 0; i < crash.stack_depth; ++i) {
                 logging(LOG_ERROR, "%s (%p)", crash.call_stack[i].name, crash.call_stack[i].address);
             }
         } else {
@@ -101,7 +102,7 @@ bool shutdown_user(bool jump_to_bootloader) {
 
     // power off all screens
     if (IS_ENABLED(QUANTUM_PAINTER)) {
-        for (uint8_t i = 0; i < qp_get_num_devices(); ++i) {
+        for (size_t i = 0; i < qp_get_num_devices(); ++i) {
             painter_device_t device = qp_get_device_by_index(i);
             qp_power(device, false);
         }

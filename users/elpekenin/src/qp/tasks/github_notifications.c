@@ -11,7 +11,7 @@ static struct {
     uint8_t            count;
     bool               redraw;
     bool               clear;
-} state = {0};
+} github_notifications = {0};
 
 static const char *as_text(uint8_t value) {
     static char text[2] = {0, 0};
@@ -45,23 +45,23 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     }
 
     if (xap_last_activity_elapsed() > MILLISECONDS(QP_TASK_GITHUB_NOTIFICATIONS_TIMEOUT)) {
-        if (state.clear) {
+        if (github_notifications.clear) {
             // clear previous drawings
             qp_rect(args->device, args->x, args->y, args->x + logo->width, args->y + logo->height, HSV_BLACK, true);
             qp_drawtext(args->device, args->x, args->y, args->font, " ");
         }
 
-        state.clear = false;
+        github_notifications.clear = false;
     } else {
-        state.clear = true;
+        github_notifications.clear = true;
 
-        if (state.redraw) {
-            const hsv_t color = (state.count == 0) ? (hsv_t){HSV_GREEN} : (hsv_t){HSV_RED};
+        if (github_notifications.redraw) {
+            const hsv_t color = (github_notifications.count == 0) ? (hsv_t){HSV_GREEN} : (hsv_t){HSV_RED};
             qp_drawimage(args->device, args->x, args->y, logo);
-            qp_drawtext_recolor(args->device, args->x, args->y, args->font, as_text(state.count), color.h, color.s, color.v, HSV_BLACK);
+            qp_drawtext_recolor(args->device, args->x, args->y, args->font, as_text(github_notifications.count), color.h, color.s, color.v, HSV_BLACK);
         }
 
-        state.redraw = false;
+        github_notifications.redraw = false;
     }
 
     return MILLISECONDS(QP_TASK_GITHUB_NOTIFICATIONS_REDRAW_INTERVAL);
@@ -74,12 +74,12 @@ qp_callback_args_t *get_github_notifications_args(void) {
     }
     configured = true;
 
-    defer_exec(MILLISECONDS(10), callback, &state.args);
+    defer_exec(MILLISECONDS(10), callback, &github_notifications.args);
 
-    return &state.args;
+    return &github_notifications.args;
 }
 
 void set_github_notifications_count(uint8_t count) {
-    state.count  = count;
-    state.redraw = true;
+    github_notifications.count  = count;
+    github_notifications.redraw = true;
 }

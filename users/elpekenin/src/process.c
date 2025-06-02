@@ -16,6 +16,12 @@
 #include "elpekenin/string.h"
 #include "elpekenin/xap.h"
 
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
+#endif
+
 // compat: function must exist
 #if CM_ENABLED(MEMORY)
 #    include "elpekenin/memory.h"
@@ -39,7 +45,7 @@ bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *co
 
     // on space tap dance
     // ... fix the typo
-    for (uint8_t i = 0; i < backspaces; ++i) {
+    while (backspaces--) {
         tap_code(KC_BSPC);
     }
     send_string_P(str);
@@ -167,18 +173,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 const autoconf_setting_t *settings = get_autoconf_settings();
                 for (size_t i = 0; i < autoconf_settings_count(); ++i) {
                     const autoconf_setting_t setting = settings[i];
-
-                    printf("%s=", setting.name);
                     switch (setting.value.type) {
                         case AUTOCONF_INT:
-                            printf("%d", setting.value.integer);
+                            logging(LOG_INFO, "%s=%d", setting.name, setting.value.integer);
                             break;
 
                         case AUTOCONF_STRING:
-                            printf("\"%s\"", setting.value.string);
+                            logging(LOG_INFO, "%s=\"%s\"", setting.name, setting.value.string);
                             break;
                     }
-                    print("\n");
                 }
             }
             return false;

@@ -20,11 +20,11 @@
 static struct {
     bool               running;
     qp_callback_args_t args;
-} global = {0};
+} layer = {0};
 
 static void draw_layer(const char *text, bool last_frame) {
     // FIXME:
-    qp_callback_args_t *arg = &global.args;
+    qp_callback_args_t *arg = &layer.args;
 
     if (arg->device == NULL || arg->font == NULL) {
         return;
@@ -37,7 +37,7 @@ static void draw_layer(const char *text, bool last_frame) {
     qp_drawtext_recolor(arg->device, arg->x, arg->y, arg->font, text, hue, sat, UINT8_MAX, HSV_BLACK);
 
     if (last_frame) {
-        global.running = false;
+        layer.running = false;
     }
 }
 
@@ -48,20 +48,19 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
 
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
-    static uint8_t last_layer = UINT8_MAX;
+    static uint8_t last_layer    = UINT8_MAX;
+    const uint8_t  current_layer = get_highest_layer(layer_state | default_layer_state);
 
-    const uint8_t layer = get_highest_layer(layer_state | default_layer_state);
-
-    if (args->device == NULL || args->font == NULL || last_layer == layer || global.running) {
+    if (args->device == NULL || args->font == NULL || last_layer == current_layer || layer.running) {
         return MILLISECONDS(QP_TASK_LAYER_REDRAW_INTERVAL);
     }
 
-    last_layer     = layer;
-    global.running = true;
+    last_layer    = current_layer;
+    layer.running = true;
 
     // start the animation
     const glitch_text_config_t config = {
-        .str      = get_layer_name(layer),
+        .str      = get_layer_name(current_layer),
         .callback = draw_layer,
         .delay    = 30,
     };
@@ -77,7 +76,7 @@ qp_callback_args_t *get_layer_args(void) {
     }
     configured = true;
 
-    defer_exec(MILLISECONDS(10), callback, &global.args);
+    defer_exec(MILLISECONDS(10), callback, &layer.args);
 
-    return &global.args;
+    return &layer.args;
 }

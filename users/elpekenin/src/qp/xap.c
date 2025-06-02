@@ -336,14 +336,8 @@ bool xap_execute_draw_scrolling_text(xap_token_t token, xap_route_user_quantum_p
             .n_chars = arg->n_chars,
             .delay   = arg->delay,
             .spaces  = 5,
-            .bg =
-                {
-                    .hsv888 = {HSV_BLACK},
-                },
-            .fg =
-                {
-                    .hsv888 = {HSV_WHITE},
-                },
+            .bg      = {HSV_BLACK},
+            .fg      = {HSV_WHITE},
         };
         deferred_token def_token = scrolling_text_start(&config);
 

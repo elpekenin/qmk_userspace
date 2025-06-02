@@ -24,12 +24,14 @@
 #    error Must enable 'elpekenin/string'
 #endif
 
-static bool               running = false;
-static qp_callback_args_t args    = {0};
+static struct {
+    qp_callback_args_t args;
+    bool               running;
+} heap_stats = {0};
 
 static void draw_heap(const char *text, __unused bool last_frame) {
     // FIXME:
-    qp_callback_args_t *arg = &args;
+    qp_callback_args_t *arg = &heap_stats.args;
 
     if (arg->device == NULL || arg->font == NULL) {
         return;
@@ -51,12 +53,12 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     static size_t last_used = 0;
     const size_t  used_heap = get_used_heap();
 
-    if (args->device == NULL || args->font == NULL || last_used == used_heap || running) {
+    if (args->device == NULL || args->font == NULL || last_used == used_heap || heap_stats.running) {
         return MILLISECONDS(QP_TASK_HEAP_STATS_REDRAW_INTERVAL);
     }
 
-    last_used = used_heap;
-    running   = true;
+    last_used          = used_heap;
+    heap_stats.running = true;
 
     // on first go, draw the consumed flash
     string_t str = str_new(100);
@@ -91,7 +93,7 @@ qp_callback_args_t *get_heap_stats_args(void) {
     }
     configured = true;
 
-    defer_exec(MILLISECONDS(10), callback, &args);
+    defer_exec(MILLISECONDS(10), callback, &heap_stats.args);
 
-    return &args;
+    return &heap_stats.args;
 }
