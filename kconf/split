@@ -2,6 +2,7 @@ menu "split"
 
 config RPC_M2S_BUFFER_SIZE
     int "master to slave buffer size"
+    default 80
 
 config RPC_S2M_BUFFER_SIZE
     int "slave to master buffer size"

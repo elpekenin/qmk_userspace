@@ -3,7 +3,7 @@ SRC += matrix.c
 
 # built with 2MB Pico's
 OPT_DEFS += "-DPICO_FLASH_SIZE_BYTES=(2 * 1024 * 1024)" # default already (?)
-EXTRALDFLAGS += -Wl,--defsym,FLASH_LEN=2048k  # not required (for now)
+LDFLAGS += -Wl,--defsym,FLASH_LEN=2048k  # not required (for now)
 
 # QP drivers
 QUANTUM_PAINTER_DRIVERS += \

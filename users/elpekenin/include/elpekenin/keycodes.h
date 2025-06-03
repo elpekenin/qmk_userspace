@@ -23,7 +23,8 @@ enum userspace_keycodes {
     PK_LOG, // cycle logging level
     PK_SIZE, // print used flash
 
-    PK_CONF, // dump autoconf settings
+    PK_CONF, // print autoconf settings
+    PK_ID, // print build id
 
     // !! remember to update KEYCODE_STRING_NAMES_USER
 

@@ -118,7 +118,7 @@ INCLUDE rules_stacks_c1.ld
 INCLUDE RP2040_rules_code_with_boot2.ld
 INCLUDE RP2040_rules_data_with_timecrit.ld
 
-/* Keep pico SDK symbols */
+/* elpekenin change: keep pico SDK symbols */
 SECTIONS {
     .preinit : ALIGN(4){
         . = ALIGN(4);
@@ -130,8 +130,7 @@ SECTIONS {
     } > XTORS_FLASH AT > XTORS_FLASH_LMA
 }
 
-
-/* KASAN */
+/* elpekenin change: kasan */
 SECTIONS {
     .kasan_shadow : {
         . = ALIGN(8);
@@ -139,6 +138,14 @@ SECTIONS {
         . = ORIGIN(ram2) + LENGTH(ram2);
         __kasan_shadow_end__ = .;
     } > ram2
+}
+
+/* elpekenin change: keep build id */
+SECTIONS {
+    .build_id : {
+        __gnu_build_id__ = .;
+        *(.note.gnu.build-id)
+    } > flash1
 }
 
 INCLUDE rules_memory.ld

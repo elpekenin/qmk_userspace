@@ -2,6 +2,7 @@
     "modules": [
         /* standalone */
         "elpekenin/allocator",
+        "elpekenin/build_id",
         "elpekenin/crash",
         "elpekenin/generics",
         "elpekenin/logging",

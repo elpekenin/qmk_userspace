@@ -13,7 +13,6 @@
 #include "elpekenin/logging/backends/qp.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/split/transactions.h"
-#include "elpekenin/string.h"
 #include "elpekenin/xap.h"
 
 // compat: function must exist
@@ -23,9 +22,13 @@
 #    define get_flash_size() 0
 #endif
 
+STATIC_ASSERT(CM_ENABLED(BUILD_ID), "Must enable 'elpekenin/build_id'");
 STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
+STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
 
+#include "elpekenin/build_id.h"
 #include "elpekenin/logging.h"
+#include "elpekenin/string.h"
 
 static struct {
     // dont mind me, just bodging my way in  :)
@@ -183,6 +186,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;
+
+        case PK_ID:
+            if (pressed) {
+                const u128 build_id = get_build_id();
+
+                printf("Build id: 0x");
+                for (size_t i = 0; i < sizeof(u128); ++i) {
+                    printf("%x", build_id.bytes[i]);
+                }
+                printf("\n");
+            }
 
         default:
             break;

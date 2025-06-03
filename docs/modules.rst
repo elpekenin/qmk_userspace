@@ -15,6 +15,10 @@ arm_math_m0
 
 Replaces some C builtins for floating point numbers (eg: ``sinf``) with optimized implementations for Cortex-M0 and M0+ cores.
 
+build_id
+########
+.. c:autodoc:: modules/elpekenin/build_id/elpekenin/build_id.h
+
 crash
 #####
 .. c:autodoc:: modules/elpekenin/crash/elpekenin/crash.h
@@ -22,6 +26,10 @@ crash
 dual_rp
 #######
 .. c:autodoc:: modules/elpekenin/dual_rp/elpekenin/dual_rp.h
+
+generics
+########
+.. c:autodoc:: modules/elpekenin/generics/elpekenin/generics.h
 
 glitch_text
 ###########
@@ -145,10 +153,6 @@ scrolling_text
 string
 ######
 .. c:autodoc:: modules/elpekenin/string/elpekenin/string.h
-
-types
-######
-.. c:autodoc:: modules/elpekenin/types/elpekenin/types.h
 
 version
 #######

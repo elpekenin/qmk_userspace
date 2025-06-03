@@ -53,7 +53,7 @@
         {
             "operation": "exec",
             "display": "compiling",
-            "cmd": "qmk --no-color --compiledb compile -kb elpekenin/access -km elpekenin > build.log 2>&1",
+            "cmd": "qmk --no-color compile --compiledb -kb elpekenin/access -km elpekenin > build.log 2>&1",
             "path": "$QMK_HOME"
         }
     ]

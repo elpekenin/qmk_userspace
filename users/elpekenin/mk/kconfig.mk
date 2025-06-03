@@ -129,6 +129,7 @@ SPLIT_WPM_ENABLE=yes
 # KEYLOG_ENABLE is not set
 SIPO_PINS_ENABLE=yes
 N_SIPO_PINS=8
+# BUILD_INFO is not set
 
 #
 # logging
