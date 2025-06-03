@@ -3,25 +3,17 @@
 
 #include "elpekenin/qp/tasks/layer.h"
 
+#include <quantum/compiler_support.h>
+
 #include "elpekenin/layers.h"
 
-#if CM_ENABLED(GLITCH_TEXT)
-#    include "elpekenin/glitch_text.h"
-#else
-#    error Must enable 'elpekenin/glitch_text'
-#endif
+STATIC_ASSERT(CM_ENABLED(GLITCH_TEXT), "Must enable 'elpekenin/glitch_text'");
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
+STATIC_ASSERT(CM_ENABLED(RNG), "Must enable 'elpekenin/rng'");
 
-#if CM_ENABLED(LOGGING)
-#    include "elpekenin/logging.h"
-#else
-#    error Must enable 'elpekenin/logging'
-#endif
-
-#if CM_ENABLED(RNG)
-#    include "elpekenin/rng.h"
-#else
-#    error Must enable 'elpekenin/rng'
-#endif
+#include "elpekenin/glitch_text.h"
+#include "elpekenin/logging.h"
+#include "elpekenin/rng.h"
 
 static struct {
     bool               running;

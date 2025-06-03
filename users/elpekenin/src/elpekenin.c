@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <quantum/color.h>
+#include <quantum/compiler_support.h>
 #include <quantum/process_keycode/process_autocorrect.h>
 #include <quantum/tri_layer.h>
 
-#include "elpekenin/build_info.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging/backend.h"
@@ -14,17 +14,9 @@
 #include "elpekenin/split/transactions.h"
 #include "elpekenin/xap.h"
 
-// compat: otherwise `Option(crash_info_t)` is not defined
-#if CM_ENABLED(CRASH)
-#    include "elpekenin/crash.h"
-#else
-#    error Must enable 'elpekenin/crash'
-#endif
-
-#if CM_ENABLED(LOGGING)
-#    include "elpekenin/logging.h"
-#else
-#    error Must enable 'elpekenin/logging'
+// compat: includes codegen'ed file, which won't exist if feature isn't enabled
+#if IS_ENABLED(BUILD_INFO)
+#    include "elpekenin/build_info.h"
 #endif
 
 // compat: QFF/QGF files have `#include <qp.h>`, which fails if feature is disabled
@@ -36,6 +28,13 @@
 #if IS_ENABLED(RGB_MATRIX)
 #    include <quantum/rgb_matrix/rgb_matrix.h>
 #endif
+
+// compat: otherwise `Option(crash_info_t)` is not defined
+STATIC_ASSERT(CM_ENABLED(CRASH), "Must enable 'elpekenin/crash'");
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
+
+#include "elpekenin/crash.h"
+#include "elpekenin/logging.h"
 
 // clang-format off
 KEYCODE_STRING_NAMES_USER(
@@ -57,7 +56,9 @@ void keyboard_pre_init_user(void) {
     // then, keymap-level setup
     sendchar_init();
 
+#if IS_ENABLED(BUILD_INFO)
     build_info_init();
+#endif
 
     keyboard_pre_init_keymap();
 }

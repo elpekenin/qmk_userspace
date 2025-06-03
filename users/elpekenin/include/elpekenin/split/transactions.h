@@ -12,7 +12,6 @@
 void transactions_init(void);
 
 void reset_ee_slave(void);
-void build_info_sync_keymap_callback(void);
 
 void xap_execute_slave(const void *data);
 

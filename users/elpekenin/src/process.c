@@ -1,6 +1,7 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <quantum/compiler_support.h>
 #include <quantum/keymap_extras/sendstring_spanish.h>
 #include <quantum/process_keycode/process_autocorrect.h>
 #include <quantum/process_keycode/process_rgb_matrix.h>
@@ -15,18 +16,16 @@
 #include "elpekenin/string.h"
 #include "elpekenin/xap.h"
 
-#if CM_ENABLED(LOGGING)
-#    include "elpekenin/logging.h"
-#else
-#    error Must enable 'elpekenin/logging'
-#endif
-
 // compat: function must exist
 #if CM_ENABLED(MEMORY)
 #    include "elpekenin/memory.h"
 #else
 #    define get_flash_size() 0
 #endif
+
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
+
+#include "elpekenin/logging.h"
 
 static struct {
     // dont mind me, just bodging my way in  :)

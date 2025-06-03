@@ -3,21 +3,16 @@
 
 #include "elpekenin/qp/assets.h"
 
+#include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 #include <quantum/util.h>
 #include <sys/cdefs.h>
 
-#if CM_ENABLED(GENERICS)
-#    include "elpekenin/generics.h"
-#else
-#    error Must enable 'elpekenin/generics'
-#endif
+STATIC_ASSERT(CM_ENABLED(GENERICS), "Must enable 'elpekenin/generics'");
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 
-#if CM_ENABLED(LOGGING)
-#    include "elpekenin/logging.h"
-#else
-#    error Must enable 'elpekenin/logging'
-#endif
+#include "elpekenin/generics.h"
+#include "elpekenin/logging.h"
 
 typedef enum {
     EMPTY,

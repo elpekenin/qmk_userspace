@@ -5,9 +5,9 @@
 
 #include <platforms/chibios/drivers/analog.h>
 #include <quantum/color.h>
+#include <quantum/compiler_support.h>
 #include <stdlib.h>
 
-#include "elpekenin/build_info.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/qp/assets.h"
@@ -30,12 +30,6 @@
 #    include "elpekenin/ledmap.h"
 #endif
 
-#if CM_ENABLED(LOGGING)
-#    include "elpekenin/logging.h"
-#else
-#    error Must enable 'elpekenin/logging'
-#endif
-
 #if CM_ENABLED(MICROPYTHON)
 #    include "port/micropython_embed.h"
 #endif
@@ -44,11 +38,11 @@
 #    include "elpekenin/rng.h"
 #endif
 
-#if CM_ENABLED(STRING)
-#    include "elpekenin/string.h"
-#else
-#    error Must enable 'elpekenin/string'
-#endif
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
+STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
+
+#include "elpekenin/logging.h"
+#include "elpekenin/string.h"
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -90,7 +84,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 
 static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused void *cb_arg) {
-    if (!IS_ENABLED(TOUCH_SCREEN) || !IS_DEFINED(RIGHT_HAND)) {
+    if (!IS_ENABLED(TOUCH_SCREEN) || is_keyboard_left()) {
         return 0;
     }
 
@@ -212,18 +206,18 @@ static void configure_qp_tasks(void) {
 }
 
 void keyboard_post_init_keymap(void) {
-    if (IS_ENABLED(QUANTUM_PAINTER) && IS_DEFINED(LEFT_HAND)) {
+    if (IS_ENABLED(QUANTUM_PAINTER) && is_keyboard_left()) {
         qp_set_device_by_name("il91874", il91874);
     }
 
-    if (IS_ENABLED(QUANTUM_PAINTER) && IS_DEFINED(RIGHT_HAND)) {
+    if (IS_ENABLED(QUANTUM_PAINTER) && !is_keyboard_left()) {
         qp_set_device_by_name("ili9163", ili9163);
         qp_set_device_by_name("ili9341", ili9341);
 
         configure_qp_tasks();
     }
 
-    if (IS_ENABLED(TOUCH_SCREEN) && IS_DEFINED(RIGHT_HAND)) {
+    if (IS_ENABLED(TOUCH_SCREEN) && !is_keyboard_left()) {
         defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
     }
 
@@ -231,35 +225,6 @@ void keyboard_post_init_keymap(void) {
 #if CM_ENABLED(RNG) && IS_DEFINED(ANALOG_DRIVER_REQUIRED)
     rng_set_seed(analogReadPin(GP28) * analogReadPin(GP28));
 #endif
-}
-
-void build_info_sync_keymap_callback(void) {
-    if (!IS_DEFINED(LEFT_HAND) || !IS_ENABLED(QUANTUM_PAINTER)) {
-        return;
-    }
-
-    // FIXME: where to put this signature
-    void draw_features(painter_device_t);
-
-    draw_features(il91874);
-
-    // commit
-    painter_font_handle_t font = qp_get_font_by_name("fira_code");
-    if (font == NULL) {
-        logging(LOG_ERROR, "%s: font == NULL", __func__);
-        return;
-    }
-
-    uint16_t width  = qp_get_width(il91874);
-    uint16_t height = qp_get_height(il91874);
-
-    const char *commit     = get_build_info().commit;
-    int16_t     hash_width = qp_textwidth(font, commit);
-
-    uint16_t x = width - hash_width;
-    uint16_t y = height - font->line_height;
-
-    qp_drawtext_recolor(il91874, x, y, font, commit, HSV_RED, HSV_WHITE);
 }
 
 #if CM_ENABLED(LEDMAP)

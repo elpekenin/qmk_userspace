@@ -12,11 +12,9 @@
 
 #include "elpekenin/string.h"
 
-#if CM_ENABLED(GENERICS)
-#    include "elpekenin/generics.h"
-#else
-#    error Must enable 'elpekenin/generics'
-#endif
+STATIC_ASSERT(CM_ENABLED(GENERICS), "Must enable 'elpekenin/generics'");
+
+#include "elpekenin/generics.h"
 
 static bool keylog_dirty = true;
 

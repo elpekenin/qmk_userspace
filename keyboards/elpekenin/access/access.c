@@ -70,7 +70,7 @@ void keyboard_post_init_kb(void) {
         wait_ms(150); // Let screens draw some power
     }
 
-    if (IS_ENABLED(QUANTUM_PAINTER) && IS_DEFINED(LEFT_HAND)) {
+    if (IS_ENABLED(QUANTUM_PAINTER) && is_keyboard_left()) {
         bool ret = true;
 
         // compat: factory function not available
@@ -83,7 +83,7 @@ void keyboard_post_init_kb(void) {
         printf("QP setup: %s\n", ret ? "ok" : "failed");
     }
 
-    if (IS_ENABLED(QUANTUM_PAINTER) && IS_DEFINED(RIGHT_HAND)) {
+    if (IS_ENABLED(QUANTUM_PAINTER) && !is_keyboard_left()) {
         bool ret = true;
 
 #if IS_ENABLED(QUANTUM_PAINTER_ILI9163_SPI)
@@ -103,7 +103,7 @@ void keyboard_post_init_kb(void) {
         printf("QP setup: %s\n", ret ? "ok" : "failed");
     }
 
-    if (IS_ENABLED(TOUCH_SCREEN) && IS_DEFINED(RIGHT_HAND)) {
+    if (IS_ENABLED(TOUCH_SCREEN) && !is_keyboard_left()) {
         bool ret = touch_spi_init(ili9341_touch);
         printf("Touch screen setup: %s\n", ret ? "ok" : "failed");
     }

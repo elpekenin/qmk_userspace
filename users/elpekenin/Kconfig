@@ -21,6 +21,10 @@ config N_SIPO_PINS
 
 endif # sipo
 
+config BUILD_INFO
+    bool "codegen enabled features"
+    default n
+
 rsource "src/logging/Kconfig"
 
 if QUANTUM_PAINTER_ENABLE

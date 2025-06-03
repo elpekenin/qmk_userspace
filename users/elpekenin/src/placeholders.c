@@ -29,5 +29,3 @@ __weak_symbol void suspend_wakeup_init_keymap(void) {}
 __weak_symbol bool rgb_matrix_indicators_advanced_keymap(__unused uint8_t led_min, __unused uint8_t led_max) {
     return true;
 }
-
-__weak_symbol void build_info_sync_keymap_callback(void) {}

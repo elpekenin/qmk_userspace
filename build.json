@@ -52,14 +52,8 @@
         },
         {
             "operation": "exec",
-            "display": "compiling left half",
-            "cmd": "qmk --no-color compile -kb elpekenin/access -km elpekenin -e TARGET=left > left.log 2>&1",
-            "path": "$QMK_HOME"
-        },
-        {
-            "operation": "exec",
-            "display": "compiling right half",
-            "cmd": "qmk --no-color compile -kb elpekenin/access -km elpekenin -e TARGET=right --compiledb > right.log 2>&1",
+            "display": "compiling",
+            "cmd": "qmk --no-color --compiledb compile -kb elpekenin/access -km elpekenin > build.log 2>&1",
             "path": "$QMK_HOME"
         }
     ]

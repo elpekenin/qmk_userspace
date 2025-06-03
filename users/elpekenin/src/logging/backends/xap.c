@@ -1,14 +1,13 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 #include <tmk_core/protocol/usb_descriptor.h>
 
-#if CM_ENABLED(GENERICS)
-#    include "elpekenin/generics.h"
-#else
-#    error Must enable 'elpekenin/generics'
-#endif
+STATIC_ASSERT(CM_ENABLED(GENERICS), "Must enable 'elpekenin/generics'");
+
+#include "elpekenin/generics.h"
 
 #define MAX_PAYLOAD_SIZE (XAP_EPSIZE - sizeof(xap_broadcast_header_t)) // -1 for terminator
 

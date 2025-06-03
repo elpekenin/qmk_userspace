@@ -20,5 +20,3 @@ void suspend_power_down_keymap(void);
 void suspend_wakeup_init_keymap(void);
 
 bool rgb_matrix_indicators_advanced_keymap(uint8_t led_min, uint8_t led_max);
-
-void build_info_sync_keymap_callback(void);

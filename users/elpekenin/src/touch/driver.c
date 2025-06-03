@@ -6,11 +6,9 @@
 
 #include "elpekenin/touch.h"
 
-#if CM_ENABLED(LOGGING)
-#    include "elpekenin/logging.h"
-#else
-#    error Must enable 'elpekenin/logging'
-#endif
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
+
+#include "elpekenin/logging.h"
 
 __weak_symbol bool touch_spi_init(touch_device_t device) {
     touch_driver_t          *driver       = (touch_driver_t *)device;

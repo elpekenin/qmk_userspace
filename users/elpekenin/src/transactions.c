@@ -5,34 +5,19 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/build_info.h"
 #include "elpekenin/logging/backends/split.h"
-#include "elpekenin/signatures.h"
 #include "elpekenin/time.h"
 
-#if CM_ENABLED(LOGGING)
-#    include "elpekenin/logging.h"
-#else
-#    error Must enable 'elpekenin/logging'
-#endif
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 
+#include "elpekenin/logging.h"
+
+// compat: no work to do
 #if !IS_ENABLED(SPLIT_LOG)
-// no work to be done
 #    define SPLIT_LOG_SYNC_DELAY 0
 #endif
 
 // slave-side callbacks
-static void build_info_slave_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
-    if (m2s_size != sizeof(build_info_t)) {
-        logging(LOG_ERROR, "%s size", __func__);
-        return;
-    }
-
-    build_info_t* received_build_info = (build_info_t*)m2s_buffer;
-
-    set_build_info(*received_build_info);
-    build_info_sync_keymap_callback();
-}
 
 static void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != sizeof(bool)) {
@@ -63,17 +48,6 @@ static void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, __unused
     xap_receive_base(m2s_buffer);
 }
 
-// periodic tasks
-static uint32_t build_info_sync_task(__unused uint32_t trigger_time, __unused void* cb_arg) {
-    if (!is_keyboard_master()) {
-        return 0;
-    }
-
-    build_info_t build_info = get_build_info();
-    transaction_rpc_send(RPC_ID_BUILD_INFO, sizeof(build_info_t), &build_info);
-    return SECONDS(30);
-}
-
 static uint32_t slave_log_sync_task(__unused uint32_t trigger_time, __unused void* cb_arg) {
     if (!is_keyboard_master() || !IS_ENABLED(SPLIT_LOG)) {
         return 0;
@@ -102,8 +76,6 @@ void xap_execute_slave(const void* data) {
 
 // register message handlers and kick off tasks
 void transactions_init(void) {
-    transaction_register_rpc(RPC_ID_BUILD_INFO, build_info_slave_callback);
-
     transaction_register_rpc(RPC_ID_USER_SHUTDOWN, user_shutdown_slave_callback);
 
     if (IS_ENABLED(SPLIT_LOG)) {
@@ -115,10 +87,6 @@ void transactions_init(void) {
     if (IS_ENABLED(XAP)) {
         transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
     }
-
-    // wait a bit to prevent drawing on eInk right after flash, also ensures that
-    // initialization has run, making sure `is_keyboard_master` returns correct value
-    defer_exec(SECONDS(5), build_info_sync_task, NULL);
 
     defer_exec(MILLISECONDS(SPLIT_LOG_SYNC_DELAY), slave_log_sync_task, NULL);
 }

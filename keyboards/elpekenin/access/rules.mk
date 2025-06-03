@@ -11,11 +11,3 @@ QUANTUM_PAINTER_DRIVERS += \
     ili9163_spi \
     ili9341_spi \
     surface
-
-ifeq ($(TARGET), left)
-    OPT_DEFS += -DLEFT_HAND
-else ifeq ($(TARGET), right)
-    OPT_DEFS += -DRIGHT_HAND
-else
-    $(error Invalid value for TARGET environment variable)
-endif

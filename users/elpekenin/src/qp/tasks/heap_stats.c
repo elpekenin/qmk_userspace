@@ -3,31 +3,23 @@
 
 #include "elpekenin/qp/tasks/heap_stats.h"
 
+#include <quantum/compiler_support.h>
+
 #include "elpekenin/memory.h"
+
+STATIC_ASSERT(CM_ENABLED(GLITCH_TEXT), "Must enable 'elpekenin/glitch_text'");
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
+STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
+
+#include "elpekenin/glitch_text.h"
+#include "elpekenin/logging.h"
+#include "elpekenin/string.h"
 
 // compat: function must exist
 #if CM_ENABLED(ALLOCATOR)
 #    include "elpekenin/allocator.h"
 #else
 #    define get_used_heap() 0
-#endif
-
-#if CM_ENABLED(GLITCH_TEXT)
-#    include "elpekenin/glitch_text.h"
-#else
-#    error Must enable 'elpekenin/glitch_text'
-#endif
-
-#if CM_ENABLED(LOGGING)
-#    include "elpekenin/logging.h"
-#else
-#    error Must enable 'elpekenin/logging'
-#endif
-
-#if CM_ENABLED(STRING)
-#    include "elpekenin/string.h"
-#else
-#    error Must enable 'elpekenin/string'
 #endif
 
 static struct {

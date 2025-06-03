@@ -7,11 +7,9 @@
 
 #include "elpekenin/xap.h"
 
-#if CM_ENABLED(QP_HELPERS)
-#    include "qp_helpers.h"
-#else
-#    error Must enable 'drashna/qp_helpers'
-#endif
+STATIC_ASSERT(CM_ENABLED(QP_HELPERS), "Must enable 'drashna/qp_helpers'");
+
+#include "qp_helpers.h"
 
 static struct {
     qp_callback_args_t args;

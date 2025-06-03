@@ -5,21 +5,16 @@
 
 #include <errno.h>
 #include <quantum/color.h>
+#include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 
 #include "elpekenin/qp/tasks/common.h"
 
-#if CM_ENABLED(LOGGING)
-#    include "elpekenin/logging.h"
-#else
-#    error Must enable 'elpekenin/logging'
-#endif
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
+STATIC_ASSERT(CM_ENABLED(SCROLLING_TEXT), "Must enable 'elpekenin/scrolling_text'");
 
-#if CM_ENABLED(SCROLLING_TEXT)
-#    include "elpekenin/scrolling_text.h"
-#else
-#    error Must enable 'elpekenin/scrolling_text'
-#endif
+#include "elpekenin/logging.h"
+#include "elpekenin/scrolling_text.h"
 
 static struct {
     char           buff[QP_LOG_N_LINES][QP_LOG_N_CHARS];
