@@ -1,7 +1,9 @@
+# generated files
 exclude: |
   (?x)^(
-    arm_math_m0/src/(.*)
-    |micropython/src/(.*)
+    (.*)qff\.[c,h]
+    |(.*)qgf\.[c,h]
+    |(.*)autocorrect_data\.h
   )$
 
 ci:
