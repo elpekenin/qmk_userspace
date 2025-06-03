@@ -6,10 +6,15 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/build_info.h"
-#include "elpekenin/logging.h"
 #include "elpekenin/logging/backends/split.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/time.h"
+
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
+#endif
 
 #if !IS_ENABLED(SPLIT_LOG)
 // no work to be done

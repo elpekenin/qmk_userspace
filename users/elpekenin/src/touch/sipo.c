@@ -5,9 +5,14 @@
 
 #include <platforms/wait.h>
 
-#include "elpekenin/logging.h"
 #include "elpekenin/spi_custom.h"
 #include "elpekenin/touch.h"
+
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
+#endif
 
 bool touch_spi_init(touch_device_t device) {
     touch_driver_t          *driver       = (touch_driver_t *)device;

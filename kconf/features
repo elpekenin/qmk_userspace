@@ -6,8 +6,18 @@ config ANALOG_DRIVER_REQUIRED
 config AUTOCORRECT_ENABLE
     bool "autocorrect"
 
-config BOOTMAGIC_ENABLE
+menuconfig BOOTMAGIC_ENABLE
     bool "bootmagic"
+
+if BOOTMAGIC_ENABLE
+    config BOOTMAGIC_ROW
+        int "row"
+        default 0
+
+    config BOOTMAGIC_COLUMN
+        int "column"
+        default 0
+endif
 
 config DEBUG_ENABLE
     bool "debug (eg: .map file)"

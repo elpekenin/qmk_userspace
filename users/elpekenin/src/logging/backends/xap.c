@@ -4,10 +4,10 @@
 #include <quantum/quantum.h>
 #include <tmk_core/protocol/usb_descriptor.h>
 
-#if CM_ENABLED(TYPES)
-#    include "elpekenin/types.h"
+#if CM_ENABLED(GENERICS)
+#    include "elpekenin/generics.h"
 #else
-#    error Must enable 'elpekenin/types'
+#    error Must enable 'elpekenin/generics'
 #endif
 
 #define MAX_PAYLOAD_SIZE (XAP_EPSIZE - sizeof(xap_broadcast_header_t)) // -1 for terminator
@@ -35,7 +35,7 @@ int8_t sendchar_xap(uint8_t chr) {
             break;
         }
 
-        xap_buff[i]     = pop.unwrap(pop);
+        xap_buff[i]     = unwrap(pop);
         xap_buff[i + 1] = '\0';
     }
     xap_broadcast(0x00, xap_buff, MAX_PAYLOAD_SIZE);

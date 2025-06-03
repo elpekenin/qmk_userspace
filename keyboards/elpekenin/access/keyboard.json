@@ -3,10 +3,6 @@
     "keyboard_name": "access",
     "maintainer": "elpekenin",
     "bootloader": "rp2040",
-    "bootmagic": {
-        "enabled": true,
-        "matrix": [0, 6]
-    },
     "processor": "RP2040",
     "rgb_matrix": {
         "driver": "ws2812",

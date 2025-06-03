@@ -7,8 +7,17 @@
 #include <quantum/util.h>
 #include <sys/cdefs.h>
 
-#include "elpekenin/logging.h"
-#include "generated/qp_resources.h"
+#if CM_ENABLED(GENERICS)
+#    include "elpekenin/generics.h"
+#else
+#    error Must enable 'elpekenin/generics'
+#endif
+
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
+#endif
 
 typedef enum {
     EMPTY,
@@ -17,7 +26,7 @@ typedef enum {
     IMAGE,
 } asset_kind_t;
 
-const char *asset_names[] = {
+static const char *asset_names[] = {
     [EMPTY]  = "empty",
     [DEVICE] = "device",
     [FONT]   = "font",
@@ -45,8 +54,12 @@ static asset_t assets[QP_ASSETS_SIZE] = {
         },
 };
 
+static inline size_t total_count(void) {
+    return count.devices + count.fonts + count.images;
+}
+
 static void set(asset_kind_t kind, const char *name, const void *ptr) {
-    const size_t n = count.devices + count.fonts + count.images;
+    const size_t n = total_count();
     if (n >= QP_ASSETS_SIZE) {
         logging(LOG_ERROR, "%s: too many assets", __func__);
         return;
@@ -79,44 +92,49 @@ static void set(asset_kind_t kind, const char *name, const void *ptr) {
     }
 }
 
-// (FONT, 3) is not 3rd element in pool, but the third *font* in pool
+// NOTE: get_by_index(FONT, 3) is not 3rd element in pool, but the third *font* in pool
 static const void *get_by_index(asset_kind_t kind, size_t index) {
-    const size_t n = count.devices + count.fonts + count.images;
+    const char *const type = asset_names[kind];
 
     size_t counter = 0;
-    for (size_t i = 0; i < n; ++i) {
-        asset_t asset = assets[i];
 
+    bool filter(asset_t asset) {
         if (asset.kind == kind) {
             if (counter == index) {
-                const char *asset_name = asset_names[kind];
-                logging(LOG_DEBUG, "Read %s with index %d: (%p)", asset_name, n, asset.ptr);
-
-                return asset.ptr;
+                return true;
             }
 
             counter += 1;
         }
+
+        return false;
     }
 
-    return NULL;
+    const asset_t *const asset = find(assets, total_count(), filter);
+    if (asset == NULL) {
+        logging(LOG_ERROR, "(%s, %d): not found", type, index);
+        return NULL;
+    }
+
+    logging(LOG_DEBUG, "(%s, %d): %p", type, index, asset->ptr);
+    return asset->ptr;
 }
 
 static const void *get_by_name(asset_kind_t kind, const char *name) {
-    const size_t n = count.devices + count.fonts + count.images;
+    const char *const type = asset_names[kind];
 
-    for (size_t i = 0; i < n; ++i) {
-        asset_t asset = assets[i];
-
-        if (asset.kind == kind && asset.name != NULL && strcmp(asset.name, name) == 0) {
-            const char *asset_name = asset_names[kind];
-            logging(LOG_DEBUG, "Read %s '%s': %p", asset_name, name, asset.ptr);
-
-            return asset.ptr;
-        }
+    bool filter(asset_t asset) {
+        return asset.kind == kind && asset.name != NULL && strcmp(asset.name, name) == 0;
     }
 
-    return NULL;
+    const asset_t *const asset = find(assets, total_count(), filter);
+    if (asset == NULL) {
+        logging(LOG_ERROR, "(%s, '%s'): not found", type, name);
+        return NULL;
+    }
+
+    logging(LOG_DEBUG, "(%s, '%s'): %p", type, name, asset->ptr);
+    return asset->ptr;
 }
 
 //

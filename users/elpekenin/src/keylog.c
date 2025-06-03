@@ -12,10 +12,10 @@
 
 #include "elpekenin/string.h"
 
-#if CM_ENABLED(TYPES)
-#    include "elpekenin/types.h"
+#if CM_ENABLED(GENERICS)
+#    include "elpekenin/generics.h"
 #else
-#    error Must enable 'elpekenin/types'
+#    error Must enable 'elpekenin/generics'
 #endif
 
 static bool keylog_dirty = true;
@@ -94,32 +94,32 @@ static const replacements_t replacements[] = {
 };
 // clang-format on
 
+static const char *prefixes[] = {"KC_", "RGB_", "QK_", "ES_", "TD_", "TL_"};
+
 static void skip_prefix(const char **str) {
-    char *prefixes[] = {"KC_", "RGB_", "QK_", "ES_", "TD_", "TL_"};
+    bool filter(const char *prefix) {
+        return strcmp(*str, prefix) == 0;
+    }
 
-    for (size_t i = 0; i < ARRAY_SIZE(prefixes); ++i) {
-        char  *prefix = prefixes[i];
-        size_t len    = strlen(prefix);
-
-        if (strncmp(prefix, *str, len) == 0) {
-            *str += len;
-            return;
-        }
+    const char *const *const prefix = find_array(prefixes, filter);
+    if (prefix != NULL) {
+        *str += strlen(*prefix);
     }
 }
 
 OptionImpl(replacements_t);
 
 static Option(replacements_t) find_replacement(const char *str) {
-    for (size_t i = 0; i < ARRAY_SIZE(replacements); ++i) {
-        const replacements_t replacement = replacements[i];
-
-        if (strcmp(replacement.raw, str) == 0) {
-            return Some(replacements_t, replacement);
-        }
+    bool filter(replacements_t replacement) {
+        return strcmp(replacement.raw, str) == 0;
     }
 
-    return None(replacements_t);
+    const replacements_t *const replacement = find_array(replacements, filter);
+    if (replacement == NULL) {
+        return None(replacements_t);
+    }
+
+    return Some(replacements_t, *replacement);
 }
 
 static void maybe_symbol(const char **str) {
@@ -128,7 +128,7 @@ static void maybe_symbol(const char **str) {
         return;
     }
 
-    replacements_t replacement = maybe_replacement.unwrap(maybe_replacement);
+    replacements_t replacement = unwrap(maybe_replacement);
 
     const char *target = NULL;
     switch (get_mods()) {

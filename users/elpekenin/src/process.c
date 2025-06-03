@@ -9,7 +9,6 @@
 #include "elpekenin/autoconf_rt.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/keylog.h"
-#include "elpekenin/logging.h"
 #include "elpekenin/logging/backends/qp.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/split/transactions.h"

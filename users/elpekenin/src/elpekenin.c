@@ -8,19 +8,24 @@
 #include "elpekenin/build_info.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
-#include "elpekenin/logging.h"
 #include "elpekenin/logging/backend.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/split/transactions.h"
 #include "elpekenin/xap.h"
 
-// compat: otherwise `Option()` is not defined
-#if !defined(COMMUNITY_MODULE_CRASH_ENABLE)
-#    error 'elpekenin/crash' must be enabled
+// compat: otherwise `Option(crash_info_t)` is not defined
+#if CM_ENABLED(CRASH)
+#    include "elpekenin/crash.h"
+#else
+#    error Must enable 'elpekenin/crash'
 #endif
 
-#include "elpekenin/crash.h"
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
+#endif
 
 // compat: QFF/QGF files have `#include <qp.h>`, which fails if feature is disabled
 #if IS_ENABLED(QUANTUM_PAINTER)
@@ -66,7 +71,7 @@ void keyboard_post_init_user(void) {
         Option(crash_info_t) maybe_crash = get_crash();
 
         if (maybe_crash.is_some) {
-            crash_info_t crash = maybe_crash.unwrap(maybe_crash);
+            crash_info_t crash = unwrap(maybe_crash);
 
             logging(LOG_WARN, "%s", crash.msg);
             for (size_t i = 0; i < crash.stack_depth; ++i) {

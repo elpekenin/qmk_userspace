@@ -332,14 +332,16 @@ bool xap_execute_draw_scrolling_text(xap_token_t token, xap_route_user_quantum_p
             .x       = arg->x,
             .y       = arg->y,
             .font    = font,
-            .str     = (char *)arg->text,
             .n_chars = arg->n_chars,
             .delay   = arg->delay,
             .spaces  = 5,
             .bg      = {HSV_BLACK},
             .fg      = {HSV_WHITE},
+#if SCROLLING_TEXT_USE_ALLOCATOR
+            .allocator = c_runtime_allocator,
+#endif
         };
-        deferred_token def_token = scrolling_text_start(&config);
+        deferred_token def_token = scrolling_text_start(&config, (char *)arg->text);
 
         xap_send(token, XAP_RESPONSE_FLAG_SUCCESS, (const void *)&def_token, sizeof(def_token));
     }

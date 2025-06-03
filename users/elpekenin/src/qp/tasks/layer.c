@@ -11,6 +11,12 @@
 #    error Must enable 'elpekenin/glitch_text'
 #endif
 
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
+#endif
+
 #if CM_ENABLED(RNG)
 #    include "elpekenin/rng.h"
 #else
@@ -20,7 +26,12 @@
 static struct {
     bool               running;
     qp_callback_args_t args;
-} layer = {0};
+    uint8_t            last;
+} layer = {
+    .running = false,
+    .args    = {0},
+    .last    = UINT8_MAX,
+};
 
 static void draw_layer(const char *text, bool last_frame) {
     // FIXME:
@@ -48,23 +59,25 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
 
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
-    static uint8_t last_layer    = UINT8_MAX;
-    const uint8_t  current_layer = get_highest_layer(layer_state | default_layer_state);
+    const uint8_t current_layer = get_highest_layer(layer_state | default_layer_state);
 
-    if (args->device == NULL || args->font == NULL || last_layer == current_layer || layer.running) {
+    if (args->device == NULL || args->font == NULL || layer.last == current_layer || layer.running) {
         return MILLISECONDS(QP_TASK_LAYER_REDRAW_INTERVAL);
     }
 
-    last_layer    = current_layer;
-    layer.running = true;
-
     // start the animation
     const glitch_text_config_t config = {
-        .str      = get_layer_name(current_layer),
         .callback = draw_layer,
         .delay    = 30,
     };
-    glitch_text_start(&config);
+
+    const int ret = glitch_text_start(&config, get_layer_name(current_layer));
+    if (ret < 0) {
+        logging(LOG_ERROR, "%s: Could not initialize glitch text", __func__);
+    }
+
+    layer.last    = current_layer;
+    layer.running = true;
 
     return MILLISECONDS(QP_TASK_LAYER_REDRAW_INTERVAL);
 }

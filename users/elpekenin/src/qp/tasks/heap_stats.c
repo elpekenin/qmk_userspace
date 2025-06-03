@@ -18,6 +18,12 @@
 #    error Must enable 'elpekenin/glitch_text'
 #endif
 
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
+#endif
+
 #if CM_ENABLED(STRING)
 #    include "elpekenin/string.h"
 #else
@@ -27,6 +33,7 @@
 static struct {
     qp_callback_args_t args;
     bool               running;
+    size_t             last;
 } heap_stats = {0};
 
 static void draw_heap(const char *text, __unused bool last_frame) {
@@ -37,10 +44,13 @@ static void draw_heap(const char *text, __unused bool last_frame) {
         return;
     }
 
-    // heading space to align the ":" with flash
-    int16_t width = qp_drawtext(arg->device, arg->x, arg->y, arg->font, " Heap: ");
+    string_t str = str_new(30);
+    str_printf(&str, " Heap: %s", text); // heading space to align the ":" with "Flash:"
+    qp_drawtext(arg->device, arg->x, arg->y + arg->font->line_height + 2, arg->font, str.ptr);
 
-    qp_drawtext(arg->device, arg->x + width, arg->y, arg->font, text);
+    if (last_frame) {
+        heap_stats.running = false;
+    }
 }
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
@@ -50,24 +60,20 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
 
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
-    static size_t last_used = 0;
-    const size_t  used_heap = get_used_heap();
+    const size_t used_heap = get_used_heap();
 
-    if (args->device == NULL || args->font == NULL || last_used == used_heap || heap_stats.running) {
+    if (args->device == NULL || args->font == NULL || heap_stats.last == used_heap || heap_stats.running) {
         return MILLISECONDS(QP_TASK_HEAP_STATS_REDRAW_INTERVAL);
     }
 
-    last_used          = used_heap;
-    heap_stats.running = true;
-
     // on first go, draw the consumed flash
-    string_t str = str_new(100);
+    string_t str = str_new(50);
 
     str_append(&str, "Flash: ");
     pretty_bytes(&str, get_used_flash());
     str_append(&str, "/");
     pretty_bytes(&str, get_flash_size());
-    qp_drawtext(args->device, args->x, args->y - args->font->line_height + 2, args->font, str.ptr);
+    qp_drawtext(args->device, args->x, args->y, args->font, str.ptr);
 
     // reset buffer
     str_reset(&str);
@@ -77,11 +83,17 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     pretty_bytes(&str, get_heap_size());
 
     const glitch_text_config_t config = {
-        .str      = str.ptr,
         .callback = draw_heap,
         .delay    = 30,
     };
-    glitch_text_start(&config);
+
+    const int ret = glitch_text_start(&config, str.ptr);
+    if (ret < 0) {
+        logging(LOG_ERROR, "%s: Could not initialize glitch text", __func__);
+    }
+
+    heap_stats.last    = used_heap;
+    heap_stats.running = true;
 
     return MILLISECONDS(QP_TASK_HEAP_STATS_REDRAW_INTERVAL);
 }

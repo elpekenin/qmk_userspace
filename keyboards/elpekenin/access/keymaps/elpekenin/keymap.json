@@ -1,12 +1,13 @@
 {
     "modules": [
         /* standalone */
+        "elpekenin/allocator",
         "elpekenin/crash",
+        "elpekenin/generics",
         "elpekenin/logging",
         "elpekenin/memory",
         "elpekenin/rng",
         "elpekenin/string",
-        "elpekenin/types",
         "elpekenin/version",
 
         /* RGB Matrix */

@@ -10,7 +10,6 @@
 #include "elpekenin/build_info.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
-#include "elpekenin/logging.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/qp/tasks/computer_stats.h"
 #include "elpekenin/qp/tasks/github_notifications.h"
@@ -29,6 +28,12 @@
 
 #if CM_ENABLED(LEDMAP)
 #    include "elpekenin/ledmap.h"
+#endif
+
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
 #endif
 
 #if CM_ENABLED(MICROPYTHON)
@@ -154,6 +159,7 @@ static void configure_qp_tasks(void) {
         };
     }
 
+    // note: draws 2 lines
     qp_callback_args_t *heap_stats = get_heap_stats_args();
     if (heap_stats != NULL) {
         *heap_stats = (qp_callback_args_t){
@@ -200,7 +206,7 @@ static void configure_qp_tasks(void) {
             .device = ili9341,
             .font   = font,
             .x      = (ILI9341_WIDTH / 2) - offset,
-            .y      = start_y,
+            .y      = 0,
         };
     }
 }

@@ -3,8 +3,13 @@
 
 #include <quantum/quantum.h>
 
-#include "elpekenin/logging.h"
 #include "elpekenin/signatures.h"
+
+#if CM_ENABLED(LOGGING)
+#    include "elpekenin/logging.h"
+#else
+#    error Must enable 'elpekenin/logging'
+#endif
 
 static bool suspend_changed     = true;
 static bool suspend_debug_state = true;

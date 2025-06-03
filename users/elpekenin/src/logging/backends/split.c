@@ -7,10 +7,10 @@
 #include <quantum/split_common/transactions.h>
 #include <quantum/util.h>
 
-#if CM_ENABLED(TYPES)
-#    include "elpekenin/types.h"
+#if CM_ENABLED(GENERICS)
+#    include "elpekenin/generics.h"
 #else
-#    error Must enable 'elpekenin/types'
+#    error Must enable 'elpekenin/generics'
 #endif
 
 typedef struct PACKED {
@@ -57,7 +57,7 @@ void user_logging_slave_callback(__unused uint8_t m2s_size, __unused const void*
             break;
         }
 
-        const char chr = pop.unwrap(pop);
+        const char chr = unwrap(pop);
         if (chr == '\n') {
             data.header.flush = true;
         }
@@ -101,7 +101,7 @@ uint32_t user_logging_master_poll(void) {
                 break;
             }
 
-            buff[i]     = pop.unwrap(pop);
+            buff[i]     = unwrap(pop);
             buff[i + 1] = '\0';
         }
 

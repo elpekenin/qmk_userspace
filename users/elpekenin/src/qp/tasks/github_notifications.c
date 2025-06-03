@@ -23,6 +23,7 @@ static const char *as_text(uint8_t value) {
 
         default:
             text[0] = '!';
+            break;
     }
 
     return text;

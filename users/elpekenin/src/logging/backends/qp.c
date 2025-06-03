@@ -130,14 +130,16 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
             .x       = args->x,
             .y       = y,
             .font    = args->font,
-            .str     = line,
             .n_chars = args->scrolling_args.n_chars,
             .delay   = args->scrolling_args.delay,
             .spaces  = 5,
             .fg      = fg,
             .bg      = bg,
+#if SCROLLING_TEXT_USE_ALLOCATOR
+            .allocator = c_runtime_allocator,
+#endif
         };
 
-        qp_log.tokens[i] = scrolling_text_start(&config);
+        qp_log.tokens[i] = scrolling_text_start(&config, line);
     }
 }
