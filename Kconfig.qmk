@@ -1,0 +1,178 @@
+menu "QMK"
+
+config DYNAMIC_KEYMAP_LAYER_COUNT
+    int "dynamic keymap layers"
+
+config EECONFIG_USER_DATA_SIZE
+    int "user eeprom size"
+    default 0
+
+config HOLD_ON_OTHER_KEY_PRESS
+    bool "hold on other key press"
+
+choice
+    prompt "layer bitmask size"
+
+    config LAYER_STATE_8BIT
+        bool "8 bits"
+
+    config LAYER_STATE_16BIT
+        bool "16 bits"
+
+    config LAYER_STATE_32BIT
+        bool "32 bits"
+endchoice
+
+config TAPPING_TERM
+    int "tapping term (ms)"
+
+config ANALOG_DRIVER_REQUIRED
+    bool "analog input"
+
+config AUTOCORRECT_ENABLE
+    bool "autocorrect"
+
+menuconfig BOOTMAGIC_ENABLE
+    bool "bootmagic"
+
+if BOOTMAGIC_ENABLE
+    config BOOTMAGIC_ROW
+        int "row"
+        default 0
+
+    config BOOTMAGIC_COLUMN
+        int "column"
+        default 0
+endif
+
+config DEBUG_ENABLE
+    bool "debug (eg: .map file)"
+
+config CONSOLE_ENABLE
+    bool "console"
+
+menuconfig DEFERRED_EXEC_ENABLE
+    bool "deferred execution"
+
+if DEFERRED_EXEC_ENABLE
+    config MAX_DEFERRED_EXECUTORS
+        int "executors"
+endif
+
+config EXTRAKEY_ENABLE
+    bool "extrakey"
+
+config KEY_OVERRIDE_ENABLE
+    bool "key override"
+
+config KEYCODE_STRING_ENABLE
+    bool "keycode string"
+
+menuconfig QUANTUM_PAINTER_ENABLE
+    bool "quantum painter"
+
+if QUANTUM_PAINTER_ENABLE
+    config QUANTUM_PAINTER_DEBUG
+        bool "debug"
+
+    config QUANTUM_PAINTER_DISPLAY_TIMEOUT
+        int "display timeout (ms)"
+
+    config QUANTUM_PAINTER_NUM_FONTS
+        int "maximum fonts"
+
+    config QUANTUM_PAINTER_NUM_IMAGES
+        int "maximum images"
+
+    config QUANTUM_PAINTER_SUPPORTS_NATIVE_COLORS
+        bool "support native colors"
+endif
+
+menuconfig RGB_MATRIX_ENABLE
+    bool "rgb"
+
+if RGB_MATRIX_ENABLE
+    config RGB_MATRIX_DEFAULT_VAL
+        int "default val"
+        range 0 255
+
+    config RGB_MATRIX_MAXIMUM_BRIGHTNESS
+        int "maximum brightness"
+        range 0 255
+
+    menu "effects"
+        rsource "Kconfig.rgb_effects"
+    endmenu
+endif
+
+menuconfig SPLIT_KEYBOARD
+    bool "split"
+
+if SPLIT_KEYBOARD
+    config RPC_M2S_BUFFER_SIZE
+        int "master to slave buffer size"
+        default 80
+
+    config RPC_S2M_BUFFER_SIZE
+        int "slave to master buffer size"
+        default RPC_M2S_BUFFER_SIZE
+
+    config SPLIT_ACTIVITY_ENABLE
+        bool "sync last activity timestamps"
+
+    config SPLIT_HAPTIC_ENABLE
+        bool "trigger haptic feedback on slave side"
+        depends on HAPTIC_ENABLE
+
+    menuconfig SPLIT_WATCHDOG_ENABLE
+        bool "watchdog"
+
+    if SPLIT_WATCHDOG_ENABLE
+        config SPLIT_WATCHDOG_TIMEOUT
+            int "timeout"
+            default 3000
+    endif
+
+    menu "sync"
+        config SPLIT_LAYER_STATE_ENABLE
+            bool "layer state"
+
+        config SPLIT_LED_STATE_ENABLE
+            bool "host led status"
+
+        config SPLIT_MODS_ENABLE
+            bool "modifiers state"
+
+        config SPLIT_OLED_ENABLE
+            bool "oled on/off state"
+            depends on OLED_ENABLE
+
+        config SPLIT_POINTING_ENABLE
+            bool "pointing device from slave side"
+            depends on POINTING_DEVICE_ENABLE
+
+        config SPLIT_TRANSPORT_MIRROR
+            bool "master side matrix"
+
+        config SPLIT_WPM_ENABLE
+            bool "wpm"
+            depends on WPM_ENABLE
+    endmenu
+endif
+
+config TAP_DANCE_ENABLE
+    bool "tap dance"
+
+config TRI_LAYER_ENABLE
+    bool "tri layer"
+
+config UART_DRIVER_REQUIRED
+    bool "uart"
+
+config WPM_ENABLE
+    bool "wpm"
+
+config XAP_ENABLE
+    bool "xap"
+
+endmenu

@@ -23,10 +23,9 @@ const char *get_layer_name(layer_names_t layer) {
 
         case RST:
             return "  UTILS ";
-
-        default:
-            return "????????";
     }
+
+    __unreachable();
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {

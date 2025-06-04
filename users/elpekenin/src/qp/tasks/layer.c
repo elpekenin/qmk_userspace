@@ -61,11 +61,15 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     const glitch_text_config_t config = {
         .callback = draw_layer,
         .delay    = 30,
+#if GLITCH_TEXT_USE_ALLOCATOR
+        .allocator = c_runtime_allocator,
+#endif
     };
 
     const int ret = glitch_text_start(&config, get_layer_name(current_layer));
     if (ret < 0) {
         logging(LOG_ERROR, "%s: Could not initialize glitch text", __func__);
+        return MILLISECONDS(QP_TASK_LAYER_REDRAW_INTERVAL);
     }
 
     layer.last    = current_layer;

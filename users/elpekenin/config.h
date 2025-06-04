@@ -5,12 +5,28 @@
 
 #include "elpekenin/kconfig.h"
 
+//
 // logging
+//
+
 #undef PRINTF_SUPPORT_DECIMAL_SPECIFIERS
 #define PRINTF_SUPPORT_DECIMAL_SPECIFIERS 1
 
+//
 // RGB
+//
+
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_CYCLE_LEFT_RIGHT
 
+//
 // split
-#define SPLIT_TRANSACTION_IDS_USER RPC_ID_USER_SHUTDOWN, RPC_ID_USER_LOGGING, RPC_ID_USER_EE_CLR, RPC_ID_XAP
+//
+
+// clang-format off
+#define SPLIT_TRANSACTION_IDS_USER \
+    RPC_ID_USER_SHUTDOWN, \
+    RPC_ID_USER_LOGGING, \
+    RPC_ID_USER_EEPROM_CLEAR, \
+    RPC_ID_USER_XAP, \
+    RPC_ID_USER_BUILD_ID
+// clang-format on

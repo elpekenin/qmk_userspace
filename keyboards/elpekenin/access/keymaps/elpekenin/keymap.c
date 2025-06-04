@@ -8,6 +8,7 @@
 #include <quantum/compiler_support.h>
 #include <stdlib.h>
 
+#include "elpekenin/autoconf_rt.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/qp/assets.h"
@@ -52,7 +53,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_ESC,   KC_1,     KC_2,     KC_3,     KC_4,     KC_5,          KC_6,     KC_7,     KC_8,     KC_9,     KC_0,     KC_BSPC,
         KC_TAB,   KC_Q,     KC_W,     KC_E,     KC_R,     KC_T,          KC_Y,     KC_U,     KC_I,     KC_O,     KC_P,     ES_PLUS,
         XXXXXXX,  KC_A,     KC_S,     KC_D,     KC_F,     KC_G,          KC_H,     KC_J,     KC_K,     KC_L,     TD_NTIL,  XXXXXXX,
-        KC_LSFT,  TD_Z,     KC_X,     KC_C,     KC_V,     KC_B,          KC_N,     KC_M,     KC_COMM,  KC_DOT,   KC_MINS,  ES_GRV,
+        KC_LSFT,  TD_Z,     KC_X,     KC_C,     KC_V,     KC_B,          KC_N,     KC_M,     KC_COMM,  ES_DOT,   ES_MINS,  ES_GRV,
         KC_LCTL,  KC_LGUI,  KC_LALT,  TL_UPPR,      TD_SPC,                    KC_ENT,       TL_LOWR,  XXXXXXX,  XXXXXXX,  KC_VOLU
     ),
 
@@ -114,6 +115,61 @@ static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused voi
     return MILLISECONDS(100);
 }
 
+static void render_autoconf(void) {
+    painter_font_handle_t font = qp_get_font_by_name("fira_code");
+    if (font == NULL) {
+        logging(LOG_ERROR, "%s: font == NULL", __func__);
+        return;
+    }
+
+    struct {
+        bool     shifted;
+        uint16_t x;
+        uint16_t y;
+    } pos = {0};
+
+    string_t str = str_new(30);
+
+    const autoconf_setting_t *settings = get_autoconf_settings();
+    for (size_t i = 0; i < autoconf_settings_count(); ++i) {
+        autoconf_setting_t setting = settings[i];
+
+        // most likely a 'enable' flag, skip it
+        if (setting.value.type == AUTOCONF_INT && setting.value.integer == 1) {
+            continue;
+        }
+
+        str_printf(&str, "%.*s=", 20, setting.name);
+
+        switch (setting.value.type) {
+            case AUTOCONF_INT:
+                str_printf(&str, "%d", setting.value.integer);
+                break;
+
+            case AUTOCONF_STRING:
+                str_append(&str, setting.value.string);
+                break;
+        }
+
+        qp_drawtext_recolor(il91874, pos.x, pos.y, font, str.ptr, HSV_BLACK, HSV_WHITE);
+        str_reset(&str);
+
+        pos.y += font->line_height;
+
+        if (pos.y >= qp_get_height(il91874)) {
+            if (pos.shifted) {
+                logging(LOG_ERROR, "No space left in screen");
+                return;
+            }
+
+            pos.x = qp_get_width(il91874) / 2;
+            pos.y = 0;
+
+            pos.shifted = true;
+        }
+    }
+}
+
 static void configure_qp_tasks(void) {
     painter_font_handle_t font = qp_get_font_by_name("fira_code");
     if (font == NULL) {
@@ -121,18 +177,26 @@ static void configure_qp_tasks(void) {
         return;
     }
 
-    const uint16_t x_coord = 10;
-    const uint16_t start_y = 10;
     const uint16_t spacing = font->line_height + 1;
 
+    struct {
+        uint16_t x;
+        uint16_t y;
+    } pos = {
+        .x = 10,
+        .y = 10,
+    };
+
     qp_callback_args_t *keylog = get_keylog_args();
-    if (keylog != NULL) {
+    if (IS_ENABLED(KEYLOG) && keylog != NULL) {
         *keylog = (qp_callback_args_t){
             .device = ili9341,
             .font   = font,
-            .x      = x_coord,
-            .y      = start_y,
+            .x      = pos.x,
+            .y      = pos.y,
         };
+
+        pos.y += spacing;
     }
 
     qp_callback_args_t *uptime = get_uptime_args();
@@ -140,9 +204,11 @@ static void configure_qp_tasks(void) {
         *uptime = (qp_callback_args_t){
             .device = ili9341,
             .font   = font,
-            .x      = x_coord,
-            .y      = start_y + spacing,
+            .x      = pos.x,
+            .y      = pos.y,
         };
+
+        pos.y += spacing;
     }
 
     qp_callback_args_t *layer = get_layer_args();
@@ -150,20 +216,39 @@ static void configure_qp_tasks(void) {
         *layer = (qp_callback_args_t){
             .device = ili9341,
             .font   = font,
-            .x      = x_coord,
-            .y      = start_y + (2 * spacing),
+            .x      = pos.x,
+            .y      = pos.y,
         };
+
+        pos.y += spacing;
     }
 
-    // note: draws 2 lines
     qp_callback_args_t *heap_stats = get_heap_stats_args();
     if (heap_stats != NULL) {
         *heap_stats = (qp_callback_args_t){
             .device = ili9341,
             .font   = font,
-            .x      = x_coord,
-            .y      = start_y + (3 * spacing),
+            .x      = pos.x,
+            .y      = pos.y,
         };
+
+        // NOTE: draws 2 lines, flash & heap
+        pos.y += 2 * spacing;
+    }
+
+    qp_callback_args_t *computer_stats = get_computer_stats_args();
+    if (computer_stats != NULL) {
+        const uint16_t graph_size = 130;
+
+        *computer_stats = (qp_callback_args_t){
+            .device = ili9341,
+            .font   = font,
+            .x      = pos.x,
+            .y      = pos.y,
+            .extra  = (void *)(uintptr_t)graph_size,
+        };
+
+        pos.y += graph_size;
     }
 
     qp_callback_args_t *logging = get_logging_args();
@@ -172,24 +257,12 @@ static void configure_qp_tasks(void) {
             .device = ili9341,
             .font   = font,
             .x      = ILI9341_WIDTH / 2,
-            .y      = start_y,
+            .y      = spacing,
             .scrolling_args =
                 {
                     .delay   = MILLISECONDS(500),
                     .n_chars = 18, // FIXME: compute at runtime
                 },
-        };
-    }
-
-    const uint16_t      graph_size     = 130;
-    qp_callback_args_t *computer_stats = get_computer_stats_args();
-    if (computer_stats != NULL) {
-        *computer_stats = (qp_callback_args_t){
-            .device = ili9341,
-            .font   = font,
-            .x      = x_coord,
-            .y      = start_y + (4 * spacing),
-            .extra  = (void *)(uintptr_t)graph_size,
         };
     }
 
@@ -210,6 +283,8 @@ static void configure_qp_tasks(void) {
 void keyboard_post_init_keymap(void) {
     if (IS_ENABLED(QUANTUM_PAINTER) && is_keyboard_left()) {
         qp_set_device_by_name("il91874", il91874);
+
+        render_autoconf();
     }
 
     if (IS_ENABLED(QUANTUM_PAINTER) && !is_keyboard_left()) {

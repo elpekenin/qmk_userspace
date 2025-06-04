@@ -26,7 +26,11 @@ static struct {
     qp_callback_args_t args;
     bool               running;
     size_t             last;
-} heap_stats = {0};
+} heap_stats = {
+    .args    = {0},
+    .running = false,
+    .last    = SIZE_MAX,
+};
 
 static void draw_heap(const char *text, __unused bool last_frame) {
     // FIXME:
@@ -46,19 +50,13 @@ static void draw_heap(const char *text, __unused bool last_frame) {
 }
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
-    if (!CM_ENABLED(ALLOCATOR)) {
-        return 0;
-    }
-
     qp_callback_args_t *args = (qp_callback_args_t *)cb_arg;
 
-    const size_t used_heap = get_used_heap();
-
-    if (args->device == NULL || args->font == NULL || heap_stats.last == used_heap || heap_stats.running) {
+    if (args->device == NULL || args->font == NULL) {
         return MILLISECONDS(QP_TASK_HEAP_STATS_REDRAW_INTERVAL);
     }
 
-    // on first go, draw the consumed flash
+    // flash usage
     string_t str = str_new(50);
 
     str_append(&str, "Flash: ");
@@ -66,6 +64,15 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     str_append(&str, "/");
     pretty_bytes(&str, get_flash_size());
     qp_drawtext(args->device, args->x, args->y, args->font, str.ptr);
+
+    if (!CM_ENABLED(ALLOCATOR)) {
+        return 0;
+    }
+
+    const size_t used_heap = get_used_heap();
+    if (heap_stats.last == used_heap || heap_stats.running) {
+        return MILLISECONDS(QP_TASK_HEAP_STATS_REDRAW_INTERVAL);
+    }
 
     // reset buffer
     str_reset(&str);
@@ -77,11 +84,15 @@ static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
     const glitch_text_config_t config = {
         .callback = draw_heap,
         .delay    = 30,
+#if GLITCH_TEXT_USE_ALLOCATOR
+        .allocator = c_runtime_allocator,
+#endif
     };
 
     const int ret = glitch_text_start(&config, str.ptr);
     if (ret < 0) {
         logging(LOG_ERROR, "%s: Could not initialize glitch text", __func__);
+        return MILLISECONDS(QP_TASK_HEAP_STATS_REDRAW_INTERVAL);
     }
 
     heap_stats.last    = used_heap;

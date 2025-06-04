@@ -16,23 +16,27 @@ STATIC_ASSERT(CM_ENABLED(SCROLLING_TEXT), "Must enable 'elpekenin/scrolling_text
 #include "elpekenin/logging.h"
 #include "elpekenin/scrolling_text.h"
 
+typedef struct {
+    char          *ptr;
+    log_level_t    level;
+    deferred_token token;
+} log_line_t;
+
 static struct {
-    char           buff[QP_LOG_N_LINES][QP_LOG_N_CHARS];
-    size_t         col;
-    char          *pointers[QP_LOG_N_LINES];
-    deferred_token tokens[QP_LOG_N_LINES];
-    bool           redraw;
-    log_level_t    levels[QP_LOG_N_LINES];
+    char       buff[QP_LOG_N_LINES][QP_LOG_N_CHARS];
+    size_t     col;
+    bool       redraw;
+    log_line_t lines[QP_LOG_N_LINES];
 } qp_log = {0};
 
 void sendchar_qp_init(void) {
     for (size_t i = 0; i < QP_LOG_N_LINES; ++i) {
-        qp_log.pointers[i] = qp_log.buff[i];
+        qp_log.lines[i].ptr = qp_log.buff[i];
     }
 }
 
 int8_t sendchar_qp(uint8_t chr) {
-    const size_t last_index = QP_LOG_N_LINES - 1;
+    log_line_t *const last_line = &qp_log.lines[QP_LOG_N_LINES - 1];
 
     // no-op, always appending a terminator upon writing a char
     if (chr == '\0') {
@@ -41,15 +45,18 @@ int8_t sendchar_qp(uint8_t chr) {
 
     // newline, move everything 1 line upwards
     if (chr == '\n') {
-        char *const temp = qp_log.pointers[0];
+        log_line_t overwritten = qp_log.lines[0];
+        scrolling_text_stop(overwritten.token);
 
-        memmove(qp_log.pointers, qp_log.pointers + 1, sizeof(char *) * (QP_LOG_N_LINES - 1));
-        qp_log.col                     = 0;
-        qp_log.pointers[last_index]    = temp;
-        qp_log.pointers[last_index][0] = '\0';
+        memmove(qp_log.lines, qp_log.lines + 1, sizeof(log_line_t) * (QP_LOG_N_LINES - 1));
 
-        memmove(qp_log.levels, qp_log.levels + 1, sizeof(log_level_t) * (QP_LOG_N_LINES - 1));
-        qp_log.levels[last_index] = LOG_NONE;
+        qp_log.col = 0;
+        *last_line = (log_line_t){
+            .ptr   = overwritten.ptr,
+            .level = LOG_NONE,
+            .token = INVALID_DEFERRED_TOKEN,
+        };
+        *last_line->ptr = '\0';
 
         qp_log.redraw = true;
         return 0;
@@ -61,11 +68,10 @@ int8_t sendchar_qp(uint8_t chr) {
     }
 
     // regular buffering
-    char *const last_line   = qp_log.pointers[last_index];
-    last_line[qp_log.col++] = chr;
-    last_line[qp_log.col]   = '\0';
+    last_line->ptr[qp_log.col++] = chr;
+    last_line->ptr[qp_log.col]   = '\0';
 
-    qp_log.levels[last_index] = get_current_message_level();
+    last_line->level = get_current_message_level();
 
     qp_log.redraw = true;
     return 0;
@@ -105,18 +111,19 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
 
     uint16_t y = args->y - font_height;
     for (size_t i = 0; i < QP_LOG_N_LINES; ++i) {
-        scrolling_text_stop(qp_log.tokens[i]);
+        log_line_t *const line = &qp_log.lines[i];
+
+        scrolling_text_stop(line->token);
+        line->token = INVALID_DEFERRED_TOKEN;
+
         y += font_height;
 
-        const hsv_t fg = log_colors[qp_log.levels[i]];
+        const hsv_t fg = log_colors[line->level];
         const hsv_t bg = {HSV_BLACK};
 
-        const char *const line = qp_log.pointers[i];
-
-        const bool text_fits = qp_textwidth(args->font, line) < (qp_get_width(args->device) - args->x);
+        const bool text_fits = qp_textwidth(args->font, line->ptr) < (qp_get_width(args->device) - args->x);
         if (text_fits) {
-            qp_drawtext_recolor(args->device, args->x, y, args->font, line, fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
-            qp_log.tokens[i] = INVALID_DEFERRED_TOKEN;
+            qp_drawtext_recolor(args->device, args->x, y, args->font, line->ptr, fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
             continue;
         }
 
@@ -135,6 +142,6 @@ void qp_logging_backend_render(qp_callback_args_t *args) {
 #endif
         };
 
-        qp_log.tokens[i] = scrolling_text_start(&config, line);
+        line->token = scrolling_text_start(&config, line->ptr);
     }
 }

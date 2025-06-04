@@ -40,14 +40,7 @@ static struct {
     size_t images;
 } count = {0};
 
-static asset_t assets[QP_ASSETS_SIZE] = {
-    [0 ... QP_ASSETS_SIZE - 1] =
-        {
-            .kind = EMPTY,
-            .name = NULL,
-            .ptr  = NULL,
-        },
-};
+static asset_t assets[QP_ASSETS_SIZE] = {0};
 
 static inline size_t total_count(void) {
     return count.devices + count.fonts + count.images;
@@ -70,6 +63,9 @@ static void set(asset_kind_t kind, const char *name, const void *ptr) {
     logging(LOG_DEBUG, "Stored %s '%s'(%p) at index %d of assets pool", asset_name, name, ptr, n);
 
     switch (kind) {
+        case EMPTY:
+            __unreachable();
+
         case DEVICE:
             count.devices += 1;
             break;
@@ -81,9 +77,6 @@ static void set(asset_kind_t kind, const char *name, const void *ptr) {
         case IMAGE:
             count.images += 1;
             break;
-
-        default:
-            __unreachable();
     }
 }
 

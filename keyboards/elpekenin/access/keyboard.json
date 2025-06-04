@@ -75,9 +75,6 @@
             "driver": "vendor",
             "pin": "GP15"
         },
-        "transport": {
-            "watchdog": true
-        }
     },
     "url": "https://github.com/elpekenin/access_kb",
     "usb": {

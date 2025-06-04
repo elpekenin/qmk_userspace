@@ -17,9 +17,11 @@ STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #    define SPLIT_LOG_SYNC_DELAY 0
 #endif
 
-// slave-side callbacks
+//
+// Slave-side handlers
+//
 
-static void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
+static void shutdown_handler(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != sizeof(bool)) {
         logging(LOG_ERROR, "%s size", __func__);
         return;
@@ -29,7 +31,7 @@ static void user_shutdown_slave_callback(uint8_t m2s_size, const void* m2s_buffe
     shutdown_quantum(*(bool*)m2s_buffer);
 }
 
-static void user_ee_clr_callback(uint8_t m2s_size, __unused const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
+static void ee_clear_handler(uint8_t m2s_size, __unused const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != 0) {
         logging(LOG_ERROR, "%s size", __func__);
         return;
@@ -38,7 +40,7 @@ static void user_ee_clr_callback(uint8_t m2s_size, __unused const void* m2s_buff
     eeconfig_init();
 }
 
-static void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
+static void xap_handler(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != XAP_EPSIZE) {
         logging(LOG_ERROR, "%s size", __func__);
         return;
@@ -48,7 +50,21 @@ static void user_xap_callback(uint8_t m2s_size, const void* m2s_buffer, __unused
     xap_receive_base(m2s_buffer);
 }
 
-static uint32_t slave_log_sync_task(__unused uint32_t trigger_time, __unused void* cb_arg) {
+static void build_id_handler(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
+    if (m2s_size != 0) {
+        logging(LOG_ERROR, "%s size", __func__);
+        return;
+    }
+
+    const u128 build_id = get_build_id();
+    memcpy(s2m_buffer, &build_id, sizeof(u128));
+}
+
+//
+// Periodic tasks callbacks
+//
+
+static uint32_t logging_task_cb(__unused uint32_t trigger_time, __unused void* cb_arg) {
     if (!is_keyboard_master() || !IS_ENABLED(SPLIT_LOG)) {
         return 0;
     }
@@ -56,12 +72,16 @@ static uint32_t slave_log_sync_task(__unused uint32_t trigger_time, __unused voi
     return user_logging_master_poll();
 }
 
+//
+// Public API
+//
+
 void reset_ee_slave(void) {
     if (!is_keyboard_master()) {
         return;
     }
 
-    transaction_rpc_send(RPC_ID_USER_EE_CLR, 0, NULL);
+    transaction_rpc_send(RPC_ID_USER_EEPROM_CLEAR, 0, NULL);
 }
 
 void xap_execute_slave(const void* data) {
@@ -71,22 +91,37 @@ void xap_execute_slave(const void* data) {
 
     xap_split_msg_t msg = {0};
     memcpy(&msg.data, data, XAP_EPSIZE);
-    transaction_rpc_send(RPC_ID_XAP, XAP_EPSIZE, &msg);
+    transaction_rpc_send(RPC_ID_USER_XAP, XAP_EPSIZE, &msg);
 }
 
-// register message handlers and kick off tasks
+bool get_slave_build_id(u128* build_id) {
+    if (!is_keyboard_master()) {
+        return false;
+    }
+
+    return transaction_rpc_recv(RPC_ID_USER_BUILD_ID, sizeof(u128), build_id);
+}
+
 void transactions_init(void) {
-    transaction_register_rpc(RPC_ID_USER_SHUTDOWN, user_shutdown_slave_callback);
+    //
+    // rpc handlers
+    //
+    transaction_register_rpc(RPC_ID_USER_SHUTDOWN, shutdown_handler);
 
     if (IS_ENABLED(SPLIT_LOG)) {
-        transaction_register_rpc(RPC_ID_USER_LOGGING, user_logging_slave_callback);
+        transaction_register_rpc(RPC_ID_USER_LOGGING, logging_handler);
     }
 
-    transaction_register_rpc(RPC_ID_USER_EE_CLR, user_ee_clr_callback);
+    transaction_register_rpc(RPC_ID_USER_EEPROM_CLEAR, ee_clear_handler);
 
     if (IS_ENABLED(XAP)) {
-        transaction_register_rpc(RPC_ID_XAP, user_xap_callback);
+        transaction_register_rpc(RPC_ID_USER_XAP, xap_handler);
     }
 
-    defer_exec(MILLISECONDS(SPLIT_LOG_SYNC_DELAY), slave_log_sync_task, NULL);
+    transaction_register_rpc(RPC_ID_USER_BUILD_ID, build_id_handler);
+
+    //
+    // periodic tasks
+    //
+    defer_exec(MILLISECONDS(SPLIT_LOG_SYNC_DELAY), logging_task_cb, NULL);
 }

@@ -1,8 +1,4 @@
-menu "quantum painter"
-
 config QP_ASSETS_SIZE
     int "size of array tracking assets"
 
 rsource "tasks/Kconfig"
-
-endmenu # qp

@@ -38,7 +38,7 @@ int8_t sendchar_split(uint8_t chr) {
         return 0;
     }
 
-    const bool pushed = rbuf.push(&rbuf, chr);
+    const bool pushed = rbuf_push(rbuf, chr);
     if (!pushed) {
         return -ENOMEM;
     }
@@ -46,11 +46,11 @@ int8_t sendchar_split(uint8_t chr) {
     return 0;
 }
 
-void user_logging_slave_callback(__unused uint8_t m2s_size, __unused const void* m2s_buffer, __unused uint8_t s2m_size, void* s2m_buffer) {
+void logging_handler(__unused uint8_t m2s_size, __unused const void* m2s_buffer, __unused uint8_t s2m_size, void* s2m_buffer) {
     split_logging_t data = {0};
 
     for (size_t i = 0; i < PAYLOAD_SIZE - 1; ++i) {
-        const Option(char) pop = rbuf.pop(&rbuf);
+        const Option(char) pop = rbuf_pop(rbuf);
         if (!pop.is_some) {
             break;
         }
@@ -82,7 +82,7 @@ uint32_t user_logging_master_poll(void) {
     // copy received
     bool rbuf_full = false;
     for (size_t i = 0; i < data.header.bytes; ++i) {
-        const bool pushed = rbuf.push(&rbuf, data.buff[i]);
+        const bool pushed = rbuf_push(rbuf, data.buff[i]);
         if (!pushed) {
             rbuf_full = true;
             break;
@@ -94,7 +94,7 @@ uint32_t user_logging_master_poll(void) {
         char buff[PAYLOAD_SIZE] = {0};
 
         for (size_t i = 0; i < PAYLOAD_SIZE - 1; ++i) {
-            const Option(char) pop = rbuf.pop(&rbuf);
+            const Option(char) pop = rbuf_pop(rbuf);
             if (!pop.is_some) {
                 break;
             }

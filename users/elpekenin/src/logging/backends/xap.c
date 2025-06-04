@@ -19,7 +19,7 @@ static char rbuf_inner[XAP_LOG_BUFFER_SIZE] = {0};
 static RingBuffer(char) rbuf = rbuf_from(char, rbuf_inner);
 
 int8_t sendchar_xap(uint8_t chr) {
-    const bool pushed = rbuf.push(&rbuf, chr);
+    const bool pushed = rbuf_push(rbuf, chr);
 
     // buffered
     if (chr != '\n' && pushed) {
@@ -29,7 +29,7 @@ int8_t sendchar_xap(uint8_t chr) {
     // send
     char xap_buff[MAX_PAYLOAD_SIZE] = {0};
     for (size_t i = 0; i < MAX_PAYLOAD_SIZE - 1; ++i) {
-        const Option(char) pop = rbuf.pop(&rbuf);
+        const Option(char) pop = rbuf_pop(rbuf);
         if (!pop.is_some) {
             break;
         }
@@ -41,7 +41,7 @@ int8_t sendchar_xap(uint8_t chr) {
 
     // failed to push before, do it now that buffer was sent
     if (!pushed) {
-        assert(rbuf.push(&rbuf, chr) == true);
+        assert(rbuf_push(rbuf, chr) == true);
     }
 
     return 0;
