@@ -3,10 +3,17 @@
 
 #pragma once
 
-#include <quantum/painter/qp.h>
-#include <quantum/util.h>
+#include <quantum/compiler_support.h>
 
+#include "elpekenin/qp/assets.h"
 #include "elpekenin/time.h"
+
+STATIC_ASSERT(CM_ENABLED(UI), "Must enable 'elpekenin/ui'");
+#include "elpekenin/ui.h"
+
+bool task_should_draw(uint32_t *last, uint32_t ms);
+
+// TODO: remove  everything below
 
 typedef struct PACKED {
     size_t   n_chars;

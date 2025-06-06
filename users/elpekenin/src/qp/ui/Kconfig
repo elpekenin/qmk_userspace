@@ -1,0 +1,61 @@
+if XAP_ENABLE
+    menu "computer stats"
+        config QP_TASK_COMPUTER_STATS_SIZE
+            int "size of array"
+            default 30
+
+        config QP_TASK_COMPUTER_STATS_REDRAW_INTERVAL
+            int "draw interval (ms)"
+            default 500
+
+        config QP_TASK_COMPUTER_STATS_TIMEOUT
+            int "timeout before removing (ms)"
+            default 5000
+    endmenu
+endif
+
+menu "flash"
+    config QP_TASK_FLASH_REDRAW_INTERVAL
+        int "draw interval (ms)"
+        default 500
+endmenu
+
+if XAP_ENABLE
+    menu "github notifications"
+        config QP_TASK_GITHUB_NOTIFICATIONS_REDRAW_INTERVAL
+            int "draw interval (ms)"
+            default 500
+
+        config QP_TASK_GITHUB_NOTIFICATIONS_TIMEOUT
+            int "timeout before removing (ms)"
+            default 5000
+    endmenu
+endif
+
+menu "heap"
+    config QP_TASK_HEAP_REDRAW_INTERVAL
+        int "draw interval (ms)"
+        default 500
+endmenu
+
+if KEYLOG_ENABLE
+    menu "keylog"
+        config QP_TASK_KEYLOG_REDRAW_INTERVAL
+            int "draw interval (ms)"
+            default 100
+    endmenu
+endif
+
+menu "layer"
+    config QP_TASK_LAYER_REDRAW_INTERVAL
+        int "draw interval (ms)"
+        default 100
+endmenu
+
+if QP_LOG_ENABLE
+    menu "qp logging"
+        config QP_TASK_QP_LOGGING_REDRAW_INTERVAL
+            int "draw interval (ms)"
+            default 100
+    endmenu
+endif

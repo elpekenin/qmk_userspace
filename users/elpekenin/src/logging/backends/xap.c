@@ -6,7 +6,6 @@
 #include <tmk_core/protocol/usb_descriptor.h>
 
 STATIC_ASSERT(CM_ENABLED(GENERICS), "Must enable 'elpekenin/generics'");
-
 #include "elpekenin/generics.h"
 
 #define MAX_PAYLOAD_SIZE (XAP_EPSIZE - sizeof(xap_broadcast_header_t)) // -1 for terminator

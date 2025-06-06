@@ -31,9 +31,9 @@
 
 // compat: otherwise `Option(crash_info_t)` is not defined
 STATIC_ASSERT(CM_ENABLED(CRASH), "Must enable 'elpekenin/crash'");
-STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
-
 #include "elpekenin/crash.h"
+
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #include "elpekenin/logging.h"
 
 // clang-format off
@@ -109,8 +109,8 @@ bool shutdown_user(bool jump_to_bootloader) {
 
     // power off all screens
     if (IS_ENABLED(QUANTUM_PAINTER)) {
-        for (size_t i = 0; i < qp_get_num_devices(); ++i) {
-            painter_device_t device = qp_get_device_by_index(i);
+        for (size_t i = 0; i < get_num_devices(); ++i) {
+            painter_device_t device = get_device_by_index(i);
             qp_power(device, false);
         }
     }

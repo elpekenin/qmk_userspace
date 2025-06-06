@@ -8,7 +8,6 @@
 #include <quantum/util.h>
 
 STATIC_ASSERT(CM_ENABLED(GENERICS), "Must enable 'elpekenin/generics'");
-
 #include "elpekenin/generics.h"
 
 typedef struct PACKED {

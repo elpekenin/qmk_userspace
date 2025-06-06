@@ -9,6 +9,7 @@
         "elpekenin/memory",
         "elpekenin/rng",
         "elpekenin/string",
+        "elpekenin/ui",
         "elpekenin/version",
 
         /* RGB Matrix */

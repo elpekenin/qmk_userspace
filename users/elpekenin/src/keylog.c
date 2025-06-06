@@ -13,7 +13,6 @@
 #include "elpekenin/string.h"
 
 STATIC_ASSERT(CM_ENABLED(GENERICS), "Must enable 'elpekenin/generics'");
-
 #include "elpekenin/generics.h"
 
 static bool keylog_dirty = true;
@@ -22,7 +21,9 @@ static char keylog[KEYLOG_SIZE + 1] = {
     [0 ... KEYLOG_SIZE - 1] = ' ',
     [KEYLOG_SIZE]           = '\0',
 }; // extra space for terminator
-STATIC_ASSERT(sizeof(*keylog) == 1, "memmove will use wrong size");
+
+// if keylog's type is ever changed, memmove needs update
+STATIC_ASSERT(sizeof(keylog) == KEYLOG_SIZE + 1, "memmove will use wrong size");
 
 typedef enum {
     NO_MODS,

@@ -23,11 +23,12 @@
 #endif
 
 STATIC_ASSERT(CM_ENABLED(BUILD_ID), "Must enable 'elpekenin/build_id'");
-STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
-STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
-
 #include "elpekenin/build_id.h"
+
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #include "elpekenin/logging.h"
+
+STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
 #include "elpekenin/string.h"
 
 static struct {

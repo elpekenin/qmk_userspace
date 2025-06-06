@@ -6,6 +6,13 @@
 #include "elpekenin/kconfig.h"
 
 //
+// utility macros
+//
+
+// similar to offsetof, but this doesn't exist
+#define member_size(type, member) (sizeof(((type *)NULL)->member))
+
+//
 // logging
 //
 
@@ -24,7 +31,6 @@
 
 // clang-format off
 #define SPLIT_TRANSACTION_IDS_USER \
-    RPC_ID_USER_SHUTDOWN, \
     RPC_ID_USER_LOGGING, \
     RPC_ID_USER_EEPROM_CLEAR, \
     RPC_ID_USER_XAP, \

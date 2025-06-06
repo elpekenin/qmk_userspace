@@ -10,22 +10,23 @@
 const char *get_layer_name(layer_names_t layer) {
     switch (layer) {
         case QWERTY:
-            return " QWERTY ";
+            return "QWERTY";
 
         case FN1:
-            return " F-KEYS ";
+            return "F-KEYS";
 
         case FN2:
-            return " NUMPAD ";
+            return "NUMPAD";
 
         case FN3:
-            return "SYMBOLS ";
+            return "SYMBOLS";
 
         case RST:
-            return "  UTILS ";
-    }
+            return "UTILS";
 
-    __unreachable();
+        default:
+            return "???";
+    }
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {

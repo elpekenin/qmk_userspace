@@ -157,7 +157,7 @@ def gen_draw_file(file: Path, features: set[str]) -> None:
                 "}\n",
                 "\n",
                 "void draw_features(painter_device_t device) {\n",
-                '    painter_font_handle_t font = qp_get_font_by_name("fira_code");\n',
+                '    painter_font_handle_t font = get_font_by_name("fira_code");\n',
                 "    if (font == NULL) {\n",
                 '        logging(LOG_ERROR, "Font was NULL");\n',
                 "        return;\n",

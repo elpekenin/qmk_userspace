@@ -6,22 +6,24 @@
 #include <platforms/chibios/drivers/analog.h>
 #include <quantum/color.h>
 #include <quantum/compiler_support.h>
+#include <quantum/split_common/split_util.h>
 #include <stdlib.h>
 
 #include "elpekenin/autoconf_rt.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
+#include "elpekenin/logging/backends/qp.h" // rendering of logs
 #include "elpekenin/qp/assets.h"
-#include "elpekenin/qp/tasks/computer_stats.h"
-#include "elpekenin/qp/tasks/github_notifications.h"
-#include "elpekenin/qp/tasks/heap_stats.h"
-#include "elpekenin/qp/tasks/keylog.h"
-#include "elpekenin/qp/tasks/layer.h"
-#include "elpekenin/qp/tasks/logging.h"
-#include "elpekenin/qp/tasks/uptime.h"
+#include "elpekenin/qp/ui/computer_stats.h"
+#include "elpekenin/qp/ui/flash.h"
+#include "elpekenin/qp/ui/github_notifications.h"
+#include "elpekenin/qp/ui/heap.h"
+#include "elpekenin/qp/ui/layer.h"
+#include "elpekenin/qp/ui/uptime.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/time.h"
 #include "elpekenin/xap.h"
+#include "generated/qp_resources.h"
 
 #if CM_ENABLED(INDICATORS)
 #    include "elpekenin/indicators.h"
@@ -40,12 +42,16 @@
 #endif
 
 STATIC_ASSERT(CM_ENABLED(BUILD_ID), "Must enable 'elpekenin/build_id'");
-STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
-STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
-
 #include "elpekenin/build_id.h"
+
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #include "elpekenin/logging.h"
+
+STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
 #include "elpekenin/string.h"
+
+STATIC_ASSERT(CM_ENABLED(UI), "Must enable 'elpekenin/ui'");
+#include "elpekenin/ui.h"
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -86,6 +92,109 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
+//
+// user interface
+//
+
+// clang really wants to indent things far to the right...
+
+// clang-format off
+static github_notifications_args_t gh_args = {
+    .logo = gfx_github,
+};
+
+static ui_node_t first_row[] = {
+    {
+        .node_size = UI_IMAGE(),
+        .init      = github_notifications_init,
+        .render    = github_notifications_render,
+        .args      = &gh_args,
+    },
+// TODO
+#if 0
+    {
+        .node_size = UI_REMAINING(),
+        .init      = fw_mismatch_init,
+        .render    = fw_mismatch_render,
+    },
+#endif
+};
+
+static ui_node_t left[] = {
+    {
+        .node_size = UI_IMAGE(),
+        .direction = UI_SPLIT_DIR_HORIZONTAL,
+        .children  = UI_CHILDREN(first_row),
+        .args      = &gh_args,
+    },
+    {
+        .node_size = UI_FONT(),
+        .init      = uptime_init,
+        .render    = uptime_render,
+        .args      = &(uptime_args_t){
+            .font = font_fira_code,
+        },
+    },
+    {
+        .node_size = UI_FONT(),
+        .init      = layer_init,
+        .render    = layer_render,
+        .args      = &(layer_args_t){
+            .font = font_fira_code,
+        },
+    },
+    {
+        .node_size = UI_FONT(),
+        .init      = flash_init,
+        .render    = flash_render,
+        .args      = &(flash_args_t){
+            .font = font_fira_code,
+        },
+    },
+    {
+        .node_size = UI_FONT(),
+        .init      = heap_init,
+        .render    = heap_render,
+        .args      = &(heap_args_t){
+            .font = font_fira_code,
+        },
+    },
+    {
+        .node_size = UI_REMAINING(),
+        .init      = computer_stats_init,
+        .render    = computer_stats_render,
+        .args      = &(computer_stats_args_t){},
+    }
+};
+
+static ui_node_t nodes[] = {
+    {
+        // left half: various things
+        .node_size = UI_RELATIVE(50),
+        .direction = UI_SPLIT_DIR_VERTICAL,
+        .children  = UI_CHILDREN(left),
+    },
+    {
+        // right half: logging
+        .node_size = UI_REMAINING(),
+        .init      = qp_logging_init,
+        .render    = qp_logging_render,
+        .args      = &(qp_logging_args_t){
+            .font = font_fira_code,
+        },
+    },
+};
+
+static ui_node_t root = {
+    .direction = UI_SPLIT_DIR_HORIZONTAL,
+    .children  = UI_CHILDREN(nodes),
+};
+// clang-format off
+
+//
+// helper functions
+//
+
 static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused void *cb_arg) {
     if (!IS_ENABLED(TOUCH_SCREEN) || is_keyboard_left()) {
         return 0;
@@ -116,7 +225,7 @@ static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused voi
 }
 
 static void render_autoconf(void) {
-    painter_font_handle_t font = qp_get_font_by_name("fira_code");
+    painter_font_handle_t font = get_font_by_name("fira_code");
     if (font == NULL) {
         logging(LOG_ERROR, "%s: font == NULL", __func__);
         return;
@@ -170,141 +279,6 @@ static void render_autoconf(void) {
     }
 }
 
-static void configure_qp_tasks(void) {
-    painter_font_handle_t font = qp_get_font_by_name("fira_code");
-    if (font == NULL) {
-        logging(LOG_ERROR, "%s: font == NULL", __func__);
-        return;
-    }
-
-    const uint16_t spacing = font->line_height + 1;
-
-    struct {
-        uint16_t x;
-        uint16_t y;
-    } pos = {
-        .x = 10,
-        .y = 10,
-    };
-
-    qp_callback_args_t *keylog = get_keylog_args();
-    if (IS_ENABLED(KEYLOG) && keylog != NULL) {
-        *keylog = (qp_callback_args_t){
-            .device = ili9341,
-            .font   = font,
-            .x      = pos.x,
-            .y      = pos.y,
-        };
-
-        pos.y += spacing;
-    }
-
-    qp_callback_args_t *uptime = get_uptime_args();
-    if (uptime != NULL) {
-        *uptime = (qp_callback_args_t){
-            .device = ili9341,
-            .font   = font,
-            .x      = pos.x,
-            .y      = pos.y,
-        };
-
-        pos.y += spacing;
-    }
-
-    qp_callback_args_t *layer = get_layer_args();
-    if (layer != NULL) {
-        *layer = (qp_callback_args_t){
-            .device = ili9341,
-            .font   = font,
-            .x      = pos.x,
-            .y      = pos.y,
-        };
-
-        pos.y += spacing;
-    }
-
-    qp_callback_args_t *heap_stats = get_heap_stats_args();
-    if (heap_stats != NULL) {
-        *heap_stats = (qp_callback_args_t){
-            .device = ili9341,
-            .font   = font,
-            .x      = pos.x,
-            .y      = pos.y,
-        };
-
-        // NOTE: draws 2 lines, flash & heap
-        pos.y += 2 * spacing;
-    }
-
-    qp_callback_args_t *computer_stats = get_computer_stats_args();
-    if (computer_stats != NULL) {
-        const uint16_t graph_size = 130;
-
-        *computer_stats = (qp_callback_args_t){
-            .device = ili9341,
-            .font   = font,
-            .x      = pos.x,
-            .y      = pos.y,
-            .extra  = (void *)(uintptr_t)graph_size,
-        };
-
-        pos.y += graph_size;
-    }
-
-    qp_callback_args_t *logging = get_logging_args();
-    if (logging != NULL) {
-        *logging = (qp_callback_args_t){
-            .device = ili9341,
-            .font   = font,
-            .x      = ILI9341_WIDTH / 2,
-            .y      = spacing,
-            .scrolling_args =
-                {
-                    .delay   = MILLISECONDS(500),
-                    .n_chars = 18, // FIXME: compute at runtime
-                },
-        };
-    }
-
-    qp_callback_args_t *github_notifications = get_github_notifications_args();
-    if (github_notifications != NULL) {
-        painter_image_handle_t github = qp_get_image_by_name("github");
-        const uint16_t         offset = (github == NULL) ? 50 : github->width;
-
-        *github_notifications = (qp_callback_args_t){
-            .device = ili9341,
-            .font   = font,
-            .x      = (ILI9341_WIDTH / 2) - offset,
-            .y      = 0,
-        };
-    }
-}
-
-void keyboard_post_init_keymap(void) {
-    if (IS_ENABLED(QUANTUM_PAINTER) && is_keyboard_left()) {
-        qp_set_device_by_name("il91874", il91874);
-
-        render_autoconf();
-    }
-
-    if (IS_ENABLED(QUANTUM_PAINTER) && !is_keyboard_left()) {
-        qp_set_device_by_name("ili9163", ili9163);
-        qp_set_device_by_name("ili9341", ili9341);
-
-        // left side has no tasks (e-Ink)
-        configure_qp_tasks();
-    }
-
-    if (IS_ENABLED(TOUCH_SCREEN) && !is_keyboard_left()) {
-        defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
-    }
-
-    // NOTE: analog macro is not provided by QMK, but custom Kconfig
-#if CM_ENABLED(RNG) && IS_DEFINED(ANALOG_DRIVER_REQUIRED)
-    rng_set_seed(analogReadPin(GP28) * analogReadPin(GP28));
-#endif
-}
-
 #if CM_ENABLED(LEDMAP)
 // clang-format off
 const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -356,15 +330,6 @@ const indicator_t PROGMEM indicators[] = {
 };
 #endif
 
-bool rgb_matrix_indicators_advanced_keymap(__unused uint8_t led_min, __unused uint8_t led_max) {
-#if CM_ENABLED(MICROPYTHON)
-#    include "py/rgb_effect.c"
-    mp_embed_exec_str(rgb_effect);
-#endif
-
-    return true;
-}
-
 const char *log_time(void) {
     static char buff[15];
 
@@ -374,4 +339,50 @@ const char *log_time(void) {
     str_printf(&str, "%d.%ds", secs.quot, secs.rem);
 
     return buff;
+}
+
+//
+// QMK hooks
+//
+
+void keyboard_post_init_keymap(void) {
+    if (IS_ENABLED(QUANTUM_PAINTER) && is_keyboard_left()) {
+        set_device_by_name("il91874", il91874);
+
+        // TODO: if (get_build_id() != eeprom_build_id))
+        render_autoconf();
+    }
+
+    if (IS_ENABLED(QUANTUM_PAINTER) && !is_keyboard_left()) {
+        set_device_by_name("ili9163", ili9163);
+        set_device_by_name("ili9341", ili9341);
+
+        ui_init(&root, qp_get_width(ili9341), qp_get_height(ili9341));
+    }
+
+    if (IS_ENABLED(TOUCH_SCREEN) && !is_keyboard_left()) {
+        defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
+    }
+
+    // NOTE: analog macro is not provided by QMK, but custom Kconfig
+#if CM_ENABLED(RNG) && IS_DEFINED(ANALOG_DRIVER_REQUIRED)
+    rng_set_seed(analogReadPin(GP28) * analogReadPin(GP28));
+#endif
+}
+
+bool rgb_matrix_indicators_advanced_keymap(__unused uint8_t led_min, __unused uint8_t led_max) {
+#if CM_ENABLED(MICROPYTHON)
+#    include "py/rgb_effect.c"
+    mp_embed_exec_str(rgb_effect);
+#endif
+
+    return true;
+}
+
+void housekeeping_task_keymap(void) {
+    if (is_keyboard_left()) {
+        return;
+    }
+
+    ui_render(&root, ili9341);
 }

@@ -9,9 +9,9 @@
 #include <sys/cdefs.h>
 
 STATIC_ASSERT(CM_ENABLED(GENERICS), "Must enable 'elpekenin/generics'");
-STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
-
 #include "elpekenin/generics.h"
+
+STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #include "elpekenin/logging.h"
 
 typedef enum {
@@ -127,54 +127,54 @@ static const void *get_by_name(asset_kind_t kind, const char *name) {
 
 //
 
-void qp_set_device_by_name(const char *name, painter_device_t device) {
+void set_device_by_name(const char *name, painter_device_t device) {
     set(DEVICE, name, device);
 }
 
-painter_device_t qp_get_device_by_name(const char *name) {
+painter_device_t get_device_by_name(const char *name) {
     return get_by_name(DEVICE, name);
 }
 
-size_t qp_get_num_devices(void) {
+size_t get_num_devices(void) {
     return count.devices;
 }
 
-painter_device_t qp_get_device_by_index(size_t index) {
+painter_device_t get_device_by_index(size_t index) {
     return get_by_index(DEVICE, index);
 }
 
 //
 
-void qp_set_font_by_name(const char *name, const uint8_t *font) {
+void set_font_by_name(const char *name, const uint8_t *font) {
     set(FONT, name, font);
 }
 
-painter_font_handle_t qp_get_font_by_name(const char *name) {
+painter_font_handle_t get_font_by_name(const char *name) {
     return get_by_name(FONT, name);
 }
 
-size_t qp_get_num_fonts(void) {
+size_t get_num_fonts(void) {
     return count.fonts;
 }
 
-painter_font_handle_t qp_get_font_by_index(size_t index) {
+painter_font_handle_t get_font_by_index(size_t index) {
     return get_by_index(FONT, index);
 }
 
 //
 
-void qp_set_image_by_name(const char *name, const uint8_t *image) {
+void set_image_by_name(const char *name, const uint8_t *image) {
     set(IMAGE, name, image);
 }
 
-painter_image_handle_t qp_get_image_by_name(const char *name) {
+painter_image_handle_t get_image_by_name(const char *name) {
     return get_by_name(IMAGE, name);
 }
 
-size_t qp_get_num_images(void) {
+size_t get_num_images(void) {
     return count.images;
 }
 
-painter_image_handle_t qp_get_image_by_index(size_t index) {
+painter_image_handle_t get_image_by_index(size_t index) {
     return get_by_index(IMAGE, index);
 }

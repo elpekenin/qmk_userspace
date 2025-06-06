@@ -8,12 +8,12 @@
 #include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 
-#include "elpekenin/qp/tasks/common.h"
+#include "elpekenin/qp/ui/common.h"
 
 STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
-STATIC_ASSERT(CM_ENABLED(SCROLLING_TEXT), "Must enable 'elpekenin/scrolling_text'");
-
 #include "elpekenin/logging.h"
+
+STATIC_ASSERT(CM_ENABLED(SCROLLING_TEXT), "Must enable 'elpekenin/scrolling_text'");
 #include "elpekenin/scrolling_text.h"
 
 typedef struct {
@@ -25,9 +25,13 @@ typedef struct {
 static struct {
     char       buff[QP_LOG_N_LINES][QP_LOG_N_CHARS];
     size_t     col;
-    bool       redraw;
+    uint32_t   last;
     log_line_t lines[QP_LOG_N_LINES];
 } qp_log = {0};
+
+//
+// sendchar implementation (buffering)
+//
 
 void sendchar_qp_init(void) {
     for (size_t i = 0; i < QP_LOG_N_LINES; ++i) {
@@ -58,8 +62,7 @@ int8_t sendchar_qp(uint8_t chr) {
         };
         *last_line->ptr = '\0';
 
-        qp_log.redraw = true;
-        return 0;
+        goto exit;
     }
 
     // exhausted buffer
@@ -73,7 +76,8 @@ int8_t sendchar_qp(uint8_t chr) {
 
     last_line->level = get_current_message_level();
 
-    qp_log.redraw = true;
+exit:
+    qp_log.last = timer_read32();
     return 0;
 }
 
@@ -94,54 +98,69 @@ static const hsv_t log_colors[] = {
 // clang-format on
 ASSERT_LEVELS(log_colors);
 
-void qp_logging_backend_render(qp_callback_args_t *args) {
-    if (IS_DEFINED(QUANTUM_PAINTER_DEBUG)) {
+//
+// ui rendering
+//
+
+bool qp_logging_init(ui_node_t *self) {
+    qp_logging_args_t *const args = self->args;
+
+    const painter_font_handle_t font = qp_load_font_mem(args->font);
+    if (font == NULL) {
+        return false;
+    }
+
+    const uint8_t line_height = font->line_height;
+    qp_close_font(font);
+
+    return line_height <= self->size.y;
+}
+
+void qp_logging_render(const ui_node_t *self, painter_device_t display) {
+    qp_logging_args_t *args = self->args;
+
+    if (!task_should_draw(&args->timer, MILLISECONDS(QP_TASK_FLASH_REDRAW_INTERVAL))) {
         return;
     }
 
-    if (!qp_log.redraw || args->device == NULL || args->font == NULL) {
+    if (qp_log.last <= args->last) {
         return;
     }
-    qp_log.redraw = false;
 
-    const uint16_t font_height = args->font->line_height;
+    const painter_font_handle_t font = qp_load_font_mem(args->font);
+    if (font == NULL) {
+        return;
+    }
 
-    // Clear space
-    qp_rect(args->device, args->x, args->y, qp_get_width(args->device), args->y + (QP_LOG_N_LINES * font_height), HSV_BLACK, true);
+    // clear
+    qp_rect(display, self->start.x, self->start.y, self->start.x + self->size.x, self->start.y + self->size.y, HSV_BLACK, true);
 
-    uint16_t y = args->y - font_height;
     for (size_t i = 0; i < QP_LOG_N_LINES; ++i) {
+        const uint16_t y = self->start.y + (i * font->line_height);
+
+        // can't fit more lines
+        if ((y + font->line_height) > self->size.y) {
+            goto exit;
+        }
+
         log_line_t *const line = &qp_log.lines[i];
 
         scrolling_text_stop(line->token);
         line->token = INVALID_DEFERRED_TOKEN;
 
-        y += font_height;
-
         const hsv_t fg = log_colors[line->level];
         const hsv_t bg = {HSV_BLACK};
 
-        const bool text_fits = qp_textwidth(args->font, line->ptr) < (qp_get_width(args->device) - args->x);
-        if (text_fits) {
-            qp_drawtext_recolor(args->device, args->x, y, args->font, line->ptr, fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
+        const uint16_t width = qp_textwidth(font, line->ptr);
+        if (width == 0 || width > self->size.y) {
             continue;
         }
 
-        const scrolling_text_config_t config = {
-            .device  = args->device,
-            .x       = args->x,
-            .y       = y,
-            .font    = args->font,
-            .n_chars = args->scrolling_args.n_chars,
-            .delay   = args->scrolling_args.delay,
-            .spaces  = 5,
-            .fg      = fg,
-            .bg      = bg,
-#if SCROLLING_TEXT_USE_ALLOCATOR
-            .allocator = c_runtime_allocator,
-#endif
-        };
-
-        line->token = scrolling_text_start(&config, line->ptr);
+        qp_drawtext_recolor(display, self->start.x, y, font, line->ptr, fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
     }
+
+    args->last = timer_read32();
+
+exit:
+    qp_close_font(font);
 }

@@ -10,8 +10,8 @@
 #include <quantum/xap/xap.h>
 
 #include "elpekenin/qp/assets.h"
-#include "elpekenin/qp/tasks/computer_stats.h"
-#include "elpekenin/qp/tasks/github_notifications.h"
+#include "elpekenin/qp/ui/computer_stats.h"
+#include "elpekenin/qp/ui/github_notifications.h"
 #include "elpekenin/scrolling_text.h"
 #include "elpekenin/split/transactions.h"
 
@@ -42,7 +42,7 @@ static inline void xap_preprocess(xap_token_t token) {
 bool xap_execute_qp_clear(xap_token_t token, xap_route_user_quantum_painter_clear_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -55,7 +55,7 @@ bool xap_execute_qp_clear(xap_token_t token, xap_route_user_quantum_painter_clea
 bool xap_execute_qp_setpixel(xap_token_t token, xap_route_user_quantum_painter_setpixel_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -68,7 +68,7 @@ bool xap_execute_qp_setpixel(xap_token_t token, xap_route_user_quantum_painter_s
 bool xap_execute_qp_line(xap_token_t token, xap_route_user_quantum_painter_draw_line_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -81,7 +81,7 @@ bool xap_execute_qp_line(xap_token_t token, xap_route_user_quantum_painter_draw_
 bool xap_execute_qp_rect(xap_token_t token, xap_route_user_quantum_painter_draw_rect_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -94,7 +94,7 @@ bool xap_execute_qp_rect(xap_token_t token, xap_route_user_quantum_painter_draw_
 bool xap_execute_qp_circle(xap_token_t token, xap_route_user_quantum_painter_draw_circle_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -107,7 +107,7 @@ bool xap_execute_qp_circle(xap_token_t token, xap_route_user_quantum_painter_dra
 bool xap_execute_qp_ellipse(xap_token_t token, xap_route_user_quantum_painter_draw_ellipse_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -120,13 +120,13 @@ bool xap_execute_qp_ellipse(xap_token_t token, xap_route_user_quantum_painter_dr
 bool xap_execute_qp_drawimage(xap_token_t token, xap_route_user_quantum_painter_drawimage_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_image_handle_t image = qp_get_image_by_name((const char *)arg->image_name);
+    const painter_image_handle_t image = get_image_by_name((const char *)arg->image_name);
     if (image == NULL) {
         printf("Unknown image: %s\n", arg->image_name);
         return true;
     }
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -139,13 +139,13 @@ bool xap_execute_qp_drawimage(xap_token_t token, xap_route_user_quantum_painter_
 bool xap_execute_qp_drawimage_recolor(xap_token_t token, xap_route_user_quantum_painter_drawimage_recolor_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_image_handle_t image = qp_get_image_by_name((const char *)arg->image_name);
+    const painter_image_handle_t image = get_image_by_name((const char *)arg->image_name);
     if (image == NULL) {
         printf("Unknown image: %s\n", arg->image_name);
         return true;
     }
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -158,13 +158,13 @@ bool xap_execute_qp_drawimage_recolor(xap_token_t token, xap_route_user_quantum_
 bool xap_execute_qp_animate(xap_token_t token, xap_route_user_quantum_painter_animate_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_image_handle_t image = qp_get_image_by_name((const char *)arg->image_name);
+    const painter_image_handle_t image = get_image_by_name((const char *)arg->image_name);
     if (image == NULL) {
         printf("Unknown image: %s\n", arg->image_name);
         return true;
     }
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -177,13 +177,13 @@ bool xap_execute_qp_animate(xap_token_t token, xap_route_user_quantum_painter_an
 bool xap_execute_qp_animate_recolor(xap_token_t token, xap_route_user_quantum_painter_animate_recolor_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_image_handle_t image = qp_get_image_by_name((const char *)arg->image_name);
+    const painter_image_handle_t image = get_image_by_name((const char *)arg->image_name);
     if (image == NULL) {
         printf("Unknown image: %s\n", arg->image_name);
         return true;
     }
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -196,13 +196,13 @@ bool xap_execute_qp_animate_recolor(xap_token_t token, xap_route_user_quantum_pa
 bool xap_execute_qp_drawtext(xap_token_t token, xap_route_user_quantum_painter_drawtext_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_font_handle_t font = qp_get_font_by_name((const char *)arg->font_name);
+    const painter_font_handle_t font = get_font_by_name((const char *)arg->font_name);
     if (font == NULL) {
         printf("Unknown font: %s\n", arg->font_name);
         return true;
     }
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -215,13 +215,13 @@ bool xap_execute_qp_drawtext(xap_token_t token, xap_route_user_quantum_painter_d
 bool xap_execute_qp_drawtext_recolor(xap_token_t token, xap_route_user_quantum_painter_drawtext_recolor_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_font_handle_t font = qp_get_font_by_name((const char *)arg->font_name);
+    const painter_font_handle_t font = get_font_by_name((const char *)arg->font_name);
     if (font == NULL) {
         printf("Unknown font: %s\n", arg->font_name);
         return true;
     }
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -240,7 +240,7 @@ bool xap_execute_qp_get_geometry(xap_token_t token, xap_route_user_quantum_paint
     uint16_t           offset_x;
     uint16_t           offset_y;
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -256,7 +256,7 @@ bool xap_execute_qp_get_geometry(xap_token_t token, xap_route_user_quantum_paint
 bool xap_execute_qp_flush(xap_token_t token, xap_route_user_quantum_painter_flush_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -269,7 +269,7 @@ bool xap_execute_qp_flush(xap_token_t token, xap_route_user_quantum_painter_flus
 bool xap_execute_qp_viewport(xap_token_t token, xap_route_user_quantum_painter_viewport_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -287,7 +287,7 @@ bool xap_respond_qp_pixdata(xap_token_t token, const uint8_t *data, size_t data_
     const uint8_t device_name_len = 10;
     const uint8_t n_pixels        = (data_len - device_name_len) / 2;
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -300,7 +300,7 @@ bool xap_respond_qp_pixdata(xap_token_t token, const uint8_t *data, size_t data_
 bool xap_execute_qp_textwidth(xap_token_t token, xap_route_user_quantum_painter_textwidth_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_font_handle_t font = qp_get_font_by_name((const char *)arg->font_name);
+    const painter_font_handle_t font = get_font_by_name((const char *)arg->font_name);
     if (font == NULL) {
         printf("Unknown font: %s\n", arg->font_name);
         return true;
@@ -317,13 +317,13 @@ bool xap_execute_qp_textwidth(xap_token_t token, xap_route_user_quantum_painter_
 bool xap_execute_draw_scrolling_text(xap_token_t token, xap_route_user_quantum_painter_scrolling_text_arg_t *arg) {
     xap_preprocess(token);
 
-    const painter_font_handle_t font = qp_get_font_by_name((const char *)arg->font_name);
+    const painter_font_handle_t font = get_font_by_name((const char *)arg->font_name);
     if (font == NULL) {
         printf("Unknown font: %s\n", arg->font_name);
         return true;
     }
 
-    const painter_device_t device = qp_get_device_by_name((const char *)arg->device_name);
+    const painter_device_t device = get_device_by_name((const char *)arg->device_name);
     if (device == NULL) {
         xap_slave(arg);
     } else {
@@ -341,9 +341,10 @@ bool xap_execute_draw_scrolling_text(xap_token_t token, xap_route_user_quantum_p
             .allocator = c_runtime_allocator,
 #endif
         };
-        deferred_token def_token = scrolling_text_start(&config, (char *)arg->text);
 
-        xap_send(token, XAP_RESPONSE_FLAG_SUCCESS, (const void *)&def_token, sizeof(def_token));
+        const deferred_token def_token = scrolling_text_start(&config, (char *)arg->text);
+
+        xap_send(token, XAP_RESPONSE_FLAG_SUCCESS, &def_token, sizeof(deferred_token));
     }
 
     return true;

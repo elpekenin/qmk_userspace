@@ -10,7 +10,6 @@
 #include <tmk_core/protocol/usb_descriptor.h> // XAP_EPSIZE
 
 STATIC_ASSERT(CM_ENABLED(BUILD_ID), "Must enable 'elpekenin/build_id'");
-
 #include "elpekenin/build_id.h"
 
 void transactions_init(void);

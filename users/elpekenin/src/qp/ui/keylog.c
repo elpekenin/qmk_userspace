@@ -1,10 +1,11 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "elpekenin/qp/tasks/keylog.h"
+#include "elpekenin/qp/ui/keylog.h"
 
 #include "elpekenin/keylog.h"
 
+#if 0
 static qp_callback_args_t args = {0};
 
 static uint32_t callback(__unused uint32_t trigger_time, void *cb_arg) {
@@ -51,3 +52,4 @@ qp_callback_args_t *get_keylog_args(void) {
 
     return &args;
 }
+#endif

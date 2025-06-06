@@ -7,7 +7,6 @@
 #include "elpekenin/signatures.h"
 
 STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
-
 #include "elpekenin/logging.h"
 
 static bool suspend_changed     = true;

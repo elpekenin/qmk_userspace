@@ -7,7 +7,6 @@
 #include "elpekenin/touch.h"
 
 STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
-
 #include "elpekenin/logging.h"
 
 __weak_symbol bool touch_spi_init(touch_device_t device) {

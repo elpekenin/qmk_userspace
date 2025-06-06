@@ -9,7 +9,6 @@
 #include "elpekenin/time.h"
 
 STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
-
 #include "elpekenin/logging.h"
 
 // compat: no work to do
@@ -20,16 +19,6 @@ STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 //
 // Slave-side handlers
 //
-
-static void shutdown_handler(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
-    if (m2s_size != sizeof(bool)) {
-        logging(LOG_ERROR, "%s size", __func__);
-        return;
-    }
-
-    void shutdown_quantum(bool jump_to_bootloader);
-    shutdown_quantum(*(bool*)m2s_buffer);
-}
 
 static void ee_clear_handler(uint8_t m2s_size, __unused const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
     if (m2s_size != 0) {
@@ -50,9 +39,8 @@ static void xap_handler(uint8_t m2s_size, const void* m2s_buffer, __unused uint8
     xap_receive_base(m2s_buffer);
 }
 
-static void build_id_handler(uint8_t m2s_size, const void* m2s_buffer, __unused uint8_t s2m_size, __unused void* s2m_buffer) {
-    if (m2s_size != 0) {
-        logging(LOG_ERROR, "%s size", __func__);
+static void build_id_handler(__unused uint8_t m2s_size, __unused const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
+    if (s2m_size != sizeof(u128)) {
         return;
     }
 
@@ -106,8 +94,6 @@ void transactions_init(void) {
     //
     // rpc handlers
     //
-    transaction_register_rpc(RPC_ID_USER_SHUTDOWN, shutdown_handler);
-
     if (IS_ENABLED(SPLIT_LOG)) {
         transaction_register_rpc(RPC_ID_USER_LOGGING, logging_handler);
     }

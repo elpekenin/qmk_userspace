@@ -3,6 +3,6 @@
 
 #pragma once
 
-#include "elpekenin/qp/tasks/common.h"
+#include "elpekenin/qp/ui/common.h"
 
-qp_callback_args_t *get_heap_stats_args(void);
+qp_callback_args_t *get_keylog_args(void);

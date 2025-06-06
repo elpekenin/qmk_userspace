@@ -91,7 +91,7 @@ def gen_c_file(file: Path, assets: AssetsDictT) -> None:
 
         for key, paths in assets.items():
             load = "qp_load_font_mem" if key == "fonts" else "qp_load_image_mem"
-            store = "qp_set_font_by_name" if key == "fonts" else "qp_set_image_by_name"
+            store = "set_font_by_name" if key == "fonts" else "set_image_by_name"
 
             f.writelines(
                 [
