@@ -1,18 +1,29 @@
 if XAP_ENABLE
     menu "computer stats"
-        config QP_TASK_COMPUTER_STATS_SIZE
+        config QP_TASK_COMPUTER_SIZE
             int "size of array"
             default 30
 
-        config QP_TASK_COMPUTER_STATS_REDRAW_INTERVAL
+        config QP_TASK_COMPUTER_REDRAW_INTERVAL
             int "draw interval (ms)"
             default 500
 
-        config QP_TASK_COMPUTER_STATS_TIMEOUT
+        config QP_TASK_COMPUTER_TIMEOUT
             int "timeout before removing (ms)"
             default 5000
     endmenu
 endif
+
+menu "firmware id"
+    config QP_TASK_FIRMWARE_ID_REDRAW_INTERVAL
+        int "id draw interval (ms)"
+        default 500
+
+    config QP_TASK_FIRMWARE_SYNC_REDRAW_INTERVAL
+        int "id sync draw interval (ms)"
+        default 500
+        # depends on SPLIT_ENABLE
+endmenu
 
 menu "flash"
     config QP_TASK_FLASH_REDRAW_INTERVAL
@@ -22,11 +33,11 @@ endmenu
 
 if XAP_ENABLE
     menu "github notifications"
-        config QP_TASK_GITHUB_NOTIFICATIONS_REDRAW_INTERVAL
+        config QP_TASK_GITHUB_REDRAW_INTERVAL
             int "draw interval (ms)"
             default 500
 
-        config QP_TASK_GITHUB_NOTIFICATIONS_TIMEOUT
+        config QP_TASK_GITHUB_TIMEOUT
             int "timeout before removing (ms)"
             default 5000
     endmenu

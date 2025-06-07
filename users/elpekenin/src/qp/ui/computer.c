@@ -1,7 +1,7 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "elpekenin/qp/ui/computer_stats.h"
+#include "elpekenin/qp/ui/computer.h"
 
 #include <quantum/compiler_support.h>
 
@@ -13,29 +13,29 @@ STATIC_ASSERT(CM_ENABLED(QP_HELPERS), "Must enable 'drashna/qp_helpers'");
 typedef struct {
     size_t   points;
     uint32_t last;
-    uint8_t  cpu[QP_TASK_COMPUTER_STATS_SIZE];
-    uint8_t  ram[QP_TASK_COMPUTER_STATS_SIZE];
+    uint8_t  cpu[QP_TASK_COMPUTER_SIZE];
+    uint8_t  ram[QP_TASK_COMPUTER_SIZE];
 } inner_state_t;
 
 static inner_state_t state = {0};
 
 // if types are ever changed, memmove needs update
-STATIC_ASSERT(member_size(inner_state_t, cpu) == QP_TASK_COMPUTER_STATS_SIZE, "memmove will use wrong size");
-STATIC_ASSERT(member_size(inner_state_t, ram) == QP_TASK_COMPUTER_STATS_SIZE, "memmove will use wrong size");
+STATIC_ASSERT(member_size(inner_state_t, cpu) == QP_TASK_COMPUTER_SIZE, "memmove will use wrong size");
+STATIC_ASSERT(member_size(inner_state_t, ram) == QP_TASK_COMPUTER_SIZE, "memmove will use wrong size");
 
-bool computer_stats_init(ui_node_t *self) {
+bool computer_init(ui_node_t *self) {
     return true;
 }
 
-void computer_stats_render(const ui_node_t *self, painter_device_t display) {
-    computer_stats_args_t *args = self->args;
+void computer_render(const ui_node_t *self, painter_device_t display) {
+    computer_args_t *args = self->args;
 
-    if (!task_should_draw(&args->timer, MILLISECONDS(QP_TASK_COMPUTER_STATS_REDRAW_INTERVAL))) {
+    if (!task_should_draw(&args->timer, MILLISECONDS(QP_TASK_COMPUTER_REDRAW_INTERVAL))) {
         return;
     }
 
     // clear after inactivity
-    if (xap_last_activity_elapsed() > MILLISECONDS(QP_TASK_COMPUTER_STATS_TIMEOUT)) {
+    if (xap_last_activity_elapsed() > MILLISECONDS(QP_TASK_COMPUTER_TIMEOUT)) {
         if (args->clear) {
             args->clear = false;
             qp_rect(display, self->start.x, self->start.y, self->start.x + self->size.x, self->start.y + self->size.y, HSV_BLACK, true);
@@ -88,14 +88,14 @@ void computer_stats_render(const ui_node_t *self, painter_device_t display) {
     args->clear = true;
 }
 
-void push_computer_stats(uint8_t cpu, uint8_t ram) {
-    memmove(state.cpu + 1, state.cpu, QP_TASK_COMPUTER_STATS_SIZE - 1);
-    memmove(state.ram + 1, state.ram, QP_TASK_COMPUTER_STATS_SIZE - 1);
+void push_computer(uint8_t cpu, uint8_t ram) {
+    memmove(state.cpu + 1, state.cpu, QP_TASK_COMPUTER_SIZE - 1);
+    memmove(state.ram + 1, state.ram, QP_TASK_COMPUTER_SIZE - 1);
 
     state.cpu[0] = cpu;
     state.ram[0] = ram;
 
-    state.points = MIN(QP_TASK_COMPUTER_STATS_SIZE, state.points + 1);
+    state.points = MIN(QP_TASK_COMPUTER_SIZE, state.points + 1);
 
     state.last = timer_read32();
 }

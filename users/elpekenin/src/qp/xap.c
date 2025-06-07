@@ -10,8 +10,8 @@
 #include <quantum/xap/xap.h>
 
 #include "elpekenin/qp/assets.h"
-#include "elpekenin/qp/ui/computer_stats.h"
-#include "elpekenin/qp/ui/github_notifications.h"
+#include "elpekenin/qp/ui/computer.h"
+#include "elpekenin/qp/ui/github.h"
 #include "elpekenin/scrolling_text.h"
 #include "elpekenin/split/transactions.h"
 
@@ -366,14 +366,14 @@ bool xap_execute_extend_scrolling_text(xap_token_t token, xap_route_user_quantum
 // tasks
 //
 
-bool xap_execute_push_computer_stats(xap_token_t token, xap_route_user_tasks_push_computer_stats_arg_t *arg) {
+bool xap_execute_push_computer(xap_token_t token, xap_route_user_tasks_push_computer_arg_t *arg) {
     xap_preprocess(token);
-    push_computer_stats(arg->cpu, arg->ram);
+    push_computer(arg->cpu, arg->ram);
     return true;
 }
 
-bool xap_execute_set_github_notifications_count(xap_token_t token, xap_route_user_tasks_set_github_notifications_count_arg_t *arg) {
+bool xap_execute_set_github_count(xap_token_t token, xap_route_user_tasks_set_github_count_arg_t *arg) {
     xap_preprocess(token);
-    set_github_notifications_count(arg->count);
+    set_github_count(arg->count);
     return true;
 }

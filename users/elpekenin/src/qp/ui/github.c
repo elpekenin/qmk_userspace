@@ -1,7 +1,7 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "elpekenin/qp/ui/github_notifications.h"
+#include "elpekenin/qp/ui/github.h"
 
 #include "elpekenin/xap.h"
 
@@ -10,8 +10,8 @@ static struct {
     uint32_t last;
 } state = {0};
 
-bool github_notifications_init(ui_node_t *self) {
-    github_notifications_args_t *const args = self->args;
+bool github_init(ui_node_t *self) {
+    github_args_t *const args = self->args;
 
     const painter_image_handle_t image = qp_load_image_mem(args->logo);
     if (image == NULL) {
@@ -29,10 +29,10 @@ bool github_notifications_init(ui_node_t *self) {
     return true;
 }
 
-void github_notifications_render(const ui_node_t *self, painter_device_t display) {
-    github_notifications_args_t *const args = self->args;
+void github_render(const ui_node_t *self, painter_device_t display) {
+    github_args_t *const args = self->args;
 
-    if (!task_should_draw(&args->timer, MILLISECONDS(QP_TASK_GITHUB_NOTIFICATIONS_REDRAW_INTERVAL))) {
+    if (!task_should_draw(&args->timer, MILLISECONDS(QP_TASK_GITHUB_REDRAW_INTERVAL))) {
         return;
     }
 
@@ -42,8 +42,8 @@ void github_notifications_render(const ui_node_t *self, painter_device_t display
     }
 
     // clear after inactivity
-    if (xap_last_activity_elapsed() > MILLISECONDS(QP_TASK_GITHUB_NOTIFICATIONS_TIMEOUT)) {
-        if (args->clear != true) {
+    if (xap_last_activity_elapsed() > MILLISECONDS(QP_TASK_GITHUB_TIMEOUT)) {
+        if (args->clear) {
             args->clear = false;
             qp_rect(display, self->start.x, self->start.y, self->start.x + image->width, self->start.y + image->height, HSV_BLACK, true);
         }
@@ -51,21 +51,21 @@ void github_notifications_render(const ui_node_t *self, painter_device_t display
         goto exit;
     }
 
-    if (args->last <= state.last) {
+    if (state.last <= args->last) {
         goto exit;
     }
 
-    hsv_t fg;
+    hsv_t fg = {HSV_BLACK};
     switch (state.count) {
         case 0:
             fg = (hsv_t){HSV_WHITE};
             break;
 
-        case 1 ... 3:
+        case 1:
             fg = (hsv_t){HSV_GREEN};
             break;
 
-        case 4 ... 7:
+        case 2:
             fg = (hsv_t){HSV_ORANGE};
             break;
 
@@ -83,7 +83,7 @@ exit:
     qp_close_image(image);
 }
 
-void set_github_notifications_count(uint8_t count) {
+void set_github_count(uint8_t count) {
     state.count = count;
     state.last  = timer_read32();
 }

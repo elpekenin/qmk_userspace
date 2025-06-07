@@ -14,16 +14,17 @@
 #include "elpekenin/layers.h"
 #include "elpekenin/logging/backends/qp.h" // rendering of logs
 #include "elpekenin/qp/assets.h"
-#include "elpekenin/qp/ui/computer_stats.h"
+#include "elpekenin/qp/ui/computer.h"
+#include "elpekenin/qp/ui/firmware_id.h"
 #include "elpekenin/qp/ui/flash.h"
-#include "elpekenin/qp/ui/github_notifications.h"
+#include "elpekenin/qp/ui/github.h"
 #include "elpekenin/qp/ui/heap.h"
 #include "elpekenin/qp/ui/layer.h"
 #include "elpekenin/qp/ui/uptime.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/time.h"
 #include "elpekenin/xap.h"
-#include "generated/qp_resources.h"
+#include "generated/qp_resources.h" // access to fonts/images
 
 #if CM_ENABLED(INDICATORS)
 #    include "elpekenin/indicators.h"
@@ -99,25 +100,49 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang really wants to indent things far to the right...
 
 // clang-format off
-static github_notifications_args_t gh_args = {
+static github_args_t gh_args = {
     .logo = gfx_github,
+};
+
+static ui_node_t fw[] = {
+    {
+        // spacer
+        .node_size = UI_ABSOLUTE(15),
+    },
+    {
+        .node_size = UI_FONT(),
+        .init      = fw_id_init,
+        .render    = fw_id_render,
+        .args      = &(fw_args_t){
+            .font = font_fira_code,
+        },
+    },
+    {
+        .node_size = UI_FONT(),
+        .init      = fw_sync_init,
+        .render    = fw_sync_render,
+        .args      = &(fw_args_t){
+            .font = font_fira_code,
+        },
+    },
 };
 
 static ui_node_t first_row[] = {
     {
         .node_size = UI_IMAGE(),
-        .init      = github_notifications_init,
-        .render    = github_notifications_render,
+        .init      = github_init,
+        .render    = github_render,
         .args      = &gh_args,
     },
-// TODO
-#if 0
+    {
+        // spacer
+        .node_size = UI_ABSOLUTE(5),
+    },
     {
         .node_size = UI_REMAINING(),
-        .init      = fw_mismatch_init,
-        .render    = fw_mismatch_render,
-    },
-#endif
+        .direction = UI_SPLIT_DIR_VERTICAL,
+        .children  = UI_CHILDREN(fw),
+    }
 };
 
 static ui_node_t left[] = {
@@ -161,9 +186,9 @@ static ui_node_t left[] = {
     },
     {
         .node_size = UI_REMAINING(),
-        .init      = computer_stats_init,
-        .render    = computer_stats_render,
-        .args      = &(computer_stats_args_t){},
+        .init      = computer_init,
+        .render    = computer_render,
+        .args      = &(computer_args_t){},
     }
 };
 

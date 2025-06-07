@@ -101,7 +101,7 @@ ASSERT_LEVELS(log_colors);
 //
 // ui rendering
 //
-
+#if CM_ENABLED(UI)
 bool qp_logging_init(ui_node_t *self) {
     qp_logging_args_t *const args = self->args;
 
@@ -164,3 +164,4 @@ void qp_logging_render(const ui_node_t *self, painter_device_t display) {
 exit:
     qp_close_font(font);
 }
+#endif

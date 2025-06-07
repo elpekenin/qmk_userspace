@@ -5,26 +5,16 @@
 
 #include <quantum/compiler_support.h>
 
-#include "elpekenin/qp/assets.h"
 #include "elpekenin/time.h"
 
 STATIC_ASSERT(CM_ENABLED(UI), "Must enable 'elpekenin/ui'");
 #include "elpekenin/ui.h"
 
-bool task_should_draw(uint32_t *last, uint32_t ms);
+static inline bool task_should_draw(uint32_t *last, uint32_t ms) {
+    if (timer_elapsed32(*last) < ms) {
+        return false;
+    }
 
-// TODO: remove  everything below
-
-typedef struct PACKED {
-    size_t   n_chars;
-    uint32_t delay;
-} scrolling_args_t;
-
-typedef struct PACKED {
-    painter_device_t      device;
-    painter_font_handle_t font;
-    scrolling_args_t      scrolling_args;
-    uint16_t              x;
-    uint16_t              y;
-    void                 *extra;
-} qp_callback_args_t;
+    *last = timer_read32();
+    return true;
+}

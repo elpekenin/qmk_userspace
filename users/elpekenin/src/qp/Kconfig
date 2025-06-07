@@ -1,4 +1,6 @@
 config QP_ASSETS_SIZE
     int "size of array tracking assets"
 
-rsource "ui/Kconfig"
+menu "ui"
+    rsource "ui/Kconfig"
+endmenu

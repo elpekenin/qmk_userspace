@@ -804,9 +804,9 @@
             routes: {
                 0x01: {
                     type: command
-                    name: push_computer_stats
-                    define: PUSH_COMPUTER_STATS
-                    description: Expose `push_computer_stats`
+                    name: push_computer
+                    define: PUSH_COMPUTER
+                    description: Expose `push_computer`
                     request_type: struct
                     request_struct_length: 2
                     request_struct_members: [
@@ -819,13 +819,13 @@
                             name: ram
                         }
                     ]
-                    return_execute: push_computer_stats
+                    return_execute: push_computer
                 }
                 0x02: {
                     type: command
-                    name: set_github_notifications_count
-                    define: SET_GITHUB_NOTIFICATIONS_COUNT
-                    description: Expose `set_github_notifications_count`
+                    name: set_github_count
+                    define: SET_GITHUB_COUNT
+                    description: Expose `set_github_count`
                     request_type: struct
                     request_struct_length: 1
                     request_struct_members: [
@@ -834,7 +834,7 @@
                             name: count
                         }
                     ]
-                    return_execute: set_github_notifications_count
+                    return_execute: set_github_count
                 }
             }
         }

@@ -154,6 +154,10 @@ string
 ######
 .. c:autodoc:: modules/elpekenin/string/elpekenin/string.h
 
+ui
+######
+.. c:autodoc:: modules/elpekenin/ui/elpekenin/ui.h
+
 version
 #######
 Adds ``QMK_MAJOR``, ``QMK_MINOR`` and ``QMK_PATCH`` macros to check for the version of QMK in which you are building.

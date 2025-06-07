@@ -5,4 +5,6 @@
 
 #include "elpekenin/qp/ui/common.h"
 
+#if 0
 qp_callback_args_t *get_keylog_args(void);
+#endif
