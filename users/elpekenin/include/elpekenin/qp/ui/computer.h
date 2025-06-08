@@ -3,15 +3,14 @@
 
 #pragma once
 
-#include "elpekenin/qp/ui/common.h"
+#include "elpekenin/ui.h"
 
 typedef struct {
-    uint32_t timer;
-    size_t   last;
-    bool     clear;
+    size_t last;
+    bool   clear;
 } computer_args_t;
 
-bool computer_init(ui_node_t *self);
-void computer_render(const ui_node_t *self, painter_device_t display);
+bool     computer_init(ui_node_t *self);
+uint32_t computer_render(const ui_node_t *self, painter_device_t display);
 
 void push_computer(uint8_t cpu, uint8_t ram);

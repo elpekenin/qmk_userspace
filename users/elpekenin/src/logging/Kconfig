@@ -12,6 +12,10 @@ if QP_LOG_ENABLE
     config QP_LOG_N_LINES
         int "lines stored"
         default 9
+
+    config QP_LOGGING_UI_REDRAW_INTERVAL
+        int "ui draw interval (ms)"
+        default 100
 endif
 
 menuconfig SPLIT_LOG_ENABLE

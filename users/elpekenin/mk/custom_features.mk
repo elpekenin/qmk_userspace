@@ -5,11 +5,6 @@ ifeq ($(strip $(BUILD_INFO_ENABLE)), yes)
         $(USER_SRC)/build_info.c
 endif
 
-KEYLOG_ENABLE ?= no
-ifeq ($(strip $(KEYLOG_ENABLE)), yes)
-    SRC += $(USER_SRC)/keylog.c
-endif
-
 SIPO_PINS_ENABLE ?= no
 ifeq ($(strip $(SIPO_PINS_ENABLE)), yes)
     SRC += $(USER_SRC)/sipo.c

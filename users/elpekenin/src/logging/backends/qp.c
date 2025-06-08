@@ -8,18 +8,12 @@
 #include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 
-#include "elpekenin/qp/ui/common.h"
-
 STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #include "elpekenin/logging.h"
 
-STATIC_ASSERT(CM_ENABLED(SCROLLING_TEXT), "Must enable 'elpekenin/scrolling_text'");
-#include "elpekenin/scrolling_text.h"
-
 typedef struct {
-    char          *ptr;
-    log_level_t    level;
-    deferred_token token;
+    char       *ptr;
+    log_level_t level;
 } log_line_t;
 
 static struct {
@@ -50,7 +44,6 @@ int8_t sendchar_qp(uint8_t chr) {
     // newline, move everything 1 line upwards
     if (chr == '\n') {
         log_line_t overwritten = qp_log.lines[0];
-        scrolling_text_stop(overwritten.token);
 
         memmove(qp_log.lines, qp_log.lines + 1, sizeof(log_line_t) * (QP_LOG_N_LINES - 1));
 
@@ -58,7 +51,6 @@ int8_t sendchar_qp(uint8_t chr) {
         *last_line = (log_line_t){
             .ptr   = overwritten.ptr,
             .level = LOG_NONE,
-            .token = INVALID_DEFERRED_TOKEN,
         };
         *last_line->ptr = '\0';
 
@@ -102,34 +94,22 @@ ASSERT_LEVELS(log_colors);
 // ui rendering
 //
 #if CM_ENABLED(UI)
+#    include "elpekenin/ui/utils.h"
+
 bool qp_logging_init(ui_node_t *self) {
-    qp_logging_args_t *const args = self->args;
-
-    const painter_font_handle_t font = qp_load_font_mem(args->font);
-    if (font == NULL) {
-        return false;
-    }
-
-    const uint8_t line_height = font->line_height;
-    qp_close_font(font);
-
-    return line_height <= self->size.y;
+    return ui_font_fits(self);
 }
 
-void qp_logging_render(const ui_node_t *self, painter_device_t display) {
+uint32_t qp_logging_render(const ui_node_t *self, painter_device_t display) {
     qp_logging_args_t *args = self->args;
 
-    if (!task_should_draw(&args->timer, MILLISECONDS(QP_TASK_FLASH_REDRAW_INTERVAL))) {
-        return;
-    }
-
     if (qp_log.last <= args->last) {
-        return;
+        goto exit;
     }
 
     const painter_font_handle_t font = qp_load_font_mem(args->font);
     if (font == NULL) {
-        return;
+        goto exit;
     }
 
     // clear
@@ -140,28 +120,27 @@ void qp_logging_render(const ui_node_t *self, painter_device_t display) {
 
         // can't fit more lines
         if ((y + font->line_height) > self->size.y) {
-            goto exit;
+            break;
         }
 
         log_line_t *const line = &qp_log.lines[i];
-
-        scrolling_text_stop(line->token);
-        line->token = INVALID_DEFERRED_TOKEN;
 
         const hsv_t fg = log_colors[line->level];
         const hsv_t bg = {HSV_BLACK};
 
         const uint16_t width = qp_textwidth(font, line->ptr);
-        if (width == 0 || width > self->size.y) {
+        if (width == 0 || width > self->size.x) {
             continue;
         }
 
         qp_drawtext_recolor(display, self->start.x, y, font, line->ptr, fg.h, fg.s, fg.v, bg.h, bg.s, bg.v);
     }
 
+    qp_close_font(font);
+
     args->last = timer_read32();
 
 exit:
-    qp_close_font(font);
+    return QP_LOGGING_UI_REDRAW_INTERVAL;
 }
 #endif

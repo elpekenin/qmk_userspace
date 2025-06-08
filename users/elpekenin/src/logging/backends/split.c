@@ -75,7 +75,7 @@ uint32_t user_logging_master_poll(void) {
     transaction_rpc_recv(RPC_ID_USER_LOGGING, sizeof(split_logging_t), &data);
 
     if (data.header.bytes == 0) {
-        return MILLISECONDS(SPLIT_LOG_SYNC_INTERVAL);
+        return SPLIT_LOG_SYNC_INTERVAL;
     }
 
     // copy received
@@ -106,5 +106,5 @@ uint32_t user_logging_master_poll(void) {
         printf("split\n%s\nendsplit\n", buff);
     }
 
-    return MILLISECONDS(SPLIT_LOG_SYNC_INTERVAL);
+    return SPLIT_LOG_SYNC_INTERVAL;
 }

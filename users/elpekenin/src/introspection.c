@@ -9,7 +9,6 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/keycodes.h"
-#include "elpekenin/time.h"
 
 void td_ntil_finished(tap_dance_state_t *state, __unused void *user_data) {
     switch (state->count) {

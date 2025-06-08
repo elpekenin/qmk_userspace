@@ -114,7 +114,6 @@ XAP_ENABLE=yes
 #
 # userspace
 #
-# KEYLOG_ENABLE is not set
 SIPO_PINS_ENABLE=yes
 N_SIPO_PINS=8
 # BUILD_INFO is not set
@@ -125,6 +124,7 @@ N_SIPO_PINS=8
 QP_LOG_ENABLE=yes
 QP_LOG_N_CHARS=70
 QP_LOG_N_LINES=16
+QP_LOGGING_UI_REDRAW_INTERVAL=100
 # SPLIT_LOG_ENABLE is not set
 # UART_LOG_ENABLE is not set
 # XAP_LOG_ENABLE is not set
@@ -142,56 +142,27 @@ QP_ASSETS_SIZE=30
 #
 # computer stats
 #
-QP_TASK_COMPUTER_SIZE=30
-QP_TASK_COMPUTER_REDRAW_INTERVAL=500
-QP_TASK_COMPUTER_TIMEOUT=5000
+COMPUTER_STATS_SIZE=30
+COMPUTER_STATS_UI_REDRAW_INTERVAL=500
+COMPUTER_STATS_UI_TIMEOUT=5000
 # end of computer stats
 
 #
-# firmware id
+# build match
 #
-QP_TASK_FIRMWARE_ID_REDRAW_INTERVAL=500
-QP_TASK_FIRMWARE_SYNC_REDRAW_INTERVAL=500
-# end of firmware id
-
-#
-# flash
-#
-QP_TASK_FLASH_REDRAW_INTERVAL=500
-# end of flash
+BUILD_MATCH_UI_REDRAW_INTERVAL=500
+# end of build match
 
 #
 # github notifications
 #
-QP_TASK_GITHUB_REDRAW_INTERVAL=500
-QP_TASK_GITHUB_TIMEOUT=5000
+GITHUB_NOTIFICATIONS_UI_REDRAW_INTERVAL=500
+GITHUB_NOTIFICATIONS_UI_TIMEOUT=5000
 # end of github notifications
-
-#
-# heap
-#
-QP_TASK_HEAP_REDRAW_INTERVAL=500
-# end of heap
-
-#
-# layer
-#
-QP_TASK_LAYER_REDRAW_INTERVAL=100
-# end of layer
-
-#
-# qp logging
-#
-QP_TASK_QP_LOGGING_REDRAW_INTERVAL=100
-# end of qp logging
 # end of ui
 # end of quantum painter
 
-#
-# touch screen
-#
 TOUCH_SCREEN_ENABLE=yes
-# end of touch screen
 # end of userspace
 
 #
@@ -204,7 +175,14 @@ TOUCH_SCREEN_ENABLE=yes
 # ALLOCATOR_DEBUG is not set
 ALLOC_ALLOCATORS_SIZE=10
 ALLOC_ALLOCATIONS_SIZE=100
+HEAP_UI_REDRAW_INTERVAL=500
 # end of allocator
+
+#
+# build_id
+#
+BUILD_ID_UI_REDRAW_INTERVAL=500
+# end of build_id
 
 #
 # crash
@@ -222,10 +200,23 @@ GLITCH_TEXT_TASK_INTERVAL=10
 # end of glitch text
 
 #
+# keylog
+#
+KEYLOG_SIZE=70
+KEYLOG_UI_REDRAW_INTERVAL=100
+# end of keylog
+
+#
 # logging
 #
 LOGGING_FORMAT="[%T] (%LS): %M"
 # end of logging
+
+#
+# memory
+#
+FLASH_UI_REDRAW_INTERVAL=500
+# end of memory
 
 #
 # sanitizer
@@ -248,5 +239,11 @@ SCROLLING_TEXT_TASK_INTERVAL=10
 # ui
 #
 UI_DEBUG=yes
+
+#
+# layer
+#
+UI_LAYER_REDRAW_INTERVAL=100
+# end of layer
 # end of ui
 # end of modules

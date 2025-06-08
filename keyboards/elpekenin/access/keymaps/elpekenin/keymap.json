@@ -5,6 +5,7 @@
         "elpekenin/build_id",
         "elpekenin/crash",
         "elpekenin/generics",
+        "elpekenin/keylog",
         "elpekenin/logging",
         "elpekenin/memory",
         "elpekenin/rng",

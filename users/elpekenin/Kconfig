@@ -1,12 +1,3 @@
-menuconfig KEYLOG_ENABLE
-    bool "keylog"
-
-if KEYLOG_ENABLE
-    config KEYLOG_SIZE
-        int "maximum length"
-        default 70
-endif
-
 menuconfig SIPO_PINS_ENABLE
     bool "sipo pins"
 

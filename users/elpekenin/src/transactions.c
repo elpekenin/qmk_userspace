@@ -6,7 +6,6 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/logging/backends/split.h"
-#include "elpekenin/time.h"
 
 STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #include "elpekenin/logging.h"
@@ -109,5 +108,5 @@ void transactions_init(void) {
     //
     // periodic tasks
     //
-    defer_exec(MILLISECONDS(SPLIT_LOG_SYNC_DELAY), logging_task_cb, NULL);
+    defer_exec(SPLIT_LOG_SYNC_DELAY, logging_task_cb, NULL);
 }

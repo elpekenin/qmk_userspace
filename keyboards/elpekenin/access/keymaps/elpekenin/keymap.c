@@ -12,26 +12,36 @@
 #include "elpekenin/autoconf_rt.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
-#include "elpekenin/logging/backends/qp.h" // rendering of logs
 #include "elpekenin/qp/assets.h"
+#include "elpekenin/qp/ui/build_match.h"
 #include "elpekenin/qp/ui/computer.h"
-#include "elpekenin/qp/ui/firmware_id.h"
-#include "elpekenin/qp/ui/flash.h"
 #include "elpekenin/qp/ui/github.h"
-#include "elpekenin/qp/ui/heap.h"
-#include "elpekenin/qp/ui/layer.h"
-#include "elpekenin/qp/ui/uptime.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/time.h"
 #include "elpekenin/xap.h"
 #include "generated/qp_resources.h" // access to fonts/images
+
+#if IS_ENABLED(QP_LOG)
+#    include "elpekenin/logging/backends/qp.h"
+#endif
+
+#if CM_ENABLED(ALLOCATOR)
+#    include "elpekenin/allocator.h"
+#endif
 
 #if CM_ENABLED(INDICATORS)
 #    include "elpekenin/indicators.h"
 #endif
 
+#if CM_ENABLED(KEYLOG)
+#    include "elpekenin/keylog.h"
+#endif
+
 #if CM_ENABLED(LEDMAP)
 #    include "elpekenin/ledmap.h"
+#endif
+
+#if CM_ENABLED(MEMORY)
+#    include "elpekenin/memory.h"
 #endif
 
 #if CM_ENABLED(MICROPYTHON)
@@ -53,6 +63,8 @@ STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
 
 STATIC_ASSERT(CM_ENABLED(UI), "Must enable 'elpekenin/ui'");
 #include "elpekenin/ui.h"
+#include "elpekenin/ui/layer.h"
+#include "elpekenin/ui/uptime.h"
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -104,24 +116,24 @@ static github_args_t gh_args = {
     .logo = gfx_github,
 };
 
-static ui_node_t fw[] = {
+static ui_node_t id[] = {
     {
         // spacer
         .node_size = UI_ABSOLUTE(15),
     },
     {
         .node_size = UI_FONT(),
-        .init      = fw_id_init,
-        .render    = fw_id_render,
-        .args      = &(fw_args_t){
+        .init      = build_id_init,
+        .render    = build_id_render,
+        .args      = &(build_id_args_t){
             .font = font_fira_code,
         },
     },
     {
         .node_size = UI_FONT(),
-        .init      = fw_sync_init,
-        .render    = fw_sync_render,
-        .args      = &(fw_args_t){
+        .init      = build_match_init,
+        .render    = build_match_render,
+        .args      = &(build_match_args_t){
             .font = font_fira_code,
         },
     },
@@ -134,6 +146,7 @@ static ui_node_t first_row[] = {
         .render    = github_render,
         .args      = &gh_args,
     },
+#if CM_ENABLED(BUILD_ID)
     {
         // spacer
         .node_size = UI_ABSOLUTE(5),
@@ -141,8 +154,9 @@ static ui_node_t first_row[] = {
     {
         .node_size = UI_REMAINING(),
         .direction = UI_SPLIT_DIR_VERTICAL,
-        .children  = UI_CHILDREN(fw),
+        .children  = UI_CHILDREN(id),
     }
+#endif
 };
 
 static ui_node_t left[] = {
@@ -168,6 +182,7 @@ static ui_node_t left[] = {
             .font = font_fira_code,
         },
     },
+#if CM_ENABLED(MEMORY)
     {
         .node_size = UI_FONT(),
         .init      = flash_init,
@@ -176,6 +191,9 @@ static ui_node_t left[] = {
             .font = font_fira_code,
         },
     },
+#endif
+
+#if CM_ENABLED(ALLOCATOR)
     {
         .node_size = UI_FONT(),
         .init      = heap_init,
@@ -184,6 +202,8 @@ static ui_node_t left[] = {
             .font = font_fira_code,
         },
     },
+#endif
+
     {
         .node_size = UI_REMAINING(),
         .init      = computer_init,
@@ -192,21 +212,40 @@ static ui_node_t left[] = {
     }
 };
 
-static ui_node_t nodes[] = {
+static ui_node_t right[] = {
+#if CM_ENABLED(KEYLOG)
     {
-        // left half: various things
-        .node_size = UI_RELATIVE(50),
-        .direction = UI_SPLIT_DIR_VERTICAL,
-        .children  = UI_CHILDREN(left),
+        .node_size = UI_FONT(),
+        .init      = keylog_init,
+        .render    = keylog_render,
+        .args      = &(keylog_args_t){
+            .font = font_fira_code,
+        },
     },
+#endif
+
+#if IS_ENABLED(QP_LOG)
     {
-        // right half: logging
         .node_size = UI_REMAINING(),
         .init      = qp_logging_init,
         .render    = qp_logging_render,
         .args      = &(qp_logging_args_t){
             .font = font_fira_code,
         },
+    },
+#endif
+};
+
+static ui_node_t nodes[] = {
+    {
+        .node_size = UI_RELATIVE(50),
+        .direction = UI_SPLIT_DIR_VERTICAL,
+        .children  = UI_CHILDREN(left),
+    },
+    {
+        .node_size = UI_REMAINING(),
+        .direction = UI_SPLIT_DIR_VERTICAL,
+        .children  = UI_CHILDREN(right),
     },
 };
 

@@ -1,6 +1,2 @@
-menu "touch screen"
-
-config TOUCH_SCREEN_ENABLE
+menuconfig TOUCH_SCREEN_ENABLE
     bool "touch screen"
-
-endmenu

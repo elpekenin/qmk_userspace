@@ -3,6 +3,7 @@
 
 #include "elpekenin/qp/ui/github.h"
 
+#include "elpekenin/ui/utils.h"
 #include "elpekenin/xap.h"
 
 static struct {
@@ -11,48 +12,29 @@ static struct {
 } state = {0};
 
 bool github_init(ui_node_t *self) {
-    github_args_t *const args = self->args;
-
-    const painter_image_handle_t image = qp_load_image_mem(args->logo);
-    if (image == NULL) {
-        return false;
-    }
-
-    const uint16_t image_width  = image->width;
-    const uint16_t image_height = image->height;
-    qp_close_image(image);
-
-    if (image_width > self->size.x || image_height > self->size.y) {
-        return false;
-    }
-
-    return true;
+    return ui_image_fits(self);
 }
 
-void github_render(const ui_node_t *self, painter_device_t display) {
+uint32_t github_render(const ui_node_t *self, painter_device_t display) {
     github_args_t *const args = self->args;
-
-    if (!task_should_draw(&args->timer, MILLISECONDS(QP_TASK_GITHUB_REDRAW_INTERVAL))) {
-        return;
-    }
 
     const painter_image_handle_t image = qp_load_image_mem(args->logo);
     if (image == NULL) {
-        return;
+        goto exit;
     }
 
     // clear after inactivity
-    if (xap_last_activity_elapsed() > MILLISECONDS(QP_TASK_GITHUB_TIMEOUT)) {
+    if (xap_last_activity_elapsed() > GITHUB_NOTIFICATIONS_UI_TIMEOUT) {
         if (args->clear) {
             args->clear = false;
             qp_rect(display, self->start.x, self->start.y, self->start.x + image->width, self->start.y + image->height, HSV_BLACK, true);
         }
 
-        goto exit;
+        goto err;
     }
 
     if (state.last <= args->last) {
-        goto exit;
+        goto err;
     }
 
     hsv_t fg = {HSV_BLACK};
@@ -79,8 +61,11 @@ void github_render(const ui_node_t *self, painter_device_t display) {
     args->last  = timer_read32();
     args->clear = true;
 
-exit:
+err:
     qp_close_image(image);
+
+exit:
+    return GITHUB_NOTIFICATIONS_UI_REDRAW_INTERVAL;
 }
 
 void set_github_count(uint8_t count) {

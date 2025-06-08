@@ -1,72 +1,34 @@
 if XAP_ENABLE
     menu "computer stats"
-        config QP_TASK_COMPUTER_SIZE
+        config COMPUTER_STATS_SIZE
             int "size of array"
             default 30
 
-        config QP_TASK_COMPUTER_REDRAW_INTERVAL
+        config COMPUTER_STATS_UI_REDRAW_INTERVAL
             int "draw interval (ms)"
             default 500
 
-        config QP_TASK_COMPUTER_TIMEOUT
+        config COMPUTER_STATS_UI_TIMEOUT
             int "timeout before removing (ms)"
             default 5000
     endmenu
 endif
 
-menu "firmware id"
-    config QP_TASK_FIRMWARE_ID_REDRAW_INTERVAL
-        int "id draw interval (ms)"
-        default 500
-
-    config QP_TASK_FIRMWARE_SYNC_REDRAW_INTERVAL
+menu "build match"
+    config BUILD_MATCH_UI_REDRAW_INTERVAL
         int "id sync draw interval (ms)"
         default 500
         # depends on SPLIT_ENABLE
 endmenu
 
-menu "flash"
-    config QP_TASK_FLASH_REDRAW_INTERVAL
-        int "draw interval (ms)"
-        default 500
-endmenu
-
 if XAP_ENABLE
     menu "github notifications"
-        config QP_TASK_GITHUB_REDRAW_INTERVAL
+        config GITHUB_NOTIFICATIONS_UI_REDRAW_INTERVAL
             int "draw interval (ms)"
             default 500
 
-        config QP_TASK_GITHUB_TIMEOUT
+        config GITHUB_NOTIFICATIONS_UI_TIMEOUT
             int "timeout before removing (ms)"
             default 5000
-    endmenu
-endif
-
-menu "heap"
-    config QP_TASK_HEAP_REDRAW_INTERVAL
-        int "draw interval (ms)"
-        default 500
-endmenu
-
-if KEYLOG_ENABLE
-    menu "keylog"
-        config QP_TASK_KEYLOG_REDRAW_INTERVAL
-            int "draw interval (ms)"
-            default 100
-    endmenu
-endif
-
-menu "layer"
-    config QP_TASK_LAYER_REDRAW_INTERVAL
-        int "draw interval (ms)"
-        default 100
-endmenu
-
-if QP_LOG_ENABLE
-    menu "qp logging"
-        config QP_TASK_QP_LOGGING_REDRAW_INTERVAL
-            int "draw interval (ms)"
-            default 100
     endmenu
 endif
