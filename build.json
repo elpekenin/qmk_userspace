@@ -51,6 +51,10 @@
             "file": "patches/generic_rotation.diff"
         },
         {
+            "operation": "diff",
+            "file": "patches/ee.diff"
+        },
+        {
             "operation": "exec",
             "display": "compiling",
             "cmd": "qmk --no-color compile --compiledb -kb elpekenin/access -km elpekenin > build.log 2>&1",

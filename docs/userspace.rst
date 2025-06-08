@@ -2,10 +2,6 @@
 Userspace
 *********
 
-build_info
-##########
-.. c:autodoc:: users/elpekenin/include/elpekenin/build_info.h
-
 keylog
 ######
 .. c:autodoc:: users/elpekenin/include/elpekenin/keylog.h

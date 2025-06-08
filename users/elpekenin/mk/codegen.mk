@@ -11,10 +11,6 @@ $(shell mkdir -p $(USER_GENERATED))
 # hack to force running other steps
 FORCE:
 
-# enabled_features_t
-$(USER_GENERATED)/features.c: FORCE
-	$(USERSPACE_CLI) features $(CODEGEN_ARGS)
-
 # QP assets
 ifeq ($(strip $(QUANTUM_PAINTER_ENABLE)), yes)
     # HACK: eagerly run command, so that we can `include ...mk`

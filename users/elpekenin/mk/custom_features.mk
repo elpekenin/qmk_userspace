@@ -1,10 +1,3 @@
-BUILD_INFO_ENABLE ?= no
-ifeq ($(strip $(BUILD_INFO_ENABLE)), yes)
-    SRC += \
-        $(USER_GENERATED)/features.c \
-        $(USER_SRC)/build_info.c
-endif
-
 SIPO_PINS_ENABLE ?= no
 ifeq ($(strip $(SIPO_PINS_ENABLE)), yes)
     SRC += $(USER_SRC)/sipo.c

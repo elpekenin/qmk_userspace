@@ -19,7 +19,6 @@ from elpekenin_userspace import args
 from elpekenin_userspace.commands.build import Build
 from elpekenin_userspace.commands.config import Config
 from elpekenin_userspace.commands.docs import Docs
-from elpekenin_userspace.commands.features import Features
 from elpekenin_userspace.commands.jsonschema import Jsonschema
 from elpekenin_userspace.commands.keycode_str import KeycodeStr
 from elpekenin_userspace.commands.micropython import Micropython
@@ -38,7 +37,6 @@ SUBCOMMANDS: dict[str, type[BaseCommand]] = {
     "build": Build,
     "config": Config,
     "docs": Docs,
-    "features": Features,
     "jsonschema": Jsonschema,
     "keycode_str": KeycodeStr,
     "micropython": Micropython,

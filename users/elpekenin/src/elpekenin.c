@@ -14,11 +14,6 @@
 #include "elpekenin/split/transactions.h"
 #include "elpekenin/xap.h"
 
-// compat: includes codegen'ed file, which won't exist if feature isn't enabled
-#if IS_ENABLED(BUILD_INFO)
-#    include "elpekenin/build_info.h"
-#endif
-
 // compat: QFF/QGF files have `#include <qp.h>`, which fails if feature is disabled
 #if IS_ENABLED(QUANTUM_PAINTER)
 #    include "generated/qp_resources.h"
@@ -56,10 +51,6 @@ void keyboard_pre_init_user(void) {
     // these have to happen as soon as possible, so that code relying on them doesn't break
     // then, keymap-level setup
     sendchar_init();
-
-#if IS_ENABLED(BUILD_INFO)
-    build_info_init();
-#endif
 
     keyboard_pre_init_keymap();
 }

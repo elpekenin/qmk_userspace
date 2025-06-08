@@ -6,6 +6,7 @@ VPATH += $(USER_INCLUDE)
 
 SRC += \
     $(USER_SRC)/autoconf_rt.c \
+    $(USER_SRC)/eeprom.c \
     $(USER_SRC)/elpekenin.c \
     $(USER_SRC)/placeholders.c \
     $(USER_SRC)/layers.c \

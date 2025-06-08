@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include "elpekenin/autoconf_rt.h"
+#include "elpekenin/eeprom.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/qp/assets.h"
@@ -413,8 +414,24 @@ void keyboard_post_init_keymap(void) {
     if (IS_ENABLED(QUANTUM_PAINTER) && is_keyboard_left()) {
         set_device_by_name("il91874", il91874);
 
-        // TODO: if (get_build_id() != eeprom_build_id))
-        render_autoconf();
+        const u128 running_build_id = get_build_id();
+
+        user_data_t eeprom = {0};
+        eeconfig_read_user_datablock_field(eeprom, build_id);
+
+        // only draw when a new firmware is flashed
+        // this may still be a "useless" redraw (no settings changed)
+        // but is already much better than drawing on every power cycle
+        if (memcmp(&running_build_id, &eeprom.build_id, sizeof(u128)) != 0) {
+            // NOTE: this is sub-optimal because screen won't be drawn immediately
+            //       it is flushed 3 minutes after boot, to prevent damaging it
+            //       this means that losing power during that time will cause no redraw but storing new id
+            //       which in turn means next power cycle won't draw as eeprom value matches
+            eeprom.build_id = running_build_id;
+            eeconfig_update_user_datablock_field(eeprom, build_id);
+
+            render_autoconf();
+        }
     }
 
     if (IS_ENABLED(QUANTUM_PAINTER) && !is_keyboard_left()) {
