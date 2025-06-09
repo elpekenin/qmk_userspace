@@ -99,7 +99,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [RST] = LAYOUT(
         QK_BOOT,  XXXXXXX,  KC_F2,    XXXXXXX,  KC_F4,   PK_LOG,         PK_ID,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, EE_CLR,
         XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-        PK_QCLR,  AC_TOGG,  XXXXXXX,  XXXXXXX,  PK_SIZE, XXXXXXX,        PK_KLOG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_RBT,
+        PK_QCLR,  AC_TOGG,  XXXXXXX,  XXXXXXX,  PK_SIZE, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_RBT,
         _______,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
         XXXXXXX,  XXXXXXX,  _______,  _______,      DB_TOGG,                 PK_CONF,      _______, XXXXXXX, XXXXXXX, XXXXXXX
     ),
@@ -290,7 +290,7 @@ static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused voi
 }
 
 static void render_autoconf(void) {
-    painter_font_handle_t font = get_font_by_name("fira_code");
+    painter_font_handle_t font = qp_load_font_mem(font_ubuntu);
     if (font == NULL) {
         logging(LOG_ERROR, "%s: font == NULL", __func__);
         return;
@@ -313,6 +313,7 @@ static void render_autoconf(void) {
             continue;
         }
 
+        // limit name to 20 chars, making sure text will fit horizontally
         str_printf(&str, "%.*s=", 20, setting.name);
 
         switch (setting.value.type) {
@@ -330,10 +331,10 @@ static void render_autoconf(void) {
 
         pos.y += font->line_height;
 
-        if (pos.y >= qp_get_height(il91874)) {
+        if ((pos.y + font->line_height) >= qp_get_height(il91874)) {
             if (pos.shifted) {
                 logging(LOG_ERROR, "No space left in screen");
-                return;
+                break;
             }
 
             pos.x = qp_get_width(il91874) / 2;
@@ -342,6 +343,8 @@ static void render_autoconf(void) {
             pos.shifted = true;
         }
     }
+
+    qp_close_font(font);
 }
 
 #if CM_ENABLED(LEDMAP)

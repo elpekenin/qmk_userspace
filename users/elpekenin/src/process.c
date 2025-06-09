@@ -9,7 +9,6 @@
 
 #include "elpekenin/autoconf_rt.h"
 #include "elpekenin/keycodes.h"
-#include "elpekenin/keylog.h"
 #include "elpekenin/logging/backends/qp.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/split/transactions.h"
@@ -34,7 +33,6 @@ STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
 static struct {
     // dont mind me, just bodging my way in  :)
     bool last_td_spc;
-    bool keylog_active;
 } global = {0};
 
 bool apply_autocorrect(uint8_t backspaces, const char *str, char *typo, char *correct) {
@@ -87,10 +85,6 @@ bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *t
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     string_t str = str_new(15);
-
-    if (IS_ENABLED(KEYLOG) && global.keylog_active) {
-        keylog_process(keycode, record);
-    }
 
     // log events over XAP
     if (IS_ENABLED(XAP)) {
@@ -148,12 +142,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case PK_QCLR:
             if (IS_ENABLED(QP_LOG) && pressed) {
                 qp_log_clear();
-            }
-            return false;
-
-        case PK_KLOG:
-            if (IS_ENABLED(KEYLOG) && pressed) {
-                global.keylog_active ^= true;
             }
             return false;
 

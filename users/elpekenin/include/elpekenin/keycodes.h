@@ -14,22 +14,16 @@ enum userspace_keycodes {
     CUSTOM_KEYCODES_START = QK_USER,
 
     PK_CPYR, // copyright header
-
-    // QP
-    PK_QCLR, // clear logging buffer
-    PK_KLOG, // toggle keylogger
-
-    // Logging
-    PK_LOG, // cycle logging level
+    PK_QCLR, // clear qp logging buffer
+    PK_LOG,  // cycle logging level
     PK_SIZE, // print used flash
-
     PK_CONF, // print autoconf settings
-    PK_ID, // print build id
+    PK_ID,   // print build id
 
     // !! remember to update KEYCODE_STRING_NAMES_USER
 
     // First value that can be used on a keymap, keep last
-    QK_KEYMAP
+    QK_KEYMAP,
 };
 
 enum userspace_tapdances {

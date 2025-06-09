@@ -12,8 +12,11 @@
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/qp/ui/computer.h"
 #include "elpekenin/qp/ui/github.h"
-#include "elpekenin/scrolling_text.h"
 #include "elpekenin/split/transactions.h"
+
+#if CM_ENABLED(SCROLLING_TEXT)
+#    include "elpekenin/scrolling_text.h"
+#endif
 
 static inline uint8_t lsb(uint16_t val) {
     return val & 0xFF;
@@ -314,6 +317,10 @@ bool xap_execute_qp_textwidth(xap_token_t token, xap_route_user_quantum_painter_
     return true;
 }
 
+//
+// scrolling text
+//
+#if CM_ENABLED(SCROLLING_TEXT)
 bool xap_execute_draw_scrolling_text(xap_token_t token, xap_route_user_quantum_painter_scrolling_text_arg_t *arg) {
     xap_preprocess(token);
 
@@ -337,9 +344,9 @@ bool xap_execute_draw_scrolling_text(xap_token_t token, xap_route_user_quantum_p
             .spaces  = 5,
             .bg      = {HSV_BLACK},
             .fg      = {HSV_WHITE},
-#if SCROLLING_TEXT_USE_ALLOCATOR
+#    if SCROLLING_TEXT_USE_ALLOCATOR
             .allocator = c_runtime_allocator,
-#endif
+#    endif
         };
 
         const deferred_token def_token = scrolling_text_start(&config, (char *)arg->text);
@@ -361,6 +368,7 @@ bool xap_execute_extend_scrolling_text(xap_token_t token, xap_route_user_quantum
     scrolling_text_extend(arg->token, (const char *)arg->text);
     return true;
 }
+#endif
 
 //
 // tasks

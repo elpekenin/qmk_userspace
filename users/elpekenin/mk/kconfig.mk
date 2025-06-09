@@ -168,82 +168,30 @@ TOUCH_SCREEN_ENABLE=yes
 #
 # modules
 #
-
-#
-# allocator
-#
+CM_ALLOCATOR=yes
 # ALLOCATOR_DEBUG is not set
-ALLOC_ALLOCATORS_SIZE=10
-ALLOC_ALLOCATIONS_SIZE=100
+ALLOC_ALLOCATORS_SIZE=5
+ALLOC_ALLOCATIONS_SIZE=300
 HEAP_UI_REDRAW_INTERVAL=500
-# end of allocator
-
-#
-# build_id
-#
+CM_BUILD_ID=yes
 BUILD_ID_UI_REDRAW_INTERVAL=500
-# end of build_id
-
-#
-# crash
-#
-CRASH_UNWIND_DEPTH=100
-CRASH_MESAGE_LENGTH=200
-# end of crash
-
-#
-# glitch text
-#
-# GLITCH_TEXT_DEBUG is not set
-GLITCH_TEXT_N_WORKERS=15
-GLITCH_TEXT_TASK_INTERVAL=10
-# end of glitch text
-
-#
-# keylog
-#
-KEYLOG_SIZE=70
-KEYLOG_UI_REDRAW_INTERVAL=100
-# end of keylog
-
-#
-# logging
-#
+CM_CRASH=yes
+CRASH_UNWIND_DEPTH=20
+CRASH_MESAGE_LENGTH=100
+# CM_GLITCH_TEXT is not set
+# CM_KEYLOG is not set
+CM_LOGGING=yes
 LOGGING_FORMAT="[%T] (%LS): %M"
-# end of logging
-
-#
-# memory
-#
+CM_MEMORY=yes
 FLASH_UI_REDRAW_INTERVAL=500
-# end of memory
-
-#
-# sanitizer
-#
-# KASAN_DEBUG is not set
-KASAN_INIT_DELAY=3000
-KASAN_REDZONE_SIZE=4
-KASAN_MALLOC_ARRAY_SIZE=300
-# end of sanitizer
-
-#
-# scrolling text
-#
-# SCROLLING_TEXT_DEBUG is not set
-SCROLLING_TEXT_N_WORKERS=15
-SCROLLING_TEXT_TASK_INTERVAL=10
-# end of scrolling text
-
-#
-# ui
-#
-UI_DEBUG=yes
+# CM_SANITIZER is not set
+# CM_SCROLLING_TEXT is not set
+CM_UI=yes
+# UI_DEBUG is not set
 
 #
 # layer
 #
 UI_LAYER_REDRAW_INTERVAL=100
 # end of layer
-# end of ui
 # end of modules

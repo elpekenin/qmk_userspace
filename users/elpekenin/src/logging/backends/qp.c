@@ -128,8 +128,7 @@ uint32_t qp_logging_render(const ui_node_t *self, painter_device_t display) {
         const hsv_t fg = log_colors[line->level];
         const hsv_t bg = {HSV_BLACK};
 
-        const uint16_t width = qp_textwidth(font, line->ptr);
-        if (width == 0 || width > self->size.x) {
+        if (!ui_text_fits(self, font, line->ptr)) {
             continue;
         }
 
