@@ -7,7 +7,6 @@
 
 typedef struct {
     const uint8_t *logo;
-    uint32_t       timer;
     uint32_t       last;
     bool           clear;
 } github_args_t;

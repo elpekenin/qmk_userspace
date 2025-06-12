@@ -92,6 +92,10 @@ menuconfig RGB_MATRIX_ENABLE
     bool "rgb"
 
 if RGB_MATRIX_ENABLE
+    config RGB_MATRIX_MODE_NAME_ENABLE
+        bool "enable mode names"
+        default y
+
     config RGB_MATRIX_DEFAULT_VAL
         int "default val"
         range 0 255

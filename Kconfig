@@ -5,7 +5,3 @@ rsource "Kconfig.qmk"
 menu "userspace"
     rsource "users/elpekenin/Kconfig"
 endmenu
-
-menu "modules"
-    rsource "modules/elpekenin/Kconfig"
-endmenu

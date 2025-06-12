@@ -24,7 +24,6 @@ void qp_log_clear(void);
 
 typedef struct {
     const uint8_t *font;
-    uint32_t       timer;
     uint32_t       last;
 } qp_logging_args_t;
 STATIC_ASSERT(offsetof(qp_logging_args_t, font) == 0, "UI will crash :)");

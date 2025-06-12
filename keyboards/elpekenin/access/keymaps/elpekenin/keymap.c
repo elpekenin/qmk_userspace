@@ -65,6 +65,8 @@ STATIC_ASSERT(CM_ENABLED(STRING), "Must enable 'elpekenin/string'");
 STATIC_ASSERT(CM_ENABLED(UI), "Must enable 'elpekenin/ui'");
 #include "elpekenin/ui.h"
 #include "elpekenin/ui/layer.h"
+#include "elpekenin/ui/rgb.h"
+#include "elpekenin/ui/text.h"
 #include "elpekenin/ui/uptime.h"
 
 // clang-format off
@@ -123,15 +125,16 @@ static ui_node_t id[] = {
         .node_size = UI_ABSOLUTE(15),
     },
     {
-        .node_size = UI_FONT(),
+        .node_size = UI_FONT(1),
         .init      = build_id_init,
         .render    = build_id_render,
         .args      = &(build_id_args_t){
-            .font = font_fira_code,
+            .font     = font_fira_code,
+            .interval = 500,
         },
     },
     {
-        .node_size = UI_FONT(),
+        .node_size = UI_FONT(1),
         .init      = build_match_init,
         .render    = build_match_render,
         .args      = &(build_match_args_t){
@@ -142,7 +145,7 @@ static ui_node_t id[] = {
 
 static ui_node_t first_row[] = {
     {
-        .node_size = UI_IMAGE(),
+        .node_size = UI_IMAGE(1),
         .init      = github_init,
         .render    = github_render,
         .args      = &gh_args,
@@ -162,13 +165,13 @@ static ui_node_t first_row[] = {
 
 static ui_node_t left[] = {
     {
-        .node_size = UI_IMAGE(),
+        .node_size = UI_IMAGE(1),
         .direction = UI_SPLIT_DIR_HORIZONTAL,
         .children  = UI_CHILDREN(first_row),
         .args      = &gh_args,
     },
     {
-        .node_size = UI_FONT(),
+        .node_size = UI_FONT(1),
         .init      = uptime_init,
         .render    = uptime_render,
         .args      = &(uptime_args_t){
@@ -176,31 +179,35 @@ static ui_node_t left[] = {
         },
     },
     {
-        .node_size = UI_FONT(),
+        .node_size = UI_FONT(1),
         .init      = layer_init,
         .render    = layer_render,
         .args      = &(layer_args_t){
-            .font = font_fira_code,
+            .font       = font_fira_code,
+            .interval   = 100,
+            .layer_name = get_layer_name,
         },
     },
 #if CM_ENABLED(MEMORY)
     {
-        .node_size = UI_FONT(),
+        .node_size = UI_FONT(1),
         .init      = flash_init,
         .render    = flash_render,
         .args      = &(flash_args_t){
-            .font = font_fira_code,
+            .font     = font_fira_code,
+            .interval = 500,
         },
     },
 #endif
 
 #if CM_ENABLED(ALLOCATOR)
     {
-        .node_size = UI_FONT(),
+        .node_size = UI_FONT(1),
         .init      = heap_init,
         .render    = heap_render,
         .args      = &(heap_args_t){
-            .font = font_fira_code,
+            .font     = font_fira_code,
+            .interval = 500,
         },
     },
 #endif
@@ -213,10 +220,78 @@ static ui_node_t left[] = {
     }
 };
 
+static const uint8_t *const rgb_font = font_fira_code;
+static const uint32_t rgb_interval = 500;
+
+static rgb_args_t rgb_args = {
+    .font     = rgb_font,
+    .interval = rgb_interval,
+};
+
+static ui_node_t rgb_mode[] = {
+    {
+        .node_size = UI_FONT(1),
+        .init      = text_init,
+        .render    = text_render,
+        .args      = &(text_args_t){
+            .font     = rgb_font,
+            .interval = rgb_interval,
+            .str      = "Mode",
+        },
+    },
+    {
+        .node_size = UI_FONT(1),
+        .init      = rgb_init,
+        .render    = rgb_mode_render,
+        .args      = &rgb_args,
+    },
+};
+
+static ui_node_t rgb_hsv[] = {
+    {
+        .node_size = UI_FONT(1),
+        .init      = text_init,
+        .render    = text_render,
+        .args      = &(text_args_t){
+            .font     = rgb_font,
+            .interval = rgb_interval,
+            .str      = "HSV",
+        },
+    },
+    {
+        .node_size = UI_FONT(1),
+        .init      = rgb_init,
+        .render    = rgb_hsv_render,
+        .args      = &rgb_args,
+    },
+};
+
+static ui_node_t rgb[] = {
+    {
+        .node_size = UI_RELATIVE(50),
+        .direction = UI_SPLIT_DIR_VERTICAL,
+        .children  = UI_CHILDREN(rgb_mode),
+    },
+    {
+        .node_size = UI_REMAINING(),
+        .direction = UI_SPLIT_DIR_VERTICAL,
+        .children  = UI_CHILDREN(rgb_hsv),
+    },
+};
+
 static ui_node_t right[] = {
+#if IS_ENABLED(RGB_MATRIX)
+    {
+        .node_size = UI_FONT(2),
+        .direction = UI_SPLIT_DIR_HORIZONTAL,
+        .children  = UI_CHILDREN(rgb),
+        .args      = &rgb_args,
+    },
+#endif
+
 #if CM_ENABLED(KEYLOG)
     {
-        .node_size = UI_FONT(),
+        .node_size = UI_FONT(1),
         .init      = keylog_init,
         .render    = keylog_render,
         .args      = &(keylog_args_t){

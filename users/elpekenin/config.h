@@ -13,6 +13,18 @@
 #define member_size(type, member) (sizeof(((type *)NULL)->member))
 
 //
+// community modules
+//
+
+// #define ALLOCATOR_DEBUG
+// #define UI_DEBUG
+#define ALLOC_ALLOCATORS_SIZE 5
+#define ALLOC_ALLOCATIONS_SIZE 300
+#define CRASH_UNWIND_DEPTH 20
+#define CRASH_MESAGE_LENGTH 100
+#define LOGGING_FORMAT "[%T] (%LS): %M"
+
+//
 // logging
 //
 
