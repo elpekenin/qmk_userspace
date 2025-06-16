@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import shlex
 import shutil
 import subprocess
 import sys
@@ -34,7 +33,7 @@ if TYPE_CHECKING:
     class CompilationDatabaseEntry(TypedDict):
         """Typing stub for data in `compile_commands.json`."""
 
-        command: str
+        arguments: list[str]
         directory: str
         file: str
 
@@ -160,7 +159,10 @@ def get_args_and_dir_from_file(file: Path) -> tuple[list[str], Path]:
     """Extract arguments from a compilation database file."""
     database: list[CompilationDatabaseEntry] = json.loads(file.read_text())
     entry = database[0]
-    return shlex.split(entry["command"]), Path(entry["directory"])
+    return (
+        entry["arguments"],
+        Path(entry["directory"]),
+    )
 
 
 def get_commit(directory: Path) -> str:

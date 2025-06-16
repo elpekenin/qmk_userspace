@@ -2,10 +2,6 @@
 Userspace
 *********
 
-keylog
-######
-.. c:autodoc:: users/elpekenin/include/elpekenin/keylog.h
-
 sipo
 ####
 .. c:autodoc:: users/elpekenin/include/elpekenin/sipo.h
