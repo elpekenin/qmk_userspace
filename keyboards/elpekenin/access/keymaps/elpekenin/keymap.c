@@ -230,7 +230,7 @@ static rgb_args_t rgb_args = {
 
 static ui_node_t rgb_mode[] = {
     {
-        .node_size = UI_FONT(1),
+        .node_size = UI_RELATIVE(20),
         .init      = text_init,
         .render    = text_render,
         .args      = &(text_args_t){
@@ -240,7 +240,7 @@ static ui_node_t rgb_mode[] = {
         },
     },
     {
-        .node_size = UI_FONT(1),
+        .node_size = UI_REMAINING(),
         .init      = rgb_init,
         .render    = rgb_mode_render,
         .args      = &rgb_args,
@@ -249,7 +249,7 @@ static ui_node_t rgb_mode[] = {
 
 static ui_node_t rgb_hsv[] = {
     {
-        .node_size = UI_FONT(1),
+        .node_size = UI_RELATIVE(20),
         .init      = text_init,
         .render    = text_render,
         .args      = &(text_args_t){
@@ -259,7 +259,7 @@ static ui_node_t rgb_hsv[] = {
         },
     },
     {
-        .node_size = UI_FONT(1),
+        .node_size = UI_REMAINING(),
         .init      = rgb_init,
         .render    = rgb_hsv_render,
         .args      = &rgb_args,
@@ -269,12 +269,12 @@ static ui_node_t rgb_hsv[] = {
 static ui_node_t rgb[] = {
     {
         .node_size = UI_RELATIVE(50),
-        .direction = UI_SPLIT_DIR_VERTICAL,
+        .direction = UI_SPLIT_DIR_HORIZONTAL,
         .children  = UI_CHILDREN(rgb_mode),
     },
     {
         .node_size = UI_REMAINING(),
-        .direction = UI_SPLIT_DIR_VERTICAL,
+        .direction = UI_SPLIT_DIR_HORIZONTAL,
         .children  = UI_CHILDREN(rgb_hsv),
     },
 };
@@ -283,7 +283,7 @@ static ui_node_t right[] = {
 #if IS_ENABLED(RGB_MATRIX)
     {
         .node_size = UI_FONT(2),
-        .direction = UI_SPLIT_DIR_HORIZONTAL,
+        .direction = UI_SPLIT_DIR_VERTICAL,
         .children  = UI_CHILDREN(rgb),
         .args      = &rgb_args,
     },
