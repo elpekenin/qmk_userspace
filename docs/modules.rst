@@ -68,6 +68,9 @@ memory
 micropython
 ###########
 
+.. warning::
+    This is currently broken and WIP, dont use it because it will crash your board.
+
 Embeds microypthon's interpreter into your board
 
 Since that's not very useful by itself, a module is provided to hook into QMK APIs. Namely, you use: ``import qmk``

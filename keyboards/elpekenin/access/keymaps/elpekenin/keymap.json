@@ -13,8 +13,8 @@
         "elpekenin/version",
 
         /* RGB Matrix */
-        "elpekenin/indicators",
         "elpekenin/ledmap",
+        "elpekenin/indicators",
 
         /* QP */
         "drashna/qp_helpers",
