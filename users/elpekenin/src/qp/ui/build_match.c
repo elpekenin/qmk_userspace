@@ -18,11 +18,25 @@ uint32_t build_match_render(const ui_node_t *self, painter_device_t display) {
         goto exit;
     }
 
-    const u128 id = get_build_id();
+    u128 id;
+    if (get_build_id(&id) < 0) {
+        return 0;
+    }
+
+    if (!is_keyboard_master()) {
+        const char *const str = "unknown";
+
+        if (ui_text_fits(self, font, str)) {
+            qp_drawtext_recolor(display, self->start.x, self->start.y, font, str, HSV_YELLOW, HSV_BLACK);
+        }
+
+        goto err;
+    }
 
     u128 slave_id;
     if (!get_slave_build_id(&slave_id)) {
         const char *const str = "comms fail";
+
         if (ui_text_fits(self, font, str)) {
             qp_drawtext_recolor(display, self->start.x, self->start.y, font, str, HSV_ORANGE, HSV_BLACK);
         }

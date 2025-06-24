@@ -3,7 +3,6 @@
 
 #include "elpekenin/logging/backends/qp.h"
 
-#include <errno.h>
 #include <quantum/color.h>
 #include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
@@ -59,7 +58,7 @@ int8_t sendchar_qp(uint8_t chr) {
 
     // exhausted buffer
     if (qp_log.col >= (QP_LOG_N_CHARS - 1)) {
-        return -ENOMEM;
+        return -1;
     }
 
     // regular buffering

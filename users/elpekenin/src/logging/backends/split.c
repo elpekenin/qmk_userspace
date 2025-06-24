@@ -1,7 +1,6 @@
 // Copyright Pablo Martinez (@elpekenin) <elpekenin@elpekenin.dev>
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <errno.h>
 #include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 #include <quantum/split_common/transactions.h>
@@ -39,7 +38,7 @@ int8_t sendchar_split(uint8_t chr) {
 
     const bool pushed = rbuf_push(rbuf, chr);
     if (!pushed) {
-        return -ENOMEM;
+        return -1;
     }
 
     return 0;

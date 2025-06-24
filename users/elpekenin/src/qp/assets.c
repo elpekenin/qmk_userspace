@@ -8,9 +8,6 @@
 #include <quantum/util.h>
 #include <sys/cdefs.h>
 
-STATIC_ASSERT(CM_ENABLED(GENERICS), "Must enable 'elpekenin/generics'");
-#include "elpekenin/generics.h"
-
 STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #include "elpekenin/logging.h"
 
@@ -86,19 +83,20 @@ static const void *get_by_index(asset_kind_t kind, size_t index) {
 
     size_t counter = 0;
 
-    bool filter(asset_t asset) {
-        if (asset.kind == kind) {
+    const asset_t *asset = NULL;
+    for (size_t i = 0; i < total_count(); ++i) {
+        const asset_t *ptr = &assets[i];
+
+        if (ptr->kind == kind) {
             if (counter == index) {
-                return true;
+                asset = ptr;
+                break;
             }
 
             counter += 1;
         }
-
-        return false;
     }
 
-    const asset_t *const asset = find(assets, total_count(), filter);
     if (asset == NULL) {
         logging(LOG_ERROR, "(%s, %d): not found", type, index);
         return NULL;
@@ -111,11 +109,15 @@ static const void *get_by_index(asset_kind_t kind, size_t index) {
 static const void *get_by_name(asset_kind_t kind, const char *name) {
     const char *const type = asset_names[kind];
 
-    bool filter(asset_t asset) {
-        return asset.kind == kind && asset.name != NULL && strcmp(asset.name, name) == 0;
+    const asset_t *asset = NULL;
+    for (size_t i = 0; i < total_count(); ++i) {
+        const asset_t *ptr = &assets[i];
+        if (ptr->kind == kind && (strcmp(ptr->name, name) == 0)) {
+            asset = ptr;
+            break;
+        }
     }
 
-    const asset_t *const asset = find(assets, total_count(), filter);
     if (asset == NULL) {
         logging(LOG_ERROR, "(%s, '%s'): not found", type, name);
         return NULL;

@@ -3,7 +3,9 @@
 
 #pragma once
 
-typedef enum {
+#include <stdint.h>
+
+typedef enum : uint8_t {
     QWERTY,
     FN1,
     FN2,

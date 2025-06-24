@@ -15,6 +15,11 @@ STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #    define SPLIT_LOG_SYNC_DELAY 0
 #endif
 
+typedef struct {
+    bool ok;
+    u128 value;
+} build_id_msg_t;
+
 //
 // Slave-side handlers
 //
@@ -39,12 +44,19 @@ static void xap_handler(uint8_t m2s_size, const void* m2s_buffer, __unused uint8
 }
 
 static void build_id_handler(__unused uint8_t m2s_size, __unused const void* m2s_buffer, uint8_t s2m_size, void* s2m_buffer) {
-    if (s2m_size != sizeof(u128)) {
+    if (s2m_size != sizeof(build_id_msg_t)) {
         return;
     }
 
-    const u128 build_id = get_build_id();
-    memcpy(s2m_buffer, &build_id, sizeof(u128));
+    build_id_msg_t* msg = s2m_buffer;
+
+    u128       build_id;
+    const bool fail = get_build_id(&build_id) < 0;
+
+    msg->ok = !fail;
+    if (!fail) {
+        msg->value = build_id;
+    }
 }
 
 //
@@ -86,7 +98,15 @@ bool get_slave_build_id(u128* build_id) {
         return false;
     }
 
-    return transaction_rpc_recv(RPC_ID_USER_BUILD_ID, sizeof(u128), build_id);
+    build_id_msg_t msg = {0};
+
+    const bool ret = transaction_rpc_recv(RPC_ID_USER_BUILD_ID, sizeof(build_id_msg_t), &msg);
+    if (!ret || !msg.ok) {
+        return false;
+    }
+
+    *build_id = msg.value;
+    return true;
 }
 
 void transactions_init(void) {

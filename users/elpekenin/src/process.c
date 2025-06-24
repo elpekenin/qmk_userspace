@@ -178,7 +178,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         case PK_ID:
             if (pressed) {
-                const u128 build_id = get_build_id();
+                u128 build_id;
+                if (get_build_id(&build_id) < 0) {
+                    return false;
+                }
 
                 printf("Build id: 0x");
                 for (size_t i = 0; i < sizeof(u128); ++i) {

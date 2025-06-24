@@ -6,9 +6,9 @@ if SIPO_PINS_ENABLE
         int "number of outputs"
 endif
 
-config BUILD_INFO
-    bool "build info"
-    default n
+config AUTOCONF_FW_CHECK
+    bool "only draw autoconf settings when new fw is flashed"
+    default "n"
 
 rsource "src/logging/Kconfig"
 

@@ -121,7 +121,6 @@ static github_args_t gh_args = {
 
 static ui_node_t id[] = {
     {
-        // spacer
         .node_size = UI_ABSOLUTE(15),
     },
     {
@@ -152,12 +151,11 @@ static ui_node_t first_row[] = {
     },
 #if CM_ENABLED(BUILD_ID)
     {
-        // spacer
         .node_size = UI_ABSOLUTE(5),
     },
     {
         .node_size = UI_REMAINING(),
-        .direction = UI_SPLIT_DIR_VERTICAL,
+        .direction = UI_SPLIT_DIR_TOP_BOTTOM,
         .children  = UI_CHILDREN(id),
     }
 #endif
@@ -166,7 +164,7 @@ static ui_node_t first_row[] = {
 static ui_node_t left[] = {
     {
         .node_size = UI_IMAGE(1),
-        .direction = UI_SPLIT_DIR_HORIZONTAL,
+        .direction = UI_SPLIT_DIR_LEFT_RIGHT,
         .children  = UI_CHILDREN(first_row),
         .args      = &gh_args,
     },
@@ -269,12 +267,12 @@ static ui_node_t rgb_hsv[] = {
 static ui_node_t rgb[] = {
     {
         .node_size = UI_RELATIVE(50),
-        .direction = UI_SPLIT_DIR_HORIZONTAL,
+        .direction = UI_SPLIT_DIR_LEFT_RIGHT,
         .children  = UI_CHILDREN(rgb_mode),
     },
     {
         .node_size = UI_REMAINING(),
-        .direction = UI_SPLIT_DIR_HORIZONTAL,
+        .direction = UI_SPLIT_DIR_LEFT_RIGHT,
         .children  = UI_CHILDREN(rgb_hsv),
     },
 };
@@ -283,7 +281,7 @@ static ui_node_t right[] = {
 #if IS_ENABLED(RGB_MATRIX)
     {
         .node_size = UI_FONT(2),
-        .direction = UI_SPLIT_DIR_VERTICAL,
+        .direction = UI_SPLIT_DIR_TOP_BOTTOM,
         .children  = UI_CHILDREN(rgb),
         .args      = &rgb_args,
     },
@@ -315,18 +313,18 @@ static ui_node_t right[] = {
 static ui_node_t nodes[] = {
     {
         .node_size = UI_RELATIVE(50),
-        .direction = UI_SPLIT_DIR_VERTICAL,
+        .direction = UI_SPLIT_DIR_TOP_BOTTOM,
         .children  = UI_CHILDREN(left),
     },
     {
         .node_size = UI_REMAINING(),
-        .direction = UI_SPLIT_DIR_VERTICAL,
+        .direction = UI_SPLIT_DIR_TOP_BOTTOM,
         .children  = UI_CHILDREN(right),
     },
 };
 
 static ui_node_t root = {
-    .direction = UI_SPLIT_DIR_HORIZONTAL,
+    .direction = UI_SPLIT_DIR_LEFT_RIGHT,
     .children  = UI_CHILDREN(nodes),
 };
 // clang-format off
@@ -459,19 +457,19 @@ const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #if CM_ENABLED(INDICATORS)
 const indicator_t PROGMEM indicators[] = {
-    NUM_LOCK_INDICATOR(HSV_COLOR(HSV_RED)),
+    NUM_LOCK_INDICATOR(HUE(HUE_RED)),
 
     LAYER_INDICATOR(RST, RGB_COLOR(RGB_OFF)),
 
     // QMK keycodes
-    KEYCODE_IN_LAYER_INDICATOR(QK_BOOT, RST, RGB_COLOR(RGB_RED)),
-    KEYCODE_IN_LAYER_INDICATOR(QK_RBT, RST, RGB_COLOR(RGB_RED)),
-    KEYCODE_IN_LAYER_INDICATOR(EE_CLR, RST, RGB_COLOR(RGB_RED)),
-    KEYCODE_IN_LAYER_INDICATOR(DB_TOGG, RST, RGB_COLOR(RGB_RED)),
+    KEYCODE_IN_LAYER_INDICATOR(QK_BOOT, RST, HUE(HUE_RED)),
+    KEYCODE_IN_LAYER_INDICATOR(QK_RBT, RST, HUE(HUE_RED)),
+    KEYCODE_IN_LAYER_INDICATOR(EE_CLR, RST, HUE(HUE_RED)),
+    KEYCODE_IN_LAYER_INDICATOR(DB_TOGG, RST, HUE(HUE_RED)),
     // KEYCODE_IN_LAYER_INDICATOR(AC_DICT, RST, RGB_RED),
 
     // custom keycodes
-    CUSTOM_KEYCODE_IN_LAYER_INDICATOR(RST, RGB_COLOR(RGB_BLUE)),
+    CUSTOM_KEYCODE_IN_LAYER_INDICATOR(RST, HUE(HUE_BLUE)),
 };
 #endif
 
@@ -494,22 +492,29 @@ void keyboard_post_init_keymap(void) {
     if (IS_ENABLED(QUANTUM_PAINTER) && is_keyboard_left()) {
         set_device_by_name("il91874", il91874);
 
-        const u128 running_build_id = get_build_id();
+        u128       running_build_id;
+        const bool err = get_build_id(&running_build_id) < 0;
 
         user_data_t eeprom = {0};
         eeconfig_read_user_datablock_field(eeprom, build_id);
 
+        const bool new_fw = !err && memcmp(&running_build_id, &eeprom.build_id, sizeof(u128)) != 0;
+        // NOTE: sub-optimal because screen won't be drawn immediately
+        //       it is flushed 3 minutes after boot, to prevent damaging it
+        //       this means that losing power during that time will cause no redraw but storing new id
+        //       which in turn means next power cycle won't draw as eeprom value matches
+        if (new_fw) {
+            eeprom.build_id = running_build_id;
+            eeconfig_update_user_datablock_field(eeprom, build_id);
+        }
+
+        // FIXME: AUTOCONF_FW_CHECK is a hack to fix screen getting wiped (removes text)
+        //        find out the root cause of that, and remove this workaround
+        const bool skip_draw = IS_DEFINED(AUTOCONF_FW_CHECK) && new_fw;
         // only draw when a new firmware is flashed
         // this may still be a "useless" redraw (no settings changed)
         // but is already much better than drawing on every power cycle
-        if (memcmp(&running_build_id, &eeprom.build_id, sizeof(u128)) != 0) {
-            // NOTE: this is sub-optimal because screen won't be drawn immediately
-            //       it is flushed 3 minutes after boot, to prevent damaging it
-            //       this means that losing power during that time will cause no redraw but storing new id
-            //       which in turn means next power cycle won't draw as eeprom value matches
-            eeprom.build_id = running_build_id;
-            eeconfig_update_user_datablock_field(eeprom, build_id);
-
+        if (!skip_draw) {
             render_autoconf();
         }
     }

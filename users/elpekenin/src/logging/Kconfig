@@ -11,7 +11,7 @@ if QP_LOG_ENABLE
 
     config QP_LOG_N_LINES
         int "lines stored"
-        default 9
+        default 13
 
     config QP_LOGGING_UI_REDRAW_INTERVAL
         int "ui draw interval (ms)"
