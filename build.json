@@ -33,6 +33,11 @@
             "id": 20032
         },
         {
+            "operation": "merge",
+            "repo": "https://github.com/elpekenin/qmk_firmware",
+            "branch": "fix/ws2812_split"
+        },
+        {
             "operation": "checkout",
             "files": ["drivers/painter/il91874"],
             "repo": "https://github.com/elpekenin/qmk_firmware",
