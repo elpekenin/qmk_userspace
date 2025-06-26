@@ -78,6 +78,9 @@
                             },
                             "file": {
                                 "type": "string"
+                            },
+                            "path": {
+                                "type": "string"
                             }
                         },
                         "required": [

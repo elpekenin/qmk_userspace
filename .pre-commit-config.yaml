@@ -57,6 +57,7 @@ repos:
           kconfiglib,
           qmk,
           sphinx,
+          types-docutils,
           types-tqdm,
           typing_extensions,
         ]

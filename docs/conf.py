@@ -18,6 +18,8 @@ if TYPE_CHECKING:
 
     from sphinx.application import Sphinx
 
+# add custom extensions
+sys.path.append(str(Path("extensions").resolve()))
 
 ROOT = Path(os.environ["CONF_ROOT"])
 USERSPACE = ROOT / "users" / "elpekenin"
@@ -34,6 +36,8 @@ extensions = [
     "hawkmoth",
     "hawkmoth.ext.napoleon",
     "sphinx_tabs.tabs",
+    # custom
+    "community_module",
 ]
 
 templates_path = ["_templates"]

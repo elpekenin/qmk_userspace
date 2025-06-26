@@ -23,7 +23,6 @@
 
 #include <quantum/compiler_support.h>
 #include <quantum/util.h>
-#include <sys/cdefs.h>
 
 #ifdef SPI_CUSTOM_DEBUG
 #    include "quantum/logging/debug.h"

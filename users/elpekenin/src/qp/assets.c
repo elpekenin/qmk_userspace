@@ -6,7 +6,6 @@
 #include <quantum/compiler_support.h>
 #include <quantum/quantum.h>
 #include <quantum/util.h>
-#include <sys/cdefs.h>
 
 STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 #include "elpekenin/logging.h"

@@ -216,15 +216,16 @@ class Diff(Operation):
 
         operation: Literal["diff"]
         file: str
+        path: NotRequired[str]
 
     def __init__(
         self,
-        workdir: Path,
         file: Path,
+        path: Path,
     ) -> None:
         """Initialize an instance."""
-        self.workdir = workdir
         self.file = file
+        self.path = path
 
     @classmethod
     def init_from(
@@ -239,7 +240,14 @@ class Diff(Operation):
         if file is None:
             return missing("file")
 
-        return Ok(cls(workdir, elpekenin_userspace.path.resolve(file)))
+        path = entry.get("path") or workdir
+
+        return Ok(
+            cls(
+                elpekenin_userspace.path.resolve(file),
+                elpekenin_userspace.path.resolve(path),
+            ),
+        )
 
     def __str__(self) -> str:
         """Display this operation."""
@@ -247,7 +255,7 @@ class Diff(Operation):
 
     def run(self) -> Result[None, str]:
         """Entrypoint."""
-        repo = Repo(self.workdir)
+        repo = Repo(self.path)
         repo.git.apply("--reject", "--whitespace=fix", self.file)
         return Ok(None)
 
