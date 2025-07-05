@@ -126,7 +126,7 @@ def convert(path: Path) -> Result[None, str]:
 
 
 class Py2C(BaseCommand):
-    """Generate C-string equivalent of a .py file."""
+    """Generate C-string equivalent of .py files."""
 
     @classmethod
     def add_args(cls, parser: argparse.ArgumentParser) -> None:

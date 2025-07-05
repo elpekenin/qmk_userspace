@@ -13,14 +13,14 @@
         "elpekenin/version",
 
         /* RGB Matrix */
-        "elpekenin/ledmap",
+        // "elpekenin/ledmap",
         "elpekenin/indicators",
 
         /* QP */
         "drashna/qp_helpers",
 
         /* experimental */
-        // "elpekenin/micropython",
+        "elpekenin/micropython",
         // "elpekenin/sanitizer",
     ]
 }

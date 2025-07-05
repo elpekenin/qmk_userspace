@@ -69,6 +69,7 @@ def get_parser() -> argparse.ArgumentParser:
         subparser = subparsers.add_parser(
             name,
             help=class_.help(),
+            description=class_.help(),
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         class_.add_args(subparser)

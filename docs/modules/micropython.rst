@@ -1,7 +1,7 @@
 .. include:: _hint.rst
 
 .. warning::
-    This is currently broken and WIP, dont use it because it will crash your board.
+    This is WIP, might crash your board or something.
 
 micropython
 ###########
