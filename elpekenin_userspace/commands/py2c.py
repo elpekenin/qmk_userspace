@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 
 REPLACEMENTS: tuple[tuple[str, str], ...] = (
+    ("\\", "\\\\"),
     ('"', '\\"'),
     ("\n", "\\n"),
 )
@@ -93,8 +94,8 @@ def convert_file(file: Path) -> None:
         return
 
     tree = reduce(file)
-
     code = ast.unparse(tree)
+
     for old, new in REPLACEMENTS:
         code = code.replace(old, new)
 

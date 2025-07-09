@@ -17,7 +17,7 @@
 #define TOUCH_SPI_DIV 16
 #define TOUCH_SPI_MODE SCREENS_SPI_MODE
 // used for screens' CS as the control lines are actually SIPO "pins"
-#define DUMMY_PIN GP14
+#define DUMMY_PIN GP28
 
 #define REGISTERS_SPI_DRIVER SPID0
 #define REGISTERS_SCK_PIN GP2
@@ -48,7 +48,7 @@
 #define QUANTUM_PAINTER_PIXDATA_BUFFER_SIZE 24000
 
 // Split
-#define EE_HANDS
+#define SPLIT_HAND_PIN GP14
 #define USB_VBUS_PIN GP24
 
 // UART

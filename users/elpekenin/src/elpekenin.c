@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include <quantum/color.h>
-#include <quantum/compiler_support.h>
 #include <quantum/process_keycode/process_autocorrect.h>
 #include <quantum/tri_layer.h>
 
@@ -24,12 +23,9 @@
 #    include <quantum/rgb_matrix/rgb_matrix.h>
 #endif
 
-// compat: otherwise `Option(crash_info_t)` is not defined
-STATIC_ASSERT(CM_ENABLED(CRASH), "Must enable 'elpekenin/crash'");
-#include "elpekenin/crash.h"
-
-STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
-#include "elpekenin/logging.h"
+#if CM_ENABLED(CRASH)
+#    include "elpekenin/crash.h"
+#endif
 
 // clang-format off
 KEYCODE_STRING_NAMES_USER(
@@ -69,22 +65,21 @@ void keyboard_post_init_user(void) {
         autocorrect_enable();
     }
 
-    if (CM_ENABLED(CRASH)) {
-        Option(crash_info_t) maybe_crash = get_crash();
+#if CM_ENABLED(CRASH)
+    Option(crash_info_t) maybe_crash = get_crash();
 
-        if (maybe_crash.is_some) {
-            crash_info_t crash = unwrap(maybe_crash);
+    if (maybe_crash.is_some) {
+        crash_info_t crash = unwrap(maybe_crash);
 
-            logging(LOG_WARN, "%s", crash.msg);
-            for (size_t i = 0; i < crash.stack_depth; ++i) {
-                logging(LOG_ERROR, "%s (%p)", crash.call_stack[i].name, crash.call_stack[i].address);
-            }
-        } else {
-            logging(LOG_DEBUG, "Previous run did not crash");
+        printf("%s\n", crash.msg);
+        for (size_t i = 0; i < crash.stack_depth; ++i) {
+            printf("%s (%p)\n", crash.call_stack[i].name, crash.call_stack[i].address);
         }
+    } else {
+        printf("No crash\n");
     }
+#endif
 
-    // compat: not visible if feature is off
 #if IS_ENABLED(QUANTUM_PAINTER)
     load_qp_resources();
 #endif

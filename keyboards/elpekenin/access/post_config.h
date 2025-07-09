@@ -4,12 +4,12 @@
 #pragma once
 
 // real size, used for init function
-#define _IL91874_WIDTH 176
-#define _IL91874_HEIGHT 264
-#define _ILI9163_WIDTH 130
-#define _ILI9163_HEIGHT 130
-#define _ILI9341_WIDTH 240
-#define _ILI9341_HEIGHT 320
+#define _IL91874_WIDTH (176)
+#define _IL91874_HEIGHT (264)
+#define _ILI9163_WIDTH (130)
+#define _ILI9163_HEIGHT (130)
+#define _ILI9341_WIDTH (240)
+#define _ILI9341_HEIGHT (320)
 
 // validate rotation value
 #if !(ILI9163_ROTATION == 0 || ILI9163_ROTATION == 1 || ILI9163_ROTATION == 2 || ILI9163_ROTATION == 3)

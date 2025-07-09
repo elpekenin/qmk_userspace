@@ -70,6 +70,10 @@ void logging_handler(__unused uint8_t m2s_size, __unused const void* m2s_buffer,
 
 // master
 uint32_t user_logging_master_poll(void) {
+    if (!is_keyboard_master()) {
+        return 0;
+    }
+
     split_logging_t data = {0};
     transaction_rpc_recv(RPC_ID_USER_LOGGING, sizeof(split_logging_t), &data);
 

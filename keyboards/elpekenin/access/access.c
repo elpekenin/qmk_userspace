@@ -105,7 +105,7 @@ void keyboard_post_init_kb(void) {
 
     if (IS_ENABLED(TOUCH_SCREEN) && !is_keyboard_left()) {
         bool ret = touch_spi_init(ili9341_touch);
-        printf("Touch screen setup: %s\n", ret ? "ok" : "failed");
+        printf("Touch setup: %s\n", ret ? "ok" : "failed");
     }
 
     keyboard_post_init_user();

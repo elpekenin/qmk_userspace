@@ -12,7 +12,7 @@ STATIC_ASSERT(CM_ENABLED(LOGGING), "Must enable 'elpekenin/logging'");
 
 // compat: no work to do
 #if !IS_ENABLED(SPLIT_LOG)
-#    define SPLIT_LOG_SYNC_DELAY 0
+#    define SPLIT_LOG_SYNC_DELAY (0)
 #endif
 
 typedef struct {
