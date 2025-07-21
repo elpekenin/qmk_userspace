@@ -2,6 +2,7 @@ name: Build vs latest QMK
 
 env:
   IS_CICD: 1
+  QMK_HOME: ~/workspace/qmk_firmware
 
 on:
   # every 5 days
@@ -37,7 +38,6 @@ jobs:
           pip install Jinja2 fnvhash
           pip install --upgrade milc
           qmk config compile.parallel=20
-          echo "QMK_HOME=~/workspace/qmk" >> $GITHUB_ENV
 
       - name: Show environment info
         run: |

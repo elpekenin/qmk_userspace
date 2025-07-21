@@ -25,29 +25,14 @@ void td_ntil_finished(tap_dance_state_t *state, __unused void *user_data) {
     }
 }
 
-void td_z_finished(tap_dance_state_t *state, __unused void *user_data) {
+void td_angles_finished(tap_dance_state_t *state, __unused void *user_data) {
     switch (state->count) {
         case 1:
-            register_code16(KC_Z); // z
-            break;
-
-        case 2:
             tap_code16(ES_LABK); // <
             break;
 
-        case 3:
+        case 2:
             tap_code16(ES_RABK); // >
-            break;
-
-        default:
-            break;
-    }
-}
-
-void td_z_reset(tap_dance_state_t *state, __unused void *user_data) {
-    switch (state->count) {
-        case 1:
-            unregister_code16(KC_Z);
             break;
 
         default:
@@ -77,15 +62,15 @@ void td_grv_finished(tap_dance_state_t *state, __unused void *user_data) {
     }
 
     // TODO: Change tap-hold decision so this does not work funny
-    send_string_with_delay("``` " SS_LSFT("\n\n") "``` ", MILLISECONDS(10));
+    send_string_with_delay("``` " SS_LSFT("\n\n") "``` ", 10);
     tap_code16(KC_UP);
 }
 
 tap_dance_action_t tap_dance_actions[] = {
-    [TD_ID_NTIL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_ntil_finished, NULL),
-    [TD_ID_Z]    = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_z_finished, td_z_reset),
-    [TD_ID_SPC]  = ACTION_TAP_DANCE_FN_ADVANCED(td_spc_each, NULL, td_spc_reset),
-    [TD_ID_GRV]  = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_grv_finished, NULL),
+    [TD_ID_NTIL]   = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_ntil_finished, NULL),
+    [TD_ID_ANGLES] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_angles_finished, NULL),
+    [TD_ID_SPC]    = ACTION_TAP_DANCE_FN_ADVANCED(td_spc_each, NULL, td_spc_reset),
+    [TD_ID_GRV]    = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_grv_finished, NULL),
 };
 
 const key_override_t delete_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_BSPC, KC_DEL);

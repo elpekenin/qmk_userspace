@@ -1,6 +1,5 @@
 {
     "modules": [
-        /* standalone */
         "elpekenin/allocator",
         "elpekenin/build_id",
         "elpekenin/crash",
@@ -12,14 +11,11 @@
         "elpekenin/ui",
         "elpekenin/version",
 
-        /* RGB Matrix */
-        // "elpekenin/ledmap",
+        "elpekenin/ledmap",
         "elpekenin/indicators",
 
-        /* QP */
         "drashna/qp_helpers",
 
-        /* experimental */
         "elpekenin/micropython",
         // "elpekenin/sanitizer",
     ]

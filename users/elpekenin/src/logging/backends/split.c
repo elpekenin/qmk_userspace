@@ -106,7 +106,9 @@ uint32_t user_logging_master_poll(void) {
         }
 
         // write it
-        printf("split\n%s\nendsplit\n", buff);
+        printf(">>>\n");
+        printf("%s\n", buff);
+        printf("<<<\n");
     }
 
     return SPLIT_LOG_SYNC_INTERVAL;

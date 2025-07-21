@@ -28,13 +28,13 @@ enum userspace_keycodes {
 
 enum userspace_tapdances {
     TD_ID_NTIL,
-    TD_ID_Z,
+    TD_ID_ANGLES,
     TD_ID_GRV,
     TD_ID_SPC,
 };
 
 #define TD_NTIL TD(TD_ID_NTIL)
-#define TD_Z    TD(TD_ID_Z)
+#define TD_ANGL TD(TD_ID_ANGLES)
 #define TD_GRV  TD(TD_ID_GRV)
 #define TD_SPC  TD(TD_ID_SPC)
 

@@ -72,10 +72,6 @@ bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *t
             global.last_td_spc    = true;
             break;
 
-        case TD_Z:
-            *keycode = KC_Z;
-            break;
-
         default:
             break;
     }

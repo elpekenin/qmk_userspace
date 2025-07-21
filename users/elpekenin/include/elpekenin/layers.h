@@ -3,14 +3,16 @@
 
 #pragma once
 
+#include <quantum/compiler_support.h>
 #include <stdint.h>
 
-typedef enum : uint8_t {
+typedef enum {
     QWERTY,
     FN1,
     FN2,
     FN3,
     RST,
-} layer_names_t;
+} layer_t;
+STATIC_ASSERT(~(layer_t)0 <= UINT8_MAX, "layer_t expected to be 8bit");
 
-const char *get_layer_name(layer_names_t layer);
+const char *get_layer_name(layer_t layer);
