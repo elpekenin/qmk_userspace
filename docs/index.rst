@@ -26,6 +26,7 @@ File structure
 **************
 
 * docs: files used to generate this page
+* elpekenin_userspace: various utilities for managing this project, in a Python CLI
 * keyboards/elpekenin/access: contains source for my custom PCB, and my keymap inside it
 * modules/elpekenin: submodule pointing to my community modules
 * users/elpekenin: most of the code, structured as
@@ -33,7 +34,6 @@ File structure
   * src: source code
   * include: header files
   * mk: Makefile logic, broken into "small" sections
-  * scripts: Python that generates code at compile time
   * painter: `Quantum Painter <https://docs.qmk.fm/quantum_painter>`_ assets
   * autocorrect: database of corrections
 
