@@ -13,14 +13,14 @@ bool build_match_init(ui_node_t *self) {
 uint32_t build_match_render(const ui_node_t *self, painter_device_t display) {
     build_match_args_t *args = self->args;
 
+    u128 id;
+    if (get_build_id(&id) < 0) {
+        return UI_STOP;
+    }
+
     const painter_font_handle_t font = qp_load_font_mem(args->font);
     if (font == NULL) {
         goto exit;
-    }
-
-    u128 id;
-    if (get_build_id(&id) < 0) {
-        return 0;
     }
 
     if (!is_keyboard_master()) {
@@ -47,12 +47,11 @@ uint32_t build_match_render(const ui_node_t *self, painter_device_t display) {
     const bool        mismatch = memcmp(&id, &slave_id, sizeof(u128)) != 0;
     const char *const str      = (mismatch) ? "fw mismatch" : "fw matches";
 
-    if (!ui_text_fits(self, font, str)) {
-        goto err;
-    }
+    if (ui_text_fits(self, font, str)) {
+        const hsv_t fg = (mismatch) ? (hsv_t){HSV_RED} : (hsv_t){HSV_GREEN};
 
-    const hsv_t fg = (mismatch) ? (hsv_t){HSV_RED} : (hsv_t){HSV_GREEN};
-    qp_drawtext_recolor(display, self->start.x, self->start.y, font, str, fg.h, fg.s, fg.v, HSV_BLACK);
+        qp_drawtext_recolor(display, self->start.x, self->start.y, font, str, fg.h, fg.s, fg.v, HSV_BLACK);
+    }
 
 err:
     qp_close_font(font);
