@@ -11,10 +11,10 @@ STATIC_ASSERT(CM_ENABLED(QP_HELPERS), "Must enable 'drashna/qp_helpers'");
 #include "qp_helpers.h"
 
 typedef struct {
-    size_t   points;
-    uint32_t last;
-    uint8_t  cpu[COMPUTER_STATS_SIZE];
-    uint8_t  ram[COMPUTER_STATS_SIZE];
+    size_t    points;
+    ui_time_t last_update;
+    uint8_t   cpu[COMPUTER_STATS_SIZE];
+    uint8_t   ram[COMPUTER_STATS_SIZE];
 } inner_state_t;
 
 static inner_state_t state = {0};
@@ -27,7 +27,7 @@ bool computer_init(ui_node_t *self) {
     return true;
 }
 
-uint32_t computer_render(const ui_node_t *self, painter_device_t display) {
+ui_time_t computer_render(const ui_node_t *self, painter_device_t display) {
     computer_args_t *args = self->args;
 
     // clear after inactivity
@@ -40,7 +40,7 @@ uint32_t computer_render(const ui_node_t *self, painter_device_t display) {
         goto exit;
     }
 
-    if (state.last <= args->last) {
+    if (ui_time_lte(state.last_update, args->last_draw)) {
         goto exit;
     }
 
@@ -80,11 +80,11 @@ uint32_t computer_render(const ui_node_t *self, painter_device_t display) {
 
     qp_draw_graph(&config, lines);
 
-    args->last  = timer_read32();
-    args->clear = true;
+    args->last_draw = ui_time_now();
+    args->clear     = true;
 
 exit:
-    return COMPUTER_STATS_UI_REDRAW_INTERVAL;
+    return UI_MILLISECONDS(COMPUTER_STATS_UI_REDRAW_INTERVAL);
 }
 
 void push_computer(uint8_t cpu, uint8_t ram) {
@@ -96,5 +96,5 @@ void push_computer(uint8_t cpu, uint8_t ram) {
 
     state.points = MIN(COMPUTER_STATS_SIZE, state.points + 1);
 
-    state.last = timer_read32();
+    state.last_update = ui_time_now();
 }

@@ -7,15 +7,15 @@
 #include "elpekenin/xap.h"
 
 static struct {
-    size_t   count;
-    uint32_t last;
+    size_t    count;
+    ui_time_t last_update;
 } state = {0};
 
 bool github_init(ui_node_t *self) {
     return ui_image_fits(self);
 }
 
-uint32_t github_render(const ui_node_t *self, painter_device_t display) {
+ui_time_t github_render(const ui_node_t *self, painter_device_t display) {
     github_args_t *const args = self->args;
 
     const painter_image_handle_t image = qp_load_image_mem(args->logo);
@@ -33,7 +33,7 @@ uint32_t github_render(const ui_node_t *self, painter_device_t display) {
         goto err;
     }
 
-    if (state.last <= args->last) {
+    if (ui_time_lte(state.last_update, args->last_draw)) {
         goto err;
     }
 
@@ -58,17 +58,17 @@ uint32_t github_render(const ui_node_t *self, painter_device_t display) {
 
     qp_drawimage_recolor(display, self->start.x, self->start.y, image, fg.h, fg.s, fg.v, HSV_BLACK);
 
-    args->last  = timer_read32();
-    args->clear = true;
+    args->last_draw = ui_time_now();
+    args->clear     = true;
 
 err:
     qp_close_image(image);
 
 exit:
-    return GITHUB_NOTIFICATIONS_UI_REDRAW_INTERVAL;
+    return UI_MILLISECONDS(GITHUB_NOTIFICATIONS_UI_REDRAW_INTERVAL);
 }
 
 void set_github_count(uint8_t count) {
-    state.count = count;
-    state.last  = timer_read32();
+    state.count       = count;
+    state.last_update = ui_time_now();
 }

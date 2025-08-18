@@ -24,10 +24,10 @@ void qp_log_clear(void);
 
 typedef struct {
     const uint8_t *font;
-    uint32_t       last;
+    ui_time_t      last_draw;
 } qp_logging_args_t;
 STATIC_ASSERT(offsetof(qp_logging_args_t, font) == 0, "UI will crash :)");
 
-bool     qp_logging_init(ui_node_t *self);
-uint32_t qp_logging_render(const ui_node_t *self, painter_device_t display);
+bool      qp_logging_init(ui_node_t *self);
+ui_time_t qp_logging_render(const ui_node_t *self, painter_device_t display);
 #endif

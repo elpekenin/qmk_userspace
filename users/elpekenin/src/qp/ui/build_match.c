@@ -10,7 +10,7 @@ bool build_match_init(ui_node_t *self) {
     return ui_font_fits(self);
 }
 
-uint32_t build_match_render(const ui_node_t *self, painter_device_t display) {
+ui_time_t build_match_render(const ui_node_t *self, painter_device_t display) {
     build_match_args_t *args = self->args;
 
     u128 id;
@@ -57,5 +57,5 @@ err:
     qp_close_font(font);
 
 exit:
-    return BUILD_MATCH_UI_REDRAW_INTERVAL;
+    return UI_MILLISECONDS(BUILD_MATCH_UI_REDRAW_INTERVAL);
 }

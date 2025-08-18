@@ -51,6 +51,7 @@ SUBCOMMANDS: dict[str, type[BaseCommand]] = {
 def get_parser() -> argparse.ArgumentParser:
     """Create the parser."""
     parser = argparse.ArgumentParser(
+        prog="euc",
         description=__doc__,
     )
 

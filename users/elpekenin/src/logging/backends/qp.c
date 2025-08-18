@@ -18,7 +18,7 @@ typedef struct {
 static struct {
     char       buff[QP_LOG_N_LINES][QP_LOG_N_CHARS];
     size_t     col;
-    uint32_t   last;
+    ui_time_t  last_update;
     log_line_t lines[QP_LOG_N_LINES];
 } qp_log = {0};
 
@@ -68,7 +68,7 @@ int8_t sendchar_qp(uint8_t chr) {
     last_line->level = get_current_message_level();
 
 exit:
-    qp_log.last = timer_read32();
+    qp_log.last_update = ui_time_now();
     return 0;
 }
 
@@ -99,10 +99,10 @@ bool qp_logging_init(ui_node_t *self) {
     return ui_font_fits(self);
 }
 
-uint32_t qp_logging_render(const ui_node_t *self, painter_device_t display) {
+ui_time_t qp_logging_render(const ui_node_t *self, painter_device_t display) {
     qp_logging_args_t *args = self->args;
 
-    if (qp_log.last <= args->last) {
+    if (ui_time_lte(qp_log.last_update, args->last_draw)) {
         goto exit;
     }
 
@@ -136,9 +136,9 @@ uint32_t qp_logging_render(const ui_node_t *self, painter_device_t display) {
 
     qp_close_font(font);
 
-    args->last = timer_read32();
+    args->last_draw = ui_time_now();
 
 exit:
-    return QP_LOGGING_UI_REDRAW_INTERVAL;
+    return UI_MILLISECONDS(QP_LOGGING_UI_REDRAW_INTERVAL);
 }
 #endif

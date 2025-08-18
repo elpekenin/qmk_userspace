@@ -128,7 +128,7 @@ static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused voi
         last.pressed = false;
     }
 
-    return MILLISECONDS(100);
+    return 100;
 }
 
 static void render_autoconf(void) {
@@ -201,10 +201,10 @@ const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [FN1] = LAYOUT(
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
-        CYAN, CYAN, CYAN, CYAN, CYAN, CYAN,    CYAN, CYAN, CYAN, CYAN, CYAN, CYAN,
-        BLUE, BLUE, BLUE, BLUE, BLUE, BLUE,    BLUE, BLUE, BLUE, BLUE, BLUE, BLUE,
-        ROSE, ROSE, ROSE, ROSE, ROSE, ROSE,    ROSE, ROSE, ROSE, ROSE, ROSE, ROSE,
-        WHITE,WHITE,BLACK,TRNS,    BLACK,         BLACK,   RED,  TRNS, WHITE,WHITE
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, TRNS, TRNS, TRNS,    TRNS,          TRNS,    TRNS, TRNS, TRNS, TRNS
     ),
     [FN2] = LAYOUT(
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
@@ -245,7 +245,7 @@ const indicator_t PROGMEM indicators[] = {
 const char *log_time(void) {
     static char buff[15];
 
-    div_t secs = div((int)timer_read32(), SECONDS(1));
+    div_t secs = div((int)timer_read32(), 1000);
 
     string_t str = str_from_buffer(buff);
     str_printf(&str, "%d.%ds", secs.quot, secs.rem);
@@ -298,7 +298,7 @@ void keyboard_post_init_keymap(void) {
     }
 
     if (IS_ENABLED(TOUCH_SCREEN) && !is_keyboard_left()) {
-        defer_exec(MILLISECONDS(10), read_touch_callback, NULL);
+        defer_exec(10, read_touch_callback, NULL);
     }
 
     // NOTE: analog macro is not provided by QMK, but custom Kconfig

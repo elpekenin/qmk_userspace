@@ -38,7 +38,7 @@ static github_args_t gh_args = {
 
 static build_id_args_t build_id_args = {
     .font     = font_fira_code,
-    .interval = 500,
+    .interval = UI_MILLISECONDS(500),
 };
 
 static build_match_args_t build_match_args = {
@@ -88,21 +88,21 @@ static uptime_args_t uptime_args = {
 
 static layer_args_t layer_args = {
     .font       = font_fira_code,
-    .interval   = 100,
+    .interval   = UI_MILLISECONDS(100),
     .layer_name = get_layer_name,
 };
 
 #if CM_ENABLED(MEMORY)
 static flash_args_t flash_args = {
     .font     = font_fira_code,
-    .interval = 500,
+    .interval = UI_MILLISECONDS(500),
 };
 #endif
 
 #if CM_ENABLED(ALLOCATOR)
 static heap_args_t heap_args = {
     .font     = font_fira_code,
-    .interval = 500,
+    .interval = UI_MILLISECONDS(500),
 };
 #endif
 
@@ -154,7 +154,7 @@ static ui_node_t left[] = {
 };
 
 static const uint8_t *const rgb_font = font_fira_code;
-static const uint32_t rgb_interval = 500;
+static const ui_time_t rgb_interval = UI_MILLISECONDS(500);
 
 static rgb_args_t rgb_args = {
     .font     = rgb_font,

@@ -3,6 +3,11 @@
 
 #pragma once
 
+//
+// expose some macros to all files
+//
+
+#include "elpekenin/compiler.h"
 #include "elpekenin/kconfig.h"
 
 //
