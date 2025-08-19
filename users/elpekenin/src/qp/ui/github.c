@@ -65,7 +65,7 @@ err:
     qp_close_image(image);
 
 exit:
-    return UI_MILLISECONDS(GITHUB_NOTIFICATIONS_UI_REDRAW_INTERVAL);
+    return (ui_time_t)UI_MILLISECONDS(GITHUB_NOTIFICATIONS_UI_REDRAW_INTERVAL);
 }
 
 void set_github_count(uint8_t count) {

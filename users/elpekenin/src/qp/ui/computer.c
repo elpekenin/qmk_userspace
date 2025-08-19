@@ -84,7 +84,7 @@ ui_time_t computer_render(const ui_node_t *self, painter_device_t display) {
     args->clear     = true;
 
 exit:
-    return UI_MILLISECONDS(COMPUTER_STATS_UI_REDRAW_INTERVAL);
+    return (ui_time_t)UI_MILLISECONDS(COMPUTER_STATS_UI_REDRAW_INTERVAL);
 }
 
 void push_computer(uint8_t cpu, uint8_t ram) {

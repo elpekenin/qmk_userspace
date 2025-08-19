@@ -15,7 +15,7 @@ ui_time_t build_match_render(const ui_node_t *self, painter_device_t display) {
 
     u128 id;
     if (get_build_id(&id) < 0) {
-        return UI_STOP;
+        return (ui_time_t)UI_STOP;
     }
 
     const painter_font_handle_t font = qp_load_font_mem(args->font);
@@ -57,5 +57,5 @@ err:
     qp_close_font(font);
 
 exit:
-    return UI_MILLISECONDS(BUILD_MATCH_UI_REDRAW_INTERVAL);
+    return (ui_time_t)UI_MILLISECONDS(BUILD_MATCH_UI_REDRAW_INTERVAL);
 }

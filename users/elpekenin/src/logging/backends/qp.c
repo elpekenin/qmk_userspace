@@ -139,6 +139,6 @@ ui_time_t qp_logging_render(const ui_node_t *self, painter_device_t display) {
     args->last_draw = ui_time_now();
 
 exit:
-    return UI_MILLISECONDS(QP_LOGGING_UI_REDRAW_INTERVAL);
+    return (ui_time_t)UI_MILLISECONDS(QP_LOGGING_UI_REDRAW_INTERVAL);
 }
 #endif
