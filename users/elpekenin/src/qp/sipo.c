@@ -229,7 +229,7 @@ bool comms_sipo_dc_reset_single_byte_bulk_command_sequence(painter_device_t devi
     return true;
 }
 
-// TODO: see `qp/sipo.c`
+// TODO: see comment at the top of this file
 const painter_comms_with_command_vtable_t spi_comms_with_dc_single_byte_vtable = {
     .base =
         {
