@@ -15,4 +15,4 @@ typedef enum {
 } layer_t;
 STATIC_ASSERT(~(layer_t)0 <= UINT8_MAX, "layer_t expected to be 8bit");
 
-const char *get_layer_name(layer_t layer);
+const char *get_layer_name(uint8_t layer);

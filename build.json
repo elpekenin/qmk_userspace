@@ -33,6 +33,10 @@
             "id": 20032
         },
         {
+            "operation": "pr",
+            "id": 25591
+        },
+        {
             "operation": "merge",
             "repo": "https://github.com/elpekenin/qmk_firmware",
             "branch": "fix/ws2812_split"

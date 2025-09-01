@@ -7,8 +7,8 @@
 #include "elpekenin/xap.h"
 #include "tri_layer.h"
 
-const char *get_layer_name(layer_t layer) {
-    switch (layer) {
+const char *get_layer_name(uint8_t layer) {
+    switch ((layer_t)layer) {
         case QWERTY:
             return "QWERTY";
 

@@ -14,6 +14,10 @@
 #    define EINK_BYTES_REQD(x, y) (1)
 #endif
 
+extern painter_device_t qp_ili9163_make_sipo_device(uint16_t panel_width, uint16_t panel_height, pin_t chip_select_pin, pin_t dc_pin, pin_t reset_pin, uint16_t spi_divisor, int spi_mode);
+
+extern painter_device_t qp_ili9341_make_sipo_device(uint16_t panel_width, uint16_t panel_height, pin_t chip_select_pin, pin_t dc_pin, pin_t reset_pin, uint16_t spi_divisor, int spi_mode);
+
 enum left_sipo_pins {
     // there's an unused pin
     IL91874_RST_PIN = 1,
@@ -75,6 +79,7 @@ void keyboard_post_init_kb(void) {
 
         // compat: factory function not available
 #if IS_ENABLED(QUANTUM_PAINTER_IL91874_SPI)
+        // TODO: see `qp/sipo.c`
         il91874 = qp_il91874_make_spi_device(_IL91874_WIDTH, _IL91874_HEIGHT, IL91874_CS_PIN, SCREENS_DC_PIN_LEFT, IL91874_RST_PIN, SCREENS_SPI_DIV, SCREENS_SPI_MODE, (void *)il91874_buffer);
 #endif
         ret &= qp_init(il91874, IL91874_ROTATION);
@@ -94,7 +99,7 @@ void keyboard_post_init_kb(void) {
         qp_rect(ili9163, 0, 0, ILI9163_WIDTH, ILI9163_HEIGHT, HSV_BLACK, true);
 
 #if IS_ENABLED(QUANTUM_PAINTER_ILI9341_SPI)
-        ili9341 = qp_ili9341_make_spi_device(_ILI9341_WIDTH, _ILI9341_HEIGHT, ILI9341_CS_PIN, SCREENS_DC_PIN_RIGHT, ILI9341_RST_PIN, SCREENS_SPI_DIV, SCREENS_SPI_MODE);
+        ili9341 = qp_ili9341_make_sipo_device(_ILI9341_WIDTH, _ILI9341_HEIGHT, ILI9341_CS_PIN, SCREENS_DC_PIN_RIGHT, ILI9341_RST_PIN, SCREENS_SPI_DIV, SCREENS_SPI_MODE);
 #endif
         ret &= qp_init(ili9341, ILI9341_ROTATION);
         ret &= qp_power(ili9341, true);

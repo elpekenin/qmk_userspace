@@ -43,7 +43,7 @@
 
 #if CM_ENABLED(UI)
 #    include "elpekenin/ui.h"
-#    include "ui.inc.c"
+extern ui_node_t root; // on ./ui.c
 #endif
 
 STATIC_ASSERT(CM_ENABLED(BUILD_ID), "Must enable 'elpekenin/build_id'");
