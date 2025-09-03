@@ -92,7 +92,7 @@ void keyboard_post_init_kb(void) {
         bool ret = true;
 
 #if IS_ENABLED(QUANTUM_PAINTER_ILI9163_SPI)
-        ili9163 = qp_ili9163_make_spi_device(_ILI9163_WIDTH, _ILI9163_HEIGHT, ILI9163_CS_PIN, SCREENS_DC_PIN_RIGHT, ILI9163_RST_PIN, SCREENS_SPI_DIV, SCREENS_SPI_MODE);
+        ili9163 = qp_ili9163_make_sipo_device(_ILI9163_WIDTH, _ILI9163_HEIGHT, ILI9163_CS_PIN, SCREENS_DC_PIN_RIGHT, ILI9163_RST_PIN, SCREENS_SPI_DIV, SCREENS_SPI_MODE);
 #endif
         ret &= qp_init(ili9163, ILI9163_ROTATION);
         ret &= qp_power(ili9163, true);

@@ -1,7 +1,6 @@
 name: Build vs latest QMK
 
 env:
-  IS_CICD: 1
   QMK_HOME: ~/workspace/qmk_firmware
 
 on:
@@ -51,8 +50,7 @@ jobs:
           pip install .
           euc build
 
-      - name: Upload logs
-        if: failure()
+      - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          path: '$QMK_HOME/*.log'
+          path: ~/workspace/qmk_firmware/*.uf2

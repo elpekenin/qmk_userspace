@@ -19,11 +19,6 @@
             "dst": "$QMK_HOME/users/elpekenin"
         },
         {
-            "operation": "exec",
-            "display": "download submodules in CICD",
-            "cmd": "if [ \"$IS_CICD\" = \"1\" ]; then git submodule update --init --recursive; fi"
-        },
-        {
             "operation": "cp",
             "src": "modules",
             "dst": "$QMK_HOME/modules"
@@ -37,9 +32,8 @@
             "id": 25591
         },
         {
-            "operation": "merge",
-            "repo": "https://github.com/elpekenin/qmk_firmware",
-            "branch": "fix/ws2812_split"
+            "operation": "pr",
+            "id": 25407
         },
         {
             "operation": "checkout",
