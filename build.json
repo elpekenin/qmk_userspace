@@ -4,8 +4,8 @@
     "path": "$QMK_HOME",
     "operations": [
         {
-            "operation": "exec",
             "display": "convert Python source to C strings",
+            "operation": "exec",
             "cmd": "euc py2c keyboards/elpekenin/access/keymaps/elpekenin/py"
         },
         {
@@ -54,8 +54,8 @@
             "file": "patches/generic_rotation.diff"
         },
         {
-            "operation": "exec",
             "display": "compiling",
+            "operation": "exec",
             "cmd": "qmk --no-color compile --compiledb -kb elpekenin/access -km elpekenin > build.log 2>&1",
             "path": "$QMK_HOME"
         }

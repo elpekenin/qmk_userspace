@@ -1,7 +1,7 @@
 # project metadata and building
 [project]
 name = "elpekenin_userspace"
-version = "0.0.0a"
+version = "0.1.0"
 dependencies = [
     "gitpython",
     "qmk",  # aka: `import qmk_cli`
