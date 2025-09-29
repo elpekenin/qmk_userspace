@@ -10,6 +10,7 @@ Code exposed as Community Modules
    modules/allocator
    modules/arm_math_m0
    modules/build_id
+   modules/colors
    modules/crash
    modules/dual_rp
    modules/generics

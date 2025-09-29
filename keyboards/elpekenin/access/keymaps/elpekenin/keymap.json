@@ -2,6 +2,7 @@
     "modules": [
         "elpekenin/allocator",
         "elpekenin/build_id",
+        "elpekenin/colors",
         "elpekenin/crash",
         "elpekenin/generics",
         "elpekenin/logging",
