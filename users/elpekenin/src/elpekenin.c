@@ -66,11 +66,8 @@ void keyboard_post_init_user(void) {
     }
 
 #if CM_ENABLED(CRASH)
-    Option(crash_info_t) maybe_crash = get_crash();
-
-    if (maybe_crash.is_some) {
-        crash_info_t crash = unwrap(maybe_crash);
-
+    crash_info_t crash;
+    if (get_crash(&crash)) {
         printf("%s\n", crash.msg);
         for (size_t i = 0; i < crash.stack_depth; ++i) {
             printf("%s (%p)\n", crash.call_stack[i].name, crash.call_stack[i].address);
