@@ -12,7 +12,7 @@
         "elpekenin/ui",
         "elpekenin/version",
 
-        // "elpekenin/ledmap",
+        "elpekenin/ledmap",
         "elpekenin/indicators",
 
         "drashna/qp_helpers",

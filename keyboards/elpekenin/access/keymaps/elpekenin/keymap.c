@@ -190,8 +190,13 @@ static void render_autoconf(void) {
 }
 
 #if CM_ENABLED(LEDMAP)
+// hack layout macro, so that un-used spots are filled with NONE rather than KC_NO
+#    undef XXX
+#    define XXX NONE_COLOR
+
+#    define TRNS TRNS_COLOR
 // clang-format off
-const ledmap_color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
+const color_t PROGMEM ledmap[][MATRIX_ROWS][MATRIX_COLS] = {
     [QWERTY] = LAYOUT(
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
         TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,    TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
