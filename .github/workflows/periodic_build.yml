@@ -2,6 +2,7 @@ name: Build vs latest QMK
 
 env:
   QMK_HOME: ~/workspace/qmk_firmware
+  COMPILEDB: ""  # do not generate compiledb in CICD
 
 on:
   # every 5 days
