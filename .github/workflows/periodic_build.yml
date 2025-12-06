@@ -32,11 +32,8 @@ jobs:
           git config --global user.name elpekenin-ci
           git config --global user.email github-ci@elpekenin.dev
 
-      - name: QMK deps + config
-        run: |
-          pip install Jinja2 fnvhash
-          pip install --upgrade milc
-          qmk config compile.parallel=20
+      - name: qmk config
+        run: qmk config compile.parallel=20
 
       - name: Show environment info
         run: |
