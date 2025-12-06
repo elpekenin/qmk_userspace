@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict
 
 import elpekenin_userspace.path
 from elpekenin_userspace.operations.base import Operation
-from elpekenin_userspace.result import Ok, missing
+from elpekenin_userspace.result import Err, Ok, missing
 
 if TYPE_CHECKING:
     from typing import Literal
@@ -71,5 +72,18 @@ class Exec(Operation):
 
     def run(self) -> Result[None, str]:
         """Entrypoint."""
-        subprocess.run(self.cmd, cwd=self.path, check=True, shell=True)  # noqa: S602
-        return Ok(None)
+        process = subprocess.run(  # noqa: S602
+            self.cmd,
+            cwd=self.path,
+            shell=True,
+            capture_output=True,
+            check=False,
+        )
+
+        if process.returncode == 0:
+            return Ok(None)
+
+        sys.stdout.write(process.stdout.decode())
+        sys.stderr.write(process.stderr.decode())
+
+        return Err("Subprocess failed")
