@@ -50,6 +50,12 @@
             "file": "patches/generic_rotation.diff"
         },
         {
+            "display": "install branch deps",
+            "operation": "exec",
+            "cmd": "$(head -n 1 $(which qmk) | cut -c 3-) -m pip install -r requirements-dev.txt",
+            "path": "$QMK_HOME"
+        },
+        {
             "display": "compiling",
             "operation": "exec",
             "cmd": "qmk --no-color compile --compiledb -kb elpekenin/access -km elpekenin",
