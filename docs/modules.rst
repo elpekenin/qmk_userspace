@@ -26,5 +26,6 @@ Code exposed as Community Modules
    modules/sanitizer
    modules/scrolling_text
    modules/string
+   modules/sync
    modules/ui
    modules/version
