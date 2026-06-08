@@ -43,6 +43,10 @@ jobs:
           echo -n "       qmk: " && qmk -V || true
           echo -n "qmk config: " && qmk config || true
 
+      - name: download (sub)modules
+        run: |
+            git submodule update --init --recursive
+
       - name: Install and run build command
         run: |
           pip install .

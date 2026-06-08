@@ -89,7 +89,7 @@ static uptime_args_t uptime_args = {
 static layer_args_t layer_args = {
     .font       = font_fira_code,
     .interval   = UI_MILLISECONDS(100),
-    .layer_name = get_layer_name,
+    .get_layer_name = get_layer_name,
 };
 
 #if CM_ENABLED(MEMORY)

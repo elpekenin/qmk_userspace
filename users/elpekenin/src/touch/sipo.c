@@ -64,7 +64,7 @@ touch_report_t get_spi_touch_report(touch_device_t device, bool check_irq) {
         .pressed = false,
     };
 
-    if (check_irq && comms_config.irq_pin != NO_PIN && readPin(comms_config.irq_pin)) {
+    if (check_irq && comms_config.irq_pin != NO_PIN && gpio_read_pin(comms_config.irq_pin)) {
         goto err;
     }
 

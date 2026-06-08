@@ -104,7 +104,7 @@ __weak_symbol touch_report_t get_spi_touch_report(touch_device_t device, bool ch
         .pressed = false,
     };
 
-    if (check_irq && readPin(comms_config.irq_pin)) {
+    if (check_irq && gpio_read_pin(comms_config.irq_pin)) {
         report.pressed = false;
         return report;
     }
