@@ -13,6 +13,7 @@
 #include "elpekenin/eeprom.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
+#include "elpekenin/m5.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/xap.h"
@@ -114,15 +115,27 @@ static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused voi
     const bool pressed = is_ili9341_pressed();
     if (pressed) {
         const touch_report_t now = get_spi_touch_report(ili9341_touch, false);
+
         if (IS_ENABLED(XAP)) {
             // FIXME: do not hardcode 0
             xap_screen_pressed(0, now);
         }
+
+        if (IS_ENABLED(M5_MQTT)) {
+            m5_mqtt_screen_pressed(0, now);
+        }
+
         last = now;
     } else {
         // notify about release, if XAP is enabled
-        if (last.pressed && IS_ENABLED(XAP)) {
-            xap_screen_released(0);
+        if (last.pressed) {
+            if (IS_ENABLED(XAP)) {
+                xap_screen_released(0);
+            }
+
+            if (IS_ENABLED(M5_MQTT)) {
+                m5_mqtt_screen_released(0);
+            }
         }
 
         last.pressed = false;

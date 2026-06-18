@@ -1,0 +1,10 @@
+menuconfig M5_ENABLE
+    bool "M5 Atom integration"
+
+if M5_ENABLE
+    config M5_MIC_ENABLE
+        bool "mirophone streaming"
+
+    config M5_MQTT_ENABLE
+        bool "events over MQTT"
+endif

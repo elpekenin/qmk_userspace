@@ -163,4 +163,7 @@ GITHUB_NOTIFICATIONS_UI_TIMEOUT=5000
 # end of quantum painter
 
 TOUCH_SCREEN_ENABLE=yes
+M5_ENABLE=yes
+M5_MIC_ENABLE=yes
+M5_MQTT_ENABLE=yes
 # end of userspace

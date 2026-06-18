@@ -19,3 +19,8 @@ ifeq ($(strip $(TOUCH_SCREEN_ENABLE)), yes)
     QUANTUM_LIB_SRC += spi_master.c
     SRC += $(USER_SRC)/touch/driver.c
 endif
+
+M5_ENABLE ?= no
+ifeq ($(strip $(TOUCH_SCREEN_ENABLE)), yes)
+    SRC += $(USER_SRC)/m5/m5.c
+endif

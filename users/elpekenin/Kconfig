@@ -19,3 +19,4 @@ if QUANTUM_PAINTER_ENABLE
 endif
 
 rsource "src/touch/Kconfig"
+rsource "src/m5/Kconfig"

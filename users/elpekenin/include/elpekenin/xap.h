@@ -40,6 +40,7 @@ typedef enum {
     LAYER_CHANGE,
     KEYEVENT,
     SHUTDOWN,
+    N_XAP_MESSAGES,
 } xap_msg_id_t;
 STATIC_ASSERT(~(xap_msg_id_t)0 <= UINT8_MAX, "xap_msg_id_t expected to be 8bit");
 

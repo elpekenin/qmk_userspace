@@ -10,6 +10,7 @@
 #include "elpekenin/autoconf_rt.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/logging/backends/qp.h"
+#include "elpekenin/m5.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/split/transactions.h"
 #include "elpekenin/xap.h"
@@ -85,6 +86,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // log events over XAP
     if (IS_ENABLED(XAP)) {
         xap_keyevent(keycode, record);
+    }
+
+    if (IS_ENABLED(M5_MQTT)) {
+        m5_mqtt_keyevent(keycode, record);
     }
 
     if (IS_ENABLED(RGB_MATRIX) && IS_RGB_MATRIX_KEYCODE(keycode)) {
@@ -185,6 +190,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
                 printf("\n");
             }
+
+        case PK_MIC:
+            if (IS_ENABLED(M5_MIC)) {
+                if (pressed) {
+                    m5_mic_start();
+                } else {
+                    m5_mic_stop();
+                }
+            }
+
+            return false;
 
         default:
             break;

@@ -3,6 +3,7 @@
 
 #include "elpekenin/layers.h"
 
+#include "elpekenin/m5.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/xap.h"
 #include "tri_layer.h"
@@ -34,6 +35,10 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
     if (IS_ENABLED(XAP)) {
         xap_layer(state);
+    }
+
+    if (IS_ENABLED(M5_MQTT)) {
+        m5_mqtt_layer(state);
     }
 
     return state;

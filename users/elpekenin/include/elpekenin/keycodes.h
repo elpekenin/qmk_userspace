@@ -19,6 +19,7 @@ enum userspace_keycodes {
     PK_SIZE, // print used flash
     PK_CONF, // print autoconf settings
     PK_ID,   // print build id
+    PK_MIC,  // start microphone stream (m5atom)
 
     // !! remember to update KEYCODE_STRING_NAMES_USER
 
