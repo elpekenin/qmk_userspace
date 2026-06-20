@@ -10,6 +10,11 @@
 #include "elpekenin/compiler.h"
 #include "elpekenin/kconfig.h"
 
+// validation
+#if defined(UART_LOG_BAUD_RATE) && defined(M5_BAUD_RATE) && UART_LOG_BAUD_RATE != M5_BAUD_RATE
+#    error "UART baud rate must be consistent"
+#endif
+
 //
 // utility macros
 //

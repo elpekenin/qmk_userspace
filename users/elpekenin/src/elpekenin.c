@@ -8,6 +8,7 @@
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging/backend.h"
+#include "elpekenin/m5.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/split/transactions.h"
@@ -90,6 +91,10 @@ void keyboard_post_init_user(void) {
         set_tri_layer_lower_layer(FN1);
         set_tri_layer_upper_layer(FN2);
         set_tri_layer_adjust_layer(RST);
+    }
+
+    if (IS_ENABLED(M5)) {
+        m5_init();
     }
 
     keyboard_post_init_keymap();

@@ -2,6 +2,14 @@ menuconfig M5_ENABLE
     bool "M5 Atom integration"
 
 if M5_ENABLE
+    config M5_DEBUG
+        bool "debug"
+        default "n"
+
+    config M5_BAUD_RATE
+        int "baud rate"
+        default 115200
+
     config M5_MIC_ENABLE
         bool "mirophone streaming"
 

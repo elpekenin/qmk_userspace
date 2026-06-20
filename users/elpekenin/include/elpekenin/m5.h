@@ -13,6 +13,8 @@
 
 #include "elpekenin/touch.h"
 
+void m5_init(void);
+
 void m5_mic_start(void);
 void m5_mic_stop(void);
 
