@@ -2,7 +2,7 @@ menuconfig M5_ENABLE
     bool "M5 Atom integration"
 
 if M5_ENABLE
-    config M5_DEBUG
+    config M5_DEBUG_ENABLE
         bool "debug"
         default "n"
 

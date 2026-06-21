@@ -35,6 +35,7 @@ keyevent_msg_t make_key_event(uint16_t keycode, keyrecord_t *record) {
         .row     = record->event.key.row,
         .col     = record->event.key.col,
         .mods    = get_mods(),
+        .null    = 0,
     };
 
     const char *name = get_keycode_string(keycode);

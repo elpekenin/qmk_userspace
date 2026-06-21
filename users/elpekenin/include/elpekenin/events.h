@@ -20,7 +20,7 @@
 /**
  * Identifier for each type of event.
  */
-typedef enum {
+enum {
     SCREEN_PRESSED,
     SCREEN_RELEASED,
     LAYER_CHANGE,
@@ -29,8 +29,9 @@ typedef enum {
     MIC_START,
     MIC_END,
     N_EVENTS,
-} event_id_t;
-STATIC_ASSERT(~(event_id_t)0 <= UINT8_MAX, "event_id_t expected to be 8bit");
+};
+typedef uint8_t event_id_t;
+STATIC_ASSERT(N_EVENTS <= UINT8_MAX, "event ids must fit in u8");
 
 /**
  * Inform about a screen press event.

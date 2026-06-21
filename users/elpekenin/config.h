@@ -11,8 +11,8 @@
 #include "elpekenin/kconfig.h"
 
 // validation
-#if defined(UART_LOG_BAUD_RATE) && defined(M5_BAUD_RATE) && UART_LOG_BAUD_RATE != M5_BAUD_RATE
-#    error "UART baud rate must be consistent"
+#if IS_ENABLED(UART_LOG) && IS_ENABLED(M5)
+#    error "Enabling UART logging and M5 at the same time is not supported"
 #endif
 
 //
