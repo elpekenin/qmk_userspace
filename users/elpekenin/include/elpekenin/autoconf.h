@@ -61,8 +61,6 @@
 #define M5_ENABLE 1
 #define M5_DEBUG 1
 #define M5_BAUD_RATE 115200
-#define M5_MIC_ENABLE 1
-#define M5_MQTT_ENABLE 1
 
 #define FOREACH_AUTOCONF(X) \
     X(DYNAMIC_KEYMAP_LAYER_COUNT) \
@@ -118,6 +116,4 @@
     X(TOUCH_SCREEN_ENABLE) \
     X(M5_ENABLE) \
     X(M5_DEBUG) \
-    X(M5_BAUD_RATE) \
-    X(M5_MIC_ENABLE) \
-    X(M5_MQTT_ENABLE)
+    X(M5_BAUD_RATE)

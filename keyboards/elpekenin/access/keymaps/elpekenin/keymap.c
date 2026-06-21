@@ -11,12 +11,12 @@
 
 #include "elpekenin/autoconf_rt.h"
 #include "elpekenin/eeprom.h"
+#include "elpekenin/events.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/m5.h"
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/signatures.h"
-#include "elpekenin/xap.h"
 #include "generated/qp_resources.h" // access to fonts/images
 
 #if CM_ENABLED(INDICATORS)
@@ -116,25 +116,30 @@ static uint32_t read_touch_callback(__unused uint32_t trigger_time, __unused voi
     if (pressed) {
         const touch_report_t now = get_spi_touch_report(ili9341_touch, false);
 
+        // FIXME: do not hardcode 0
+        const screen_pressed_msg_t msg = make_screen_pressed(0, now);
+
         if (IS_ENABLED(XAP)) {
-            // FIXME: do not hardcode 0
-            xap_screen_pressed(0, now);
+            xap_broadcast_user(&msg, sizeof(msg));
         }
 
-        if (IS_ENABLED(M5_MQTT)) {
-            m5_mqtt_screen_pressed(0, now);
+        if (IS_ENABLED(M5)) {
+            m5_send(&msg, sizeof(msg));
         }
 
         last = now;
     } else {
         // notify about release, if XAP is enabled
         if (last.pressed) {
+            // FIXME: do not hardcode 0
+            const screen_released_msg_t msg = make_screen_released(0);
+
             if (IS_ENABLED(XAP)) {
-                xap_screen_released(0);
+                xap_broadcast_user(&msg, sizeof(msg));
             }
 
-            if (IS_ENABLED(M5_MQTT)) {
-                m5_mqtt_screen_released(0);
+            if (IS_ENABLED(M5)) {
+                m5_send(&msg, sizeof(msg));
             }
         }
 

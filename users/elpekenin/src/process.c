@@ -8,12 +8,12 @@
 #include <quantum/quantum.h>
 
 #include "elpekenin/autoconf_rt.h"
+#include "elpekenin/events.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/logging/backends/qp.h"
 #include "elpekenin/m5.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/split/transactions.h"
-#include "elpekenin/xap.h"
 
 // compat: function must exist
 #if CM_ENABLED(MEMORY)
@@ -83,13 +83,15 @@ bool process_autocorrect_user(uint16_t *keycode, keyrecord_t *record, uint8_t *t
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     string_t str = str_new(15);
 
+    const keyevent_msg_t msg = make_key_event(keycode, record);
+
     // log events over XAP
     if (IS_ENABLED(XAP)) {
-        xap_keyevent(keycode, record);
+        xap_broadcast_user(&msg, sizeof(msg));
     }
 
-    if (IS_ENABLED(M5_MQTT)) {
-        m5_mqtt_keyevent(keycode, record);
+    if (IS_ENABLED(M5)) {
+        m5_send(&msg, sizeof(msg));
     }
 
     if (IS_ENABLED(RGB_MATRIX) && IS_RGB_MATRIX_KEYCODE(keycode)) {
@@ -192,12 +194,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
 
         case PK_MIC:
-            if (IS_ENABLED(M5_MIC)) {
-                if (pressed) {
-                    m5_mic_start();
-                } else {
-                    m5_mic_stop();
-                }
+            if (IS_ENABLED(M5)) {
+                const mic_msg_t msg = make_mic(pressed);
+                m5_send(&msg, sizeof(msg));
             }
 
             return false;

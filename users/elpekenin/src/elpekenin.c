@@ -5,6 +5,7 @@
 #include <quantum/process_keycode/process_autocorrect.h>
 #include <quantum/tri_layer.h>
 
+#include "elpekenin/events.h"
 #include "elpekenin/keycodes.h"
 #include "elpekenin/layers.h"
 #include "elpekenin/logging/backend.h"
@@ -12,7 +13,6 @@
 #include "elpekenin/qp/assets.h"
 #include "elpekenin/signatures.h"
 #include "elpekenin/split/transactions.h"
-#include "elpekenin/xap.h"
 
 // compat: QFF/QGF files have `#include <qp.h>`, which fails if feature is disabled
 #if IS_ENABLED(QUANTUM_PAINTER)
@@ -129,7 +129,8 @@ bool shutdown_user(bool jump_to_bootloader) {
 
     // let host know
     if (IS_ENABLED(XAP)) {
-        xap_shutdown(jump_to_bootloader);
+        const shutdown_msg_t msg = make_shutdown(jump_to_bootloader);
+        xap_broadcast_user(&msg, sizeof(msg));
     }
 
     return true;

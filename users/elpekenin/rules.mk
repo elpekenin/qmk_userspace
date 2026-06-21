@@ -7,8 +7,9 @@ VPATH += $(USER_INCLUDE)
 SRC += \
     $(USER_SRC)/autoconf_rt.c \
     $(USER_SRC)/elpekenin.c \
-    $(USER_SRC)/placeholders.c \
+    $(USER_SRC)/events.c \
     $(USER_SRC)/layers.c \
+    $(USER_SRC)/placeholders.c \
     $(USER_SRC)/power.c \
     $(USER_SRC)/process.c
 
