@@ -160,7 +160,7 @@ typedef struct PACKED {
     event_id_t msg_id;
 } mic_msg_t;
 
-#if defined(_IS_QMK)
+#if _IS_QMK
 screen_pressed_msg_t  make_screen_pressed(uint8_t screen_id, touch_report_t report);
 screen_released_msg_t make_screen_released(uint8_t screen_id);
 layer_change_msg_t    make_layer_change(layer_state_t state);
