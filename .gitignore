@@ -10,11 +10,14 @@
 *.bin
 *.uf2
 
+# clangd
+compile_commands.json
+.clangd/
+.cache/
+
 # notes to self
 TODO.md
 *.log
-
-compile_commands.json
 
 # python leftovers
 __pycache__
