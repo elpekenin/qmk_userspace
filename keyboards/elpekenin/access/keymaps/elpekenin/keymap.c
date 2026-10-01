@@ -328,6 +328,8 @@ void keyboard_post_init_keymap(void) {
 #if CM_ENABLED(RNG) && IS_DEFINED(ANALOG_DRIVER_REQUIRED)
     rng_set_seed(analogReadPin(GP28) * analogReadPin(GP28));
 #endif
+
+    secure_unlock();
 }
 
 bool rgb_matrix_indicators_advanced_keymap(__unused uint8_t led_min, __unused uint8_t led_max) {

@@ -21,6 +21,6 @@ ifeq ($(strip $(TOUCH_SCREEN_ENABLE)), yes)
 endif
 
 M5_ENABLE ?= no
-ifeq ($(strip $(TOUCH_SCREEN_ENABLE)), yes)
+ifeq ($(strip $(M5_ENABLE)), yes)
     SRC += $(USER_SRC)/m5/m5.c
 endif

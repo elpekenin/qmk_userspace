@@ -48,6 +48,9 @@ endif
 config DEBUG_ENABLE
     bool "debug (eg: .map file)"
 
+config DEBUG_MATRIX_SCAN_RATE
+    bool "matrix scan rate"
+
 config CONSOLE_ENABLE
     bool "console"
 
