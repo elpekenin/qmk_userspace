@@ -94,7 +94,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
         PK_QCLR,  AC_TOGG,  XXXXXXX,  XXXXXXX,  PK_SIZE, XXXXXXX,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_RBT,
         _______,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, PK_PY,          XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-        XXXXXXX,  XXXXXXX,  _______,  _______,      DB_TOGG,                 PK_CONF,      _______, XXXXXXX, XXXXXXX, XXXXXXX
+        PK_MIC,   XXXXXXX,  _______,  _______,      DB_TOGG,                 PK_CONF,      _______, XXXXXXX, XXXXXXX, XXXXXXX
     ),
 };
 // clang-format on
